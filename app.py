@@ -18,11 +18,6 @@ from utils.inventory.purchases import Purchases
 from utils.inventory.stock_adjustment import StockAdjustment
 from utils.stock.stock_take import StockTake
 from utils.login import Login
-from utils.pos.bill_details import BillDetails
-from utils.pos.bill_entries import BillEntries
-from utils.pos.bills import Bills
-from utils.pos.new_sale import NewSale
-from utils.pos.print import Print
 from utils.reports.bills_report import BillsReport
 from utils.reports.expenses_report import ExpensesReport
 from utils.reports.profit_report import ProfitReport
@@ -238,5 +233,5 @@ def download():
     return render_template('download.html', page_title='Download > Android App')
 
 if __name__ == '__main__':
-    debug_mode = os.getenv('IS_DEBUG', 'False').lower() in ['true', '1', 't']
+    debug_mode = os.getenv('IS_DEBUG', 'False').lower() in ['True', '1', 't']
     app.run(debug=debug_mode)
