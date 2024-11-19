@@ -1,0 +1,25 @@
+<table class="table table-condensed">
+    <thead>
+        <tr>
+            <th><small>NAME</small></th>
+            <th><small>TYPE</small></th>
+            <th><small>LOCATION</small></th>
+            <th><small>PHONE</small></th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for shop in shops %}
+        <tr>
+            <td style="color: black;">{{ shop.name }}</td> 
+            <td style="color: black;">{{ shop.type }}</td> 
+            <td style="color: black;">{{ shop.location }}</td> 
+            <td style="color: black;">{{ shop.phone }}</td> 
+            <td style="color: black;">
+                <input type="hidden" id="access_shop_id" name="id" value="{{ shop.id }}" />
+                <button type="submit" id="submit_access_shop" name="action" value="access" class="btn btn-xs btn-primary">Access</button>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>

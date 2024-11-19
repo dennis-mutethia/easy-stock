@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html dir="ltr" lang="en">
+    {% include 'head.html' %}
+
+<body class="bg-dark">
+    {% include 'preloader.html' %}
+
+    <div class="auth-wrapper d-flex no-block justify-content-center align-items-center bg-dark">
+        <div class="auth-box bg-dark">
+            <div id="loginform">
+                <div class="text-center pt-3 pb-3 text-white border-bottom border-secondary">
+                    <b class="logo-icon ps-2">
+                        <!--You can put here icon as well // <i class="wi wi-sunset"></i> //-->
+                        <!-- Dark Logo icon -->
+                        <img src="{{ url_for('static', filename='images/logo.png') }}" alt="homepage" class="light-logo"
+                            width="25" />
+                    </b>
+                    <!--End Logo icon -->
+                    <!-- Logo text -->
+                    <span class="logo-text ms-2">Easy <sup>Stock</sup></span><br />
+                    <small>User Login</small>
+                    <!--End Logo icon -->
+                </div>
+                <!-- Form -->
+                <form class="form-horizontal mt-3" id="loginform" name="loginform" method="POST">
+                    <div class="row pb-4">
+                        <div class="col-12">
+                            {% if error %}
+                            <p style="color: red; font-size: smaller">{{ error }}</p>
+                            {% endif %}
+                            <div class="input-group mb-3">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text bg-success text-white h-100" id="basic-addon1"><i
+                                            class="mdi mdi-account fs-4"></i></span>
+                                </div>
+                                <input name="phone" id="phone" type="number" class="form-control form-control-lg"
+                                    placeholder="PhoneNumber" aria-label="Phone" aria-describedby="basic-addon1"
+                                    required="required" min="100000000" max="799999999" />
+                            </div>
+                            <div class="input-group mb-3">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text bg-warning text-white h-100" id="basic-addon2"><i
+                                            class="mdi mdi-lock fs-4"></i></span>
+                                </div>
+                                <input name="password" id="password" type="password"
+                                    class="form-control form-control-lg" placeholder="Password" aria-label="Password"
+                                    aria-describedby="basic-addon1" required="required" />
+                            </div>
+
+                            <div class="form-group">
+                                <button class="btn btn-success float-end text-white btn-block" type="submit"
+                                    name="action" id="action" value="login">
+                                    Login to my Shop
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+                <div class="col-12">
+                    <a class="btn btn-default btn-sm btn-block" data-toggle="modal" data-target="#newModal" href="#">
+                        Register New Company
+                    </a>
+                </div>
+
+            </div>
+        </div>
+    </div>
+    <!-- ============================================================== -->
+    <!-- Login box.scss -->
+    <!-- ============================================================== -->
+
+    <div class="modal fade" id="newModal" tabindex="-1" role="dialog" aria-labelledby="newModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <form method="POST" class="form-horizontal" id="new_frm">
+                    <div class="modal-header text-center">
+                        <h5 class="text-center">Add New Company</h5>
+                        <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="form-group row">
+                            <div class="col-sm-12">
+                                <input required="required" type="text" name="company_name" id="company_name"
+                                    class="form-control input-sm" placeholder="Enter Company Name">
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <div class="col-sm-12">
+                                <input required="required" type="text" name="shop_name" id="shop_name"
+                                    class="form-control input-sm" placeholder="Enter Shop/Branch Name">
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <div class="col-sm-12">
+                                <input required="required" type="text" name="shop_location" id="shop_location"
+                                    class="form-control input-sm" placeholder="Enter Shop/Branch Location">
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <div class="col-sm-12">
+                                <select required="required" name="shop_type_id" id="shop_type_id"
+                                    class="form-control input-sm">
+                                    <option>Select Shop Type</option>
+                                    {% for shop_type in shop_types %}
+                                    <option value="{{ shop_type.id }}">{{ shop_type.name }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <div class="col-sm-12">
+                                <input required="required" type="text" name="user_name" id="use_rname"
+                                    class="form-control input-sm" placeholder="Enter Your Name">
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <div class="col-sm-12">
+                                <input required="required" type="number" name="user_phone" id="user_phone"
+                                    min="100000000" max="999999999" class="form-control input-sm"
+                                    placeholder="Enter Your Phone">
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <div class="col-sm-12">
+                                <input required="required" type="password" name="user_password" id="user_password"
+                                    class="form-control input-sm" placeholder="Create a Password">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+                        <button type="submit" id="action_2" name="action" value="register" class="btn btn-success">Save
+                            Company</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    {% include 'footer.html' %}
+
+    <script>
+        if ($toastr_message)
+            toastr.success($toastr_message);
+        if ($toastr_err_message)
+            toastr.error($toastr_err_message);
+        $("#new_frm").submit(function () {
+            $("#action_2").html('Spinning up Your new Company');
+            $("#action_2").prop('disabled', true);
+        });
+    </script>
+</body>
+
+</html>

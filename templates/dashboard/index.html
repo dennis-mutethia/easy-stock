@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<!-- ============================================================== -->
+<!-- Container fluid  -->
+<!-- ============================================================== -->
+<div class="container-fluid table-responsive">
+    <form id="filter-frm" method="GET" class="row">
+        <div class="col-6 text-right">
+            <label class="text-white">ON THIS DATE (filter)</label>
+        </div>
+        <div class="col-6">
+            <input onchange="applyFilter()" style="height: 25px" type="date" id="report_date" name="report_date"
+                required="required" value="{{ report_date }}" />
+        </div>
+    </form>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.5.0/Chart.min.js"></script>
+
+    {% include 'dashboard/dash.html' %}
+
+    {% include 'dashboard/stock-investment.html' %}
+    
+    {% include 'dashboard/line-chart.html' %}
+
+    {% include 'dashboard/pie-chart.html' %}
+</div>
+<!-- ============================================================== -->
+<!-- End Container fluid  -->
+<!-- ============================================================== -->
+
+<script>
+    function applyFilter() {
+        $("#filter-frm").submit();
+    }
+</script>
+
+{% endblock %}

@@ -1,0 +1,196 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<!-- ============================================================== -->
+<!-- Container fluid  -->
+<!-- ============================================================== -->
+<div class="container-fluid card table-responsive">
+    <form id="filter-frm" method="GET" class="row">
+        <input type="hidden" id="page" name="page" value="{{ page }}" />
+        <div class="col-4">
+            <input onchange="applyFilter(1)" style="height: 25px" type="date" id="from_date" name="from_date"
+                required="required" value="{{ from_date }}" max="{{ current_date }}" />
+        </div>
+        <div class="col-1 text-right">
+            <label class="text-white">TO</label>
+        </div>
+        <div class="col-4">
+            <input onchange="applyFilter(1)" style="height: 25px" type="date" id="to_date" name="to_date"
+                required="required" value="{{ to_date }}" max="{{ current_date }}" />
+        </div>
+        <div class="col-3">
+            <select onchange="applyFilter(1)" name="bill_status" id="bill_status" style="width: 100%;">
+                <option value="0">All Bills</option>
+                <option {% if bill_status==1 %} selected {% endif %} value="1">Paid Bills
+                </option>
+                <option {% if bill_status==2 %} selected {% endif %} value="2">Not Paid
+                </option>
+            </select>
+        </div>
+        <div class="col-3">
+            <select class="text-center" onchange="applyFilter()" name="customer_id" id="customer_id"
+                style="width: 100%;">
+                <option value="0">All Customers</option>
+                {% for customer in customers %}
+                <option value="{{ customer.id }}" {{ 'selected' if customer_id==customer.id else '' }}>{{ customer.name
+                    }} - {{ customer.phone }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <!-- <div class="col-1 text-right">
+            <button type="submit" name="download" value="1" class="btn btn-xs btn-primary" style="width: 100%;">Export To PDF</button>
+        </div> -->
+    </form><br />
+    <table class="table-bordered table-striped">
+        <thead>
+            <tr>
+                <th class="text-right" rowspan="2">BILL No.</th>
+                <th class="text-center" rowspan="2">DATE TIME</th>
+                <th class="text-center" rowspan="2">CUSTOMER</th>
+                <th class="text-center" rowspan="2">SOLD BY</th>
+                <th class="text-center" rowspan="2">TOTAL</th>
+                <th class="text-center" colspan="2">PAID</th>
+                <th class="text-center" rowspan="2">BAL</th>
+                <th class="text-center" rowspan="2">ACTION</th>
+            </tr>
+            <tr>
+                <th class="text-center">CASH</th>
+                <th class="text-center">MPESA</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for bill in bills %}
+            <tr>
+                <td class="text-right">#{{ bill.id }}</td>
+                <td class="text-center">{{ bill.created_at }}</td>
+                <td>
+                    {% if bill.customer %}
+                    {{ bill.customer.name }}
+                    {% endif %}
+                </td>
+                <td>{{ bill.user.name }} </td>
+                <td class="text-right">{{ helper.format_number_with_commas(helper.format_number(bill.total)) }}</td>
+                <td class="text-right text-warning">{{ helper.format_number_with_commas(helper.format_number(bill.cash))
+                    }}</td>
+                <td class="text-right text-success">{{
+                    helper.format_number_with_commas(helper.format_number(bill.mpesa)) }}</td>
+                <td class="text-right text-danger">{{
+                    helper.format_number_with_commas(helper.format_number(bill.total-bill.paid)) if bill.total >
+                    bill.paid else '' }}</td>
+                <td class="text-center">
+                    <a href="#" class="text-primary mdi mdi-eye" title="View Bill" data-toggle="modal"
+                        data-target="#viewBillModal" onclick="fetch_bill_details({{ bill.id }});">View</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+        <tfoot>
+            <tr>
+                <th class="text-right" colspan="4"><b><u>TOTAL BILLS</u></b></th>
+                <th class="text-right"><b><u>{{ helper.format_number_with_commas(helper.format_number(grand_total))
+                            }}</u></b></th>
+                <th class="text-right text-warning"><b><u>{{
+                            helper.format_number_with_commas(helper.format_number(cash_total)) }}</u></b></th>
+                <th class="text-right text-success"><b><u>{{
+                            helper.format_number_with_commas(helper.format_number(mpesa_total)) }}</u></b></th>
+                <th class="text-right text-danger"><b><u>{{
+                            helper.format_number_with_commas(helper.format_number(grand_total - grand_paid)) }}</u></b>
+                </th>
+                <th class="text-center">
+                    {% if (grand_total - grand_paid) > 0 and customer_id>0 %}
+                    <button class="btn btn-success btn-xs text-white" data-toggle="modal" data-target="#newModal"
+                        onclick="updateBillAmount(0,{{ helper.format_number(grand_total - grand_paid) }});">Pay Multiple
+                        Bills</button>
+                    {% endif %}
+                </th>
+            </tr>
+        </tfoot>
+    </table><br />
+
+    <!--Pagination-->
+    <div class="row">
+        <div class="col-md-5"></div>
+        <div class="col-md-4 text-center">
+            <nav aria-label="Page navigation example" class="text-center">
+                <ul class="pagination" class="text-center">
+                    <li class="page-item {{ '' if prev_page > 0 else 'disabled' }}">
+                        <button class="page-link" id="prev_page"
+                            onclick="applyFilter({{ prev_page }})">Previous</button>
+                    </li>
+                    <li class="page-item {{ '' if next_page > 0 else 'disabled' }}">
+                        <button class="page-link" id="next_page" onclick="applyFilter({{ next_page }})">Next</button>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+
+    </div>
+    <!-- End Pagination-->
+</div>
+<!-- ============================================================== -->
+<!-- End Container fluid  -->
+<!-- ============================================================== -->
+
+<div class="modal fade" id="viewBillModal" tabindex="-1" role="dialog" aria-labelledby="deleteModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <input type="hidden" id="printable_bill_id" name="printable_bill_id" />
+            <div class="modal-header">
+                <div class="col-6">
+                    <input class="form-check-input" type="checkbox" id="show_vat" name="show_vat" value="1"
+                        checked />&nbsp; Show VAT on Receipt
+                </div>
+                <div class="col-6 text-right">
+                    <button class="btn btn-primary btn-xs text-white mdi mdi-printer" onclick="Print();"
+                        data-dismiss="modal"> PRINT THIS BILL</button>&nbsp; &nbsp;
+                </div>
+                <button class="close" type="button" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">×</span>
+                </button>
+            </div>
+            <div class="modal-body" id="bill_details"></div>
+        </div>
+    </div>
+</div>
+
+
+<script>
+    function applyFilter(page) {
+        $("#page").val(page);
+        $("#filter-frm").submit();
+    }
+
+    function Print(id) {
+        bill_id = $('#printable_bill_id').val()
+        var show_vat = 1; //document.getElementById('show_vat').checked ? 1 : 0;
+        var win = window.open("{{ url_for('posPrint') }}?show_vat=" + show_vat + "&bill_id=" + bill_id, "_blank", "scrollbars=yes,resizable=yes,top=200,left=500,width=400,height=500");
+        var document_focus = false;
+        $(document).ready(function () {
+            win.window.print();
+            document_focus = true;
+        });
+        setInterval(function () {
+            if (document_focus === true) {
+                win.window.close();
+            }
+        }, 10000);
+    }
+
+    function fetch_bill_details(id) {
+        $('#bill_details').html('');
+        $('#bill_details_2').html('');
+        $.ajax({
+            type: 'get',
+            url: '{{ url_for('posBillDetails') }}?bill_id='+id,
+            success: function (data) {
+                $('#printable_bill_id').val(id);
+                $('#bill_details').html(data);
+                $('#bill_details_2').html(data);
+            }
+        });
+
+    }
+</script>
+
+{% endblock %}

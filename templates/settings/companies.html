@@ -1,0 +1,154 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<!-- ============================================================== -->
+<!-- Container fluid  -->
+<!-- ============================================================== -->
+<div class="container-fluid table-responsive">
+    <table class="table-striped table-bordered table-condensed">
+        <thead>
+            <tr>
+                <th class="text-right">ID</th>
+                <th class="text-center">COMPANY NAME</th>
+                <th class="text-center">PHONE</th>
+                <th class="text-center">CREATED ON</th>
+                <th class="text-center">LICENSE KEY</th>
+                <th class="text-center">PACKAGE</th>
+                <th class="text-center">EXPIRES ON</th>
+                <th class="text-center">VALIDITY</th>
+                <th class="text-center" colspan="2">ACTION</th>
+                <th class="text-center">VIEW</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for company in companies %}
+            <tr> 
+                <td class="text-right">#{{ '%04d' | format(company.id) }}.</td>
+                <td>{{ company.name }}</td> 
+                <td>{{ company.phone }}</td> 
+                <td class="text-center">{{ company.created_at }}</td> 
+                <td class="text-center">{{ (company.license_key[:4] ~ '************' ~ company.license_key[-4:]).upper() }}</td> 
+                <td>{{ company.package }}</td> 
+                <td class="text-center">{{ company.expires_at }}</td> 
+                <td class="text-center" style="color: {{ 'red' if company.validity < 7 else 'green' }}">{{ company.validity }} days</td> 
+                <td class="text-center">
+                    <button class="btn btn-success btn-xs text-white" data-toggle="modal" data-target="#renewModal" onclick="renewLicense({{ company.license_id }});">Renew</button>
+                </td>
+                <td class="text-center">
+                    <button class="btn btn-warning btn-xs text-white" data-toggle="modal" data-target="#editModal" onclick="editCompany({{ company.id }}, '{{ company.name }}');">Edit</button>
+                </td>
+                <td class="text-center">
+                    <a href="#" class="text-primary mdi mdi-eye" title="View Shops" 
+                       data-toggle="modal" data-target="#shopsModal" onclick="fetchShops({{ company.id }});"
+                       >Shops</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+<!-- ============================================================== -->
+<!-- End Container fluid  -->
+<!-- ============================================================== -->
+
+
+<div class="modal fade" id="renewModal" tabindex="-1" role="dialog" aria-labelledby="renenewModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <form method="POST" class="form-horizontal">
+                <input type="hidden" id="license_id" name="id" />
+                <div class="modal-header text-center">
+                    <h5 class="text-center">Renew Company License</h5>
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <select name="package_id" id="package_id" style="width: 100%;" class="text-center">
+                        <option value="0">-- Select Package --</option>
+                        {% for package in packages %}
+                        <option value="{{ package.id }}">{{ package.name ~ ' @ ' ~ helper.format_number_with_commas(package.pay) }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+                    <button type="submit" id="renew" name="action" value="renew" class="btn btn-success">Renew License</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>     
+
+<div class="modal fade" id="editModal" tabindex="-1" role="dialog" aria-labelledby="editModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <form method="POST">
+                <input type="hidden" id="editable_company_id" name="id" />
+                <div class="modal-header">
+                    <h5 class="modal-title" id="editModalLabel">Edit Company Name</h5>
+                    <button class="close" type="button" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">×</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group row">
+                        <div class="col-sm-12">
+                            <input required="required" type="text" name="name" id="editable_company_name" 
+                                   class="form-control input-sm" placeholder="Enter New Company Name">
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-danger" data-dismiss="modal">Cancel</button>
+                    <button type="submit" id="edit" name="action" value="edit" 
+                            class="btn btn-success float-end text-white">Submit Changes</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+
+<div class="modal fade" id="shopsModal" tabindex="-1" role="dialog" aria-labelledby="shopsModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <form method="POST">
+                <div class="modal-header">
+                    <h5 class="modal-title text-center"><span id="selected_company_name"></span> Registered Shops</h5>
+                    <button class="close" type="button" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">×</span>
+                    </button>
+                </div>
+                <div class="card" id="shops_table"></div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    {% if toastr_message %}
+    toastr.success('{{ toastr_message }}');
+    {% endif %}
+
+    function renewLicense(id) {
+        $('#license_id').val(id);
+    }
+
+    function editCompany(id, name) {
+        $('#editable_company_id').val(id);
+        $('#editable_company_name').val(name);
+    }
+
+    function fetchShops(id) {
+        $('#shops_table').html('');
+        $.ajax({
+            type: 'GET',
+            url: "{{ url_for('companyShops') }}?id="+id,
+            success: function (data) {
+                $('#shops_table').html(data);
+            }
+        });
+    }
+
+</script>
+
+{% endblock %}

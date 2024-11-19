@@ -1,0 +1,8 @@
+python-dotenv
+psycopg2-binary
+Flask
+Flask-Login
+redis 
+flask-session
+user-agents
+reportlab

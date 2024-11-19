@@ -1,0 +1,21 @@
+{
+    "name": "EASY-STOCK",
+    "runServices": ["app", "db", "redis"],
+    "service": "app",
+    "workspaceFolder": "/workspace",
+    "customizations": {
+        "vscode": {
+            "extensions": [
+                "ms-azuretools.vscode-docker",
+                "github.vscode-github-actions",
+                "ms-python.pylint",
+                "mechatroner.rainbow-csv"
+            ],
+            "settings": {
+                "terminal.integrated.defaultProfile.linux#": "/bin/bash"
+            }
+        }
+    },
+    "dockerComposeFile": ["../docker-compose.yml"],
+    "forwardPorts": [5000, 5432, 6379]
+}

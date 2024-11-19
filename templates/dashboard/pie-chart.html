@@ -1,0 +1,31 @@
+<!-- Pie Chart -->
+<div class="row">
+    <div class="col-6 mt-3">
+        <div class="bg-dark p-10 text-white text-center">
+            <canvas id="myChart2" style="width:100%;"></canvas>
+        </div>
+    </div>
+</div>
+<!-- End Pie Charts -->
+
+<script>
+    new Chart("myChart2", {
+        type: "doughnut",
+        data: {
+            labels: [{{ items | join(',') | safe }}],
+            datasets: [{
+                data: [{{ qtys | join(',') | safe }}],
+                backgroundColor: [{{ bgcolors | join(',') | safe }}]
+            }]
+        },
+        options: {
+            title: {
+                display: true,
+                text: "Sales per Product Comparison"
+            },
+            legend: {
+                display: false
+            }
+        }
+    });
+</script>

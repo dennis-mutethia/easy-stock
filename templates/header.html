@@ -1,0 +1,30 @@
+<!-- ============================================================== -->
+<!-- Page wrapper  -->
+<!-- ============================================================== -->
+<div class="page-wrapper" style="margin-top: 48px">
+    <!-- ============================================================== -->
+    <!-- Bread crumb and right sidebar toggle -->
+    <!-- ============================================================== -->
+    <div class="page-breadcrumb">
+        <div class="row">
+            <div class="col-12 d-flex no-block align-items-center">
+                <div class="ms-auto text-end">
+
+                    <nav aria-label="breadcrumb">
+                        <ol class="breadcrumb">
+                            {% if current_user.license.validity < 7 %}
+                            <li class="breadcrumb-item active" aria-current="page" style="color: red; font-weight: bold;">
+                                Your License will Expire in {{ current_user.license.validity }} days. Kindly Contact <a href="https://wa.me/254105565532" title="Whatsapp +254 105 565532">0105 565 532</a> to Renew to avoid inconveniences.
+                            </li>
+                            {% endif %}
+                            <li class="breadcrumb-item active" aria-current="page">{{ page_title }}</li>
+                        </ol>
+
+                    </nav>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- ============================================================== -->
+    <!-- End Bread crumb and right sidebar toggle -->
+    <!-- ============================================================== -->

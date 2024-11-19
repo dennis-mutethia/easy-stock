@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <meta content='width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no' name='viewport'>
+    <title id="title0"> {{ current_user.shop.name }} Customer Bill - {{ bill_id }} </title>
+    <!-- Favicon icon -->
+    <link rel="icon" type="image/png" sizes="16x16" href="{{ url_for('static', filename='images/favicon.png') }}">
+    <!-- Bootstrap -->
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/bootstrap.min.css') }}" />
+    <style>
+        .color-palette {
+            height: 50px;
+            line-height: 50px;
+            text-align: center;
+        }
+
+        .color-palette-set {
+            margin-bottom: 15px;
+        }
+
+        .color-palette span {
+            display: none;
+        }
+
+        .color-palette:hover span {
+            display: block;
+        }
+
+        table {
+            border-collapse: collapse;
+            margin: 3%;
+        }
+
+        small {
+            font-size: 11px;
+            font-weight: bold;
+        }
+
+        hr {
+            border-top: 1px dotted black;
+        }
+
+        body {
+            font-family: monospace;
+        }
+
+        printer-header {
+            margin-top: 0;
+        }
+
+        table,
+        thead,
+        tbody,
+        tr,
+        td,
+        th {
+            color: black;
+        }
+    </style>
+</head>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+
+<body class="skin-blue layout-boxed">
+    <div class="content">
+        <div class="">
+            <div class="col-md-2">
+                <!-- Block buttons -->
+                <div class="box">
+                    <div class="box-header text-center text-black text-bold printer-header">
+                        <small class="text-black text-bold">{{ current_user.shop.name }}</small><br />
+                        <small class="text-black">{{ current_user.shop.location }}</small><br />
+                        {% if current_user.shop.phone_1 %}
+                        <small class="text-black"> {{ current_user.shop.phone_1 }}</small><br />
+                        {% endif %}
+                        {% if current_user.shop.phone_2 %}
+                        <small class="text-black"> {{ current_user.shop.phone_2 }}</small><br />
+                        {% endif %}
+                        <small class="text-black">Customer Name: {{ bill.customer.name }}</small><br />
+                        <small class="text-black">Customer Phone: {{ bill.customer.phone }}</small><br />
+                        {% if current_user.shop.till_no %}
+                        <small class="text-black text-bold">
+                            MPESA BUY GOODS TILL: {{ current_user.shop.till_no }}
+                        </small><br />
+                        {% endif %}
+                        {% if current_user.shop.paybill %}
+                        <small class="text-black text-bold">
+                            MPESA PAYBILL: {{ current_user.shop.paybill }} <br />
+                            ACCOUNT NO.: {{ current_user.shop.account_no }}
+                        </small><br />
+                        {% endif %}
+                    </div>
+
+                    {% include 'pos/bill-details.html' %}
+
+                    <div id="bill-footer" class="box-footer text-center">
+                        <small>
+                            Bill No: {{ bill.id }}<br />
+                            Bill Created On: {{ bill.created_at }}<br />
+                            Served By: {{ bill.user.name }}<br />
+                            WELCOME!!!<br />
+                        </small>
+                    </div>
+                    {% if show_vat == 1 and bill.paid > 0 %}
+                    <div style="display: flex; justify-content: center;">
+                        <div id="qr_code"></div>
+                    </div>
+                    <script type="text/javascript">
+                        setInterval(function () {
+                            window.close();
+                        }, 10000);
+                        let kra = 'https://itax.kra.go.ke/KRA-Portal/invoiceChk.htm?actionCode=loadPage&invoiceNo={{ bill.id }}';
+
+                        var bill_details = '{{ current_user.shop.name }} - {{ current_user.shop.location }}\n' +
+                            'BILL NO: {{ bill.id }}\n' +
+                            'BILL AMOUNT: {{ bill.total }}\n' +
+                            'BILL CREATED ON: {{ bill.created_at }}\n' +
+                            'SERVED BY: {{ bill.user.name }}\n';
+
+                        var qrcode = new QRCode(document.getElementById("qr_code"), {
+                            //text: bill_details,
+                            text: kra,
+                            width: 100,
+                            height: 100
+                        });
+                    </script>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>

@@ -1,0 +1,251 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<!-- ============================================================== -->
+<!-- Container fluid  -->
+<!-- ============================================================== -->
+<div class="container-fluid card table-responsive">
+    <form id="filter-frm" method="GET" class="row">
+        <input type="hidden" id="page" name="page" value="{{ page }}" />
+        <div class="col-4">
+            <select onchange="applyFilter(1)" name="bill_status" id="bill_status" style="width: 100%;">
+                <option value="0">All Bills</option>
+                <option {% if bill_status==1 %} selected {% endif %} value="1">Paid Bills
+                </option>
+                <option {% if bill_status==2 %} selected {% endif %} value="2">Not Paid
+                </option>
+            </select>
+        </div>
+        <div class="col-5">
+            <select class="text-center" onchange="applyFilter()" name="customer_id" id="customer_id"
+                style="width: 100%;">
+                <option value="0">All Customers</option>
+                {% for customer in customers %}
+                <option value="{{ customer.id }}" {{ 'selected' if customer_id==customer.id else '' }}>{{ customer.name
+                    }} - {{ customer.phone }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="col-3">
+            <a href="#" class="btn btn-xs btn-primary btn-flat" style="width: 100%" data-toggle="modal"
+                data-target="#newBillModal">New Bill</a>
+        </div>
+    </form><br />
+    <table class="table-bordered table-striped">
+        <thead>
+            <tr>
+                <th class="text-center" rowspan="2">DATE</th>
+                <th class="text-center" rowspan="2">CUSTOMER</th>
+                <th class="text-center" rowspan="2">SOLD BY</th>
+                <th class="text-center" rowspan="2">AMOUNT</th>
+                <th class="text-center" colspan="2">PAID</th>
+                <th class="text-center" rowspan="2">BAL</th>
+                <th class="text-center" rowspan="2">ACTION</th>
+            </tr>
+            <tr>
+                <th class="text-center">CASH</th>
+                <th class="text-center">MPESA</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for bill in bills %}
+            <tr>
+                <td class="text-center">{{ bill.created_at }}</td>
+                <td>
+                    {% if bill.customer %}
+                    {{ bill.customer.name }}
+                    {% else %}
+                    <a href="#" data-toggle="modal" data-target="#assignCustomerModal"
+                        onclick="assignCustomerBill({{ bill.id }})">Assign Customer</a>
+                    {% endif %}
+                </td>
+                <td>{{ bill.user.name }} </td>
+                <td class="text-right">{{ helper.format_number_with_commas(helper.format_number(bill.total)) }}</td>
+                <td class="text-right text-warning">{{ helper.format_number_with_commas(helper.format_number(bill.cash))
+                    }}</td>
+                <td class="text-right text-success">{{
+                    helper.format_number_with_commas(helper.format_number(bill.mpesa)) }}</td>
+                <td class="text-right text-danger">{{
+                    helper.format_number_with_commas(helper.format_number(bill.total-bill.paid)) if bill.total >
+                    bill.paid else '' }}</td>
+                <td class="text-center">
+                    {% if bill.total > bill.paid %}
+                    <button class="btn btn-success btn-xs text-white" data-toggle="modal" data-target="#newModal"
+                        onclick="updateBillAmount({{ bill.id }},{{ helper.format_number(bill.total-bill.paid) }});">Pay</button>
+                    {% endif %}
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+        <tfoot>
+            <tr>
+                <th class="text-right" colspan="3"><b><u>TOTAL BILLS</u></b></th>
+                <th class="text-right"><b><u>{{ helper.format_number_with_commas(helper.format_number(grand_total))
+                            }}</u></b></th>
+                <th class="text-right text-warning"><b><u>{{
+                            helper.format_number_with_commas(helper.format_number(cash_total)) }}</u></b></th>
+                <th class="text-right text-success"><b><u>{{
+                            helper.format_number_with_commas(helper.format_number(mpesa_total)) }}</u></b></th>
+                <th class="text-right text-danger"><b><u>{{
+                            helper.format_number_with_commas(helper.format_number(grand_total - grand_paid)) }}</u></b>
+                </th>
+                <th class="text-center">
+                    {% if (grand_total - grand_paid) > 0 and customer_id>0 %}
+                    <button class="btn btn-success btn-xs text-white" data-toggle="modal" data-target="#newModal"
+                        onclick="updateBillAmount(0,{{ helper.format_number(grand_total - grand_paid) }});">Pay Multiple
+                        Bills</button>
+                    {% endif %}
+                </th>
+            </tr>
+        </tfoot>
+    </table><br />
+
+    <!--Pagination-->
+    <div class="row">
+        <div class="col-md-5"></div>
+        <div class="col-md-4 text-center">
+            <nav aria-label="Page navigation example" class="text-center">
+                <ul class="pagination" class="text-center">
+                    <li class="page-item {{ '' if prev_page > 0 else 'disabled' }}">
+                        <button class="page-link" id="prev_page"
+                            onclick="applyFilter({{ prev_page }})">Previous</button>
+                    </li>
+                    <li class="page-item {{ '' if next_page > 0 else 'disabled' }}">
+                        <button class="page-link" id="next_page" onclick="applyFilter({{ next_page }})">Next</button>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+
+    </div>
+    <!-- End Pagination-->
+</div>
+<!-- ============================================================== -->
+<!-- End Container fluid  -->
+<!-- ============================================================== -->
+
+<div class="modal fade" id="newModal" tabindex="-1" role="dialog" aria-labelledby="newModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <form method="POST" class="form-horizontal">
+                <input type="hidden" id="category_id_new" name="category_id_new" />
+                <div class="modal-header text-center">
+                    <h5 class="text-center">Receive Customer Bill Payment</h5>
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group row">
+                        <div class="col-sm-12">
+                            <h5 class="text-center">Unpaid Bill Amount: <b id="bill_amount"></b></h5>
+                            <select name="payment_mode_id" id="payment_mode_id" style="width: 100%;">
+                                {% for payment_mode in payment_modes %}
+                                <option value="{{ payment_mode.id }}">{{ payment_mode.name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <div class="col-sm-12">
+                            <input type="hidden" name="bill_id" id="bill_id" />
+                            <input type="number" name="amount_paid" id="amount_paid" min="0" required
+                                class="form-control input-sm" placeholder="Enter Amount Paid" />
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+                    <button type="submit" id="submit_payment" name="action" value="submit_payment"
+                        class="btn btn-success">Receive Payment</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="viewBillModal" tabindex="-1" role="dialog" aria-labelledby="deleteModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <input type="hidden" id="printable_bill_id" name="printable_bill_id" />
+            <div class="modal-header">
+                <div class="col-6">
+                    <input class="form-check-input" type="checkbox" id="show_vat" name="show_vat"
+                        value="1" checked />&nbsp; Show VAT on Receipt
+                </div>
+                <div class="col-6 text-right">
+                    <button class="btn btn-primary btn-xs text-white mdi mdi-printer" onclick="Print();"
+                        data-dismiss="modal"> PRINT THIS BILL</button>&nbsp; &nbsp;
+                </div>
+                <button class="close" type="button" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">×</span>
+                </button>
+            </div>
+            <div class="modal-body" id="bill_details"></div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="newBillModal" tabindex="-1" role="dialog" aria-labelledby="newModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <form method="POST" class="form-horizontal">
+                <input type="hidden" id="assign_customer_bill_id" name="bill_id" />
+                <div class="modal-header text-center">
+                    <h5 class="text-center">Add New Bill</h5>
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                </div>
+                <div class="modal-body">  
+                    <div class="form-group row">
+                        <div class="col-sm-12">
+                            <input type="number" name="bill_amount" id="bill_amount" min="0" required
+                                class="form-control input-sm" placeholder="Enter Bill Amount" />
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <div class="col-sm-12">
+                            <br />
+                            <select name="customer_id" id="assign_customer_id" class="form-control input-xs"> 
+                                <option value="0">-- Select Customer --</option>
+                                {% for customer in customers %}
+                                <option value="{{ customer.id }}">{{ customer.name }} - {{ customer.phone }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>                  
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+                    <button type="submit" id="assign_customer_bill" name="action" value="assign_customer_bill"
+                        class="btn btn-success">Assign Selected Customer this Bill</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+
+<script>
+    function applyFilter(page) {
+        $("#page").val(page);
+        $("#filter-frm").submit();
+    }
+
+    function updateBillAmount(bill_id, balance) {
+        $('#bill_amount').html(balance.toLocaleString());
+        $('#bill_id').val(bill_id);
+        document.getElementById("amount_paid").max = balance;
+    }
+
+    function editBill(id) {
+        $('#editable_bill_id').val(id);
+    }
+
+    function assignCustomerBill(id) {
+        $('#assign_customer_bill_id').val(id);
+        fetch_bill_details(id)
+    }
+
+</script>
+
+{% endblock %}

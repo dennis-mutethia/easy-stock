@@ -1,0 +1,97 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<!-- ============================================================== -->
+<!-- Container fluid  -->
+<!-- ============================================================== -->
+<div class="container-fluid card table-responsive">
+    <form id="filter-frm" method="GET" class="row">
+        <input type="hidden" id="page" name="page" value="{{ page }}" />
+        <div class="col-4">
+            <input onchange="applyFilter(1)" style="height: 25px" type="date" id="from_date" name="from_date"
+                required="required" value="{{ from_date }}" max="{{ current_date }}" />
+        </div>
+        <div class="col-1 text-center">
+            <label class="text-white">TO</label>
+        </div>
+        <div class="col-4">
+            <input onchange="applyFilter(1)" style="height: 25px" type="date" id="to_date" name="to_date"
+                required="required" value="{{ to_date }}" max="{{ current_date }}" />
+        </div>
+        <div class="col-3">
+            <select onchange="applyFilter()" name="category_id" id="category_id" style="width: 100%;">
+                <option value="0">Filter by Category</option>
+                {% for product_category in product_categories %}
+                <option value="{{ product_category.id }}" {% if product_category.id == category_id %} selected {% endif %}>{{ product_category.name }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <!-- <div class="col-1 text-right">
+            <button type="submit" name="download" value="1" class="btn btn-xs btn-primary" style="width: 100%;">Export To PDF</button>
+        </div> -->
+    </form><br />
+    <table class="table-bordered table-striped">
+        <thead>
+            <tr>
+                <th class="text-center">DATE</th>
+                <th class="text-center">PRODUCT</th>
+                <th class="text-center">CATEGORY</th>
+                <th class="text-center">SOLD</th>
+                <th class="text-center">PRICE</th>
+                <th class="text-center">TOTAL</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for sale in sales %}
+            {% set total = sale.selling_price * sale.sold %}
+            <tr>
+                <td class="text-center">{{ sale.report_date }}</td>
+                <td>{{ sale.item_name }}</td>
+                <td>{{ sale.category_name }}</td>
+                <td class="text-center">{{ helper.format_number_with_commas(helper.format_number(sale.sold)) }}</td>
+                <td class="text-center">{{ helper.format_number_with_commas(helper.format_number(sale.selling_price)) }}</td>
+                <td class="text-center">{{ helper.format_number_with_commas(helper.format_number(total))}}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+        <tfoot>
+            <tr>
+                <th class="text-right" colspan="4"><b><u>TOTAL SALES</u></b></th>
+                <th class="text-center" colspan="2"><b><u>{{ helper.format_number_with_commas(helper.format_number(grand_total))}}</u></b></th>
+            </tr>
+        </tfoot>
+    </table><br />
+
+    <!--Pagination-->
+    <div class="row">
+        <div class="col-md-5"></div>
+        <div class="col-md-4 text-center">
+            <nav aria-label="Page navigation example" class="text-center">
+                <ul class="pagination" class="text-center">
+                    <li class="page-item {{ '' if prev_page > 0 else 'disabled' }}">
+                        <button class="page-link" id="prev_page"
+                            onclick="applyFilter({{ prev_page }})">Previous</button>
+                    </li>
+                    <li class="page-item {{ '' if next_page > 0 else 'disabled' }}">
+                        <button class="page-link" id="next_page" onclick="applyFilter({{ next_page }})">Next</button>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+
+    </div>
+    <!-- End Pagination-->
+</div>
+<!-- ============================================================== -->
+<!-- End Container fluid  -->
+<!-- ============================================================== -->
+
+<script>
+    function applyFilter(page) {
+        $("#page").val(page);
+        $("#filter-frm").submit();
+    }
+
+</script>
+
+{% endblock %}

@@ -1,0 +1,128 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<!-- ============================================================== -->
+<!-- Container fluid  -->
+<!-- ============================================================== -->
+<div class="container-fluid table-responsive">
+    <form id="filter-frm" method="GET" class="row">
+        <div class="col-12">
+            <select onchange="applyFilter()" name="category_id" id="category_id" style="width: 100%;">
+                <option value="0">Filter by Category</option>
+                {% for product_category in product_categories %}
+                <option value="{{ product_category.id }}" {% if product_category.id == category_id %} selected {% endif %}>{{ product_category.name }}</option>
+                {% endfor %}
+            </select>
+        </div>
+    </form><br />
+    <table class="table-bordered table-striped">
+        <thead>
+           <tr>
+               <th>PRODUCT</th>
+               <th>CATEGORY</th>
+               <th class="text-center">YESTERDAY OPENING</th>
+               <th class="text-center">YESTERDAY PURCHASES</th>
+               <th class="text-center">YESTERDAY TOTAL</th>
+               <th class="text-center">TODAY OPENING</th>
+               <th class="text-center">SOLD YESTERDAY</th>
+               <th class="text-center">SELLING PRICE</th>
+               <th class="text-center">TOTAL AMOUNT</th>
+           </tr>
+       </thead>
+        <tbody>
+            {% set ns = namespace(total=0) %}
+            {% for stock in stocks %}
+            {% set sold = stock.yesterday_opening+stock.yesterday_additions - stock.opening %}
+            {% set total = sold * stock.selling_price %}
+            {% set ns.total = ns.total + (total if sold>0 else 0) %}
+            {% if sold!=0 %}
+            <style>
+                input {
+                    width: 100%;
+                }
+                td{
+                    color: {{ 'red' if sold<0 else 'white' }}
+                }
+            </style>
+            <tr>                 
+                <td >{{ stock.name }}</td> 
+                <td>{{ stock.category_name }}</td> 
+                <td class="text-center">{{ helper.format_number_with_commas(stock.yesterday_opening) }}</td> 
+                <td class="text-center">{{ helper.format_number_with_commas(stock.yesterday_additions) }}</td> 
+                <td class="text-center">{{ helper.format_number_with_commas(stock.yesterday_opening+stock.yesterday_additions) }}</td> 
+                <td class="text-center">{{ helper.format_number_with_commas(stock.opening) }}</td> 
+                <td class="text-center">{{ helper.format_number_with_commas(sold) }}</td> 
+
+                <td class="text-center">{{ helper.format_number_with_commas(stock.selling_price) }}</td> 
+                <td class="text-center">{{ helper.format_number_with_commas(total) }}</td> 
+            </tr>
+            {% endif %}
+            {% endfor %}
+        </tbody>        
+        <tfoot>
+            <tr>
+                <th class="text-right" colspan="8">TOTAL SALES</th>
+                <th class="text-center">{{ helper.format_number_with_commas(ns.total) }}</th>
+            </tr>
+        </tfoot>
+    </table>
+</div>
+<!-- ============================================================== -->
+<!-- End Container fluid  -->
+<!-- ============================================================== -->
+
+<script>
+    $(document).ready(function () {
+        $("#search").focus(function () {
+            if (this.setSelectionRange)
+            {
+                var len = $(this).val().length;
+                this.setSelectionRange(len, len);
+            } else
+            {
+                $(this).val($(this).val());
+            }
+
+        });
+        $("#search").focus();
+    });
+    function applyFilter() {
+        $("#filter-frm").submit();
+    }
+
+    function updateTotal(id) {
+        let name = $("#name_" + id).html();
+        let yesterday = parseFloat($("#yesterday_" + id).html());
+        let sold = parseFloat($("#sold_" + id).html());
+        let opening_old = parseFloat($("#opening_old_" + id).val());
+        let opening = parseFloat($("#opening_" + id).val());
+        let additions = parseFloat($("#additions_" + id).val());
+        if (opening > yesterday) {
+            toastr.error("Opening stock cannot be more than yesterday's closing stock.\nAdded Stock has been set as purchases");
+            additions = opening - opening_old + additions;
+            $("#additions_" + id).val(additions);
+            opening = opening_old;
+            $("#opening_" + id).val(opening_old);
+        }
+        let total = opening + additions;
+        let tomorrow = opening+additions-sold;
+        $.ajax({
+            type: 'post',
+            url: '{{ url_for('stockTakeUpdate') }}',
+            data: {
+                id: id,
+                opening: opening,
+                additions: additions,
+                action: 'update'
+            },
+            success: function (data) {
+                toastr.success("Updated " + name);
+                $("#opening_old_" + id).html(opening);
+                $("#total_" + id).html(total);
+                $("#tomorrow_" + id).html(tomorrow);
+            }
+        });
+    }
+</script>
+
+{% endblock %}

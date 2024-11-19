@@ -1,0 +1,53 @@
+<!-- Line Chart -->
+<div class="row">
+    <div class="col-12 mt-3">
+        <div class="bg-dark p-10 text-white text-center">
+            <canvas id="myChart" style="width:100%;"></canvas>
+        </div>
+    </div>
+</div>
+<!-- End Line Charts -->
+
+<script>
+    new Chart("myChart", {
+                type: "line",
+                data: {
+                    labels: [{{ dates | join(',') | safe }}],
+                    datasets: [
+                        {
+                            data: [{{ stocks_2 | join(',') | safe }}],
+                            borderColor: "blue",
+                            fill: false,
+                            label: 'Stock'
+                        },
+                        {
+                            data: [{{ purchases | join(',') | safe }}],
+                            borderColor: "yellow",
+                            fill: false,
+                            label: 'Purchases'
+                        },     
+                        {
+                            data: [{{ sales_all | join(',') | safe }}],
+                            borderColor: "green",
+                            fill: false,
+                            label: 'Sales'
+                        },                     
+                        {
+                            data: [{{ expenses_all | join(',') | safe }}],
+                            borderColor: "red",
+                            fill: false,
+                            label: 'Expenses'
+                        }
+                    ]
+                },
+                options: {
+                    legend: {
+                        display: true
+                    },
+                    title: {
+                        display: true,
+                        text: "Monthly Stock vs Purchases vs Sales vs Expenses Trend"
+                    }
+                }
+            });
+</script>
