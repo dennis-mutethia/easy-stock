@@ -7,7 +7,7 @@
 <div class="container-fluid card table-responsive">
     <form id="filter-frm" method="GET" class="row">
         <input type="hidden" id="page" name="page" value="{{ page }}" />
-        <div class="row">
+        <div class="pt-3 pb-3">
             <div class="col-5">
                 <input onchange="applyFilter(1)" style="height: 25px" type="date" id="from_date" name="from_date"
                     required="required" value="{{ from_date }}" max="{{ current_date }}" />
@@ -19,8 +19,8 @@
                 <input onchange="applyFilter(1)" style="height: 25px" type="date" id="to_date" name="to_date"
                     required="required" value="{{ to_date }}" max="{{ current_date }}" />
             </div>
-        </div><br />
-        <div class="row">
+        </div>
+        <div class="pt-3 pb-3">
             <div class="col-6">
                 <select onchange="applyFilter(1)" name="bill_status" id="bill_status" style="width: 100%;">
                     <option value="0">All Bills</option>

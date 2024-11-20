@@ -5,6 +5,7 @@ from flask_login import current_user
 from reportlab.lib.pagesizes import letter
 from reportlab.pdfgen import canvas
 
+from utils.customers.customers import Customers
 from utils.helper import Helper
 from utils.pos.bills import Bills
 
@@ -112,6 +113,7 @@ class BillsReport():
             except Exception as e:
                 print(f"An error occurred: {e}")               
         
+        customers = Customers(self.db).fetch()
         bills = Bills(self.db).fetch(from_date, to_date, bill_status, customer_id, page) 
         prev_page = page-1 if page>1 else 0
         next_page = page+1 if len(bills)==50 else 0
@@ -127,7 +129,7 @@ class BillsReport():
             return send_file(pdf_file, as_attachment=True, download_name=f"Customers_Bills_Report_from_{from_date}_to_{to_date}_{page} - {current_user.shop.name}.pdf")
         
         return render_template('reports/bills-report.html', page_title='Reports > Bills', helper=Helper(),
-                               bills=bills, current_date=current_date, bill_status=bill_status, 
+                               customers=customers, bills=bills, current_date=current_date, bill_status=bill_status, 
                                 from_date=from_date, to_date=to_date, customer_id=customer_id,
                                 grand_total=grand_total, grand_paid=grand_paid, cash_total=cash_total, mpesa_total=mpesa_total,
                                 page=page, prev_page=prev_page, next_page=next_page)
