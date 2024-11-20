@@ -95,30 +95,45 @@ class ProfitReport():
     def fetch(self, from_date, to_date):
         self.db.ensure_connection()
         with self.db.conn.cursor() as cursor:
-            query = """
-            WITH exp AS(
-                SELECT date, SUM(amount) total_expenses
-                FROM expenses
-                GROUP BY date
+            query = """                       
+            WITH all_stock AS (
+                SELECT 
+                    stock_date, 
+                    product_id, 
+                    COALESCE(opening, 0) AS opening, 
+                    COALESCE(additions, 0) AS additions, 
+                    purchase_price,
+                    selling_price
+                FROM stock
+                WHERE shop_id = %s AND DATE(stock_date) BETWEEN DATE(%s) AND DATE(%s)
             ),
             sales AS(
-                SELECT DATE(b.created_at) AS report_date, be.price*be.qty AS sales, s.purchase_price*be.qty AS cost
-                FROM bills b
-                JOIN bill_entries be ON be.bill_id = b.id
-                JOIN stock s ON s.id = be.stock_id 
-                WHERE DATE(b.created_at) BETWEEN DATE(%s) AND DATE(%s) AND b.shop_id=%s AND total != 'Nan'
+                SELECT 
+                    yesterday.stock_date AS report_date, 
+                    yesterday.purchase_price,
+                    yesterday.selling_price,
+                    (today.opening-(yesterday.opening+yesterday.additions)) AS sold
+                FROM all_stock AS today
+                INNER JOIN all_stock AS yesterday ON yesterday.product_id = today.product_id
+                    AND DATE(yesterday.stock_date) = DATE(today.stock_date) - 1
             ),
             totals AS(
-                SELECT report_date, SUM(sales) AS total_sales, SUM(cost) AS total_cost
+                SELECT report_date, SUM(sold*selling_price) AS total_sales, SUM(sold*purchase_price) AS total_cost
                 FROM sales  
                 GROUP BY report_date
+            ),
+            exp AS(
+                SELECT date, SUM(amount) total_expenses
+                FROM expenses
+                WHERE shop_id = %s
+                GROUP BY date
             )
             SELECT report_date, total_sales, total_cost, COALESCE(total_expenses,0) AS total_expenses
             FROM totals
             LEFT JOIN exp ON exp.date=totals.report_date    
             ORDER BY report_date     
             """
-            params = [from_date, to_date, current_user.shop.id]
+            params = [current_user.shop.id, from_date, to_date, current_user.shop.id]
             
             cursor.execute(query, tuple(params))
             data = cursor.fetchall()

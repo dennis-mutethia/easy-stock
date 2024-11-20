@@ -106,30 +106,65 @@ class StockReport():
         buffer.seek(0)
         return buffer
     
-    def fetch(self, from_date, to_date, category_id=0, page=0):
+    def fetch(self, from_date, category_id=0, page=0):
         self.db.ensure_connection()
         with self.db.conn.cursor() as cursor:
-            query = """ 
-            WITH sales AS(
-                SELECT stock_id, SUM(qty) sold
-                FROM bill_entries
-                WHERE shop_id = %s AND bill_id>0
-                GROUP BY stock_id
-            )
-            SELECT stock_date, stock.name, product_categories.name AS category_name, stock.opening, stock.additions, COALESCE(sales.sold, 0) AS sold, stock.selling_price
-            FROM stock 
-            LEFT JOIN sales ON sales.stock_id = stock.id
-            LEFT JOIN product_categories ON product_categories.id= stock.category_id
-            WHERE (DATE(stock.created_at) BETWEEN DATE(%s) AND DATE(%s)) AND stock.shop_id = %s
+            query = """           
+            WITH all_stock AS (
+                SELECT 
+                    stock.stock_date, 
+                    stock.product_id, 
+                    stock.name AS item_name, 
+                    stock.category_id,
+                    pc.name AS category_name, 
+                    COALESCE(stock.opening, 0) AS opening, 
+                    COALESCE(stock.additions, 0) AS additions, 
+                    stock.selling_price
+                FROM stock
+                LEFT JOIN product_categories pc ON pc.id= stock.category_id   
+                WHERE stock.shop_id = %s
+            ),
+            yesterday AS (
+                SELECT *
+                FROM all_stock
+                WHERE DATE(stock_date) = DATE(%s) - 1
+            ),
+            today AS (
+                SELECT *
+                FROM all_stock
+                WHERE DATE(stock_date) = DATE(%s)
+            ),
+            source AS(
+                SELECT 
+                    yesterday.stock_date, 
+                    yesterday.item_name, 
+                    yesterday.category_id,
+                    yesterday.category_name,
+                    yesterday.selling_price,
+                    yesterday.opening,
+                    yesterday.additions,
+                    (today.opening-(yesterday.opening+yesterday.additions)) AS sold
+                FROM yesterday
+                INNER JOIN today ON today.product_id = yesterday.product_id
+            ) 
+            SELECT 
+                stock_date,
+                item_name,
+                category_name,
+                opening,
+                additions,
+                sold,
+                selling_price
+            FROM source  
             """
-            params = [current_user.shop.id, from_date, to_date, current_user.shop.id]
+            params = [current_user.shop.id, from_date, from_date]
             
             if category_id > 0:
-                query = query + " AND stock.category_id = %s "
+                query = query + " WHERE category_id = %s "
                 params.append(category_id)
             
             query = query + """
-            ORDER BY stock_date DESC, category_name, name
+            ORDER BY category_name, item_name
             """
             
             if page>0:
@@ -156,14 +191,13 @@ class StockReport():
         if request.method == 'GET':   
             try:    
                 from_date = request.args.get('from_date', from_date)
-                to_date = request.args.get('to_date', to_date)
                 category_id = int(request.args.get('category_id', 0))
                 page = int(request.args.get('page', 1))
                 download = int(request.args.get('download', download))
             except Exception as e:
                 print(f"An error occurred: {e}")               
         
-        stocks = self.fetch(from_date, to_date, category_id, page) 
+        stocks = self.fetch(from_date, category_id, page) 
         prev_page = page-1 if page>1 else 0
         next_page = page+1 if len(stocks)==50 else 0
         grand_total =  0

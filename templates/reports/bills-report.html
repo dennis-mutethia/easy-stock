@@ -29,8 +29,7 @@
             </select>
         </div>
         <div class="col-6">
-            <select class="text-center" onchange="applyFilter()" name="customer_id" id="customer_id"
-                style="width: 100%;">
+            <select class="text-center" onchange="applyFilter()" name="customer_id" id="customer_id" style="width: 100%;">
                 <option value="0">All Customers</option>
                 {% for customer in customers %}
                 <option value="{{ customer.id }}" {{ 'selected' if customer_id==customer.id else '' }}>{{ customer.name
@@ -42,8 +41,7 @@
     <table class="table-bordered table-striped">
         <thead>
             <tr>
-                <th class="text-right" rowspan="2">BILL No.</th>
-                <th class="text-center" rowspan="2">DATE TIME</th>
+                <th class="text-center" rowspan="2">DATE</th>
                 <th class="text-center" rowspan="2">CUSTOMER</th>
                 <th class="text-center" rowspan="2">SOLD BY</th>
                 <th class="text-center" rowspan="2">TOTAL</th>
@@ -58,7 +56,6 @@
         <tbody>
             {% for bill in bills %}
             <tr>
-                <td class="text-right">#{{ bill.id }}</td>
                 <td class="text-center">{{ bill.created_at }}</td>
                 <td>
                     {% if bill.customer %}
@@ -79,7 +76,7 @@
         </tbody>
         <tfoot>
             <tr>
-                <th class="text-right" colspan="4"><b><u>TOTAL BILLS</u></b></th>
+                <th class="text-right" colspan="3"><b><u>TOTAL BILLS</u></b></th>
                 <th class="text-right"><b><u>{{ helper.format_number_with_commas(helper.format_number(grand_total))
                             }}</u></b></th>
                 <th class="text-right text-warning"><b><u>{{

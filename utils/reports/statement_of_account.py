@@ -95,36 +95,50 @@ class StatementOfAccount():
         self.db.ensure_connection()
         with self.db.conn.cursor() as cursor:
             query = """
-            WITH sales AS(
-                SELECT DATE(created_at) AS date, SUM(total) AS sales,0 AS purchases,0 AS expenses
-                FROM bills
-                WHERE DATE(created_at) BETWEEN DATE(%s) AND DATE(%s) AND shop_id=%s AND total != 'Nan'
-                GROUP BY date
-            ),            
-            purchases AS(
-                SELECT stock_date,0,SUM(additions*purchase_price), 0
+                                
+            WITH all_stock AS (
+                SELECT 
+                    stock_date, 
+                    product_id, 
+                    COALESCE(opening, 0) AS opening, 
+                    COALESCE(additions, 0) AS additions, 
+                    purchase_price,
+                    selling_price
                 FROM stock
-                WHERE stock_date BETWEEN DATE(%s) AND DATE(%s) AND shop_id = %s
-                GROUP BY stock_date
+                WHERE shop_id = %s AND DATE(stock_date) BETWEEN DATE(%s) AND DATE(%s)
+            ),
+            sales AS(
+                SELECT 
+                    yesterday.stock_date AS date, 
+                    yesterday.purchase_price,
+                    yesterday.selling_price,
+                    (today.opening-(yesterday.opening+yesterday.additions)) AS sold,
+                    yesterday.additions
+                FROM all_stock AS today
+                INNER JOIN all_stock AS yesterday ON yesterday.product_id = today.product_id
+                    AND DATE(yesterday.stock_date) = DATE(today.stock_date) - 1
+            ),
+            totals AS(
+                SELECT date, SUM(sold*selling_price) AS total_sales, SUM(additions*purchase_price) AS total_purchases, 0 AS expenses
+                FROM sales  
+                GROUP BY date
             ),
             expenses AS(
                 SELECT date,0,0,SUM(amount)
                 FROM expenses
-                WHERE date BETWEEN DATE(%s) AND DATE(%s) AND shop_id = %s
+                WHERE shop_id = %s AND date BETWEEN DATE(%s) AND DATE(%s)
                 GROUP BY date
             ),
             final AS(
-                SELECT * FROM sales
-                UNION SELECT * FROM purchases
+                SELECT * FROM totals
                 UNION SELECT * FROM expenses
             )
             SELECT * FROM final 
-            ORDER BY date ASC, sales DESC, purchases DESC, expenses DESC
+            ORDER BY date ASC
             """
             params = [
-                from_date, to_date, current_user.shop.id,
-                from_date, to_date, current_user.shop.id,
-                from_date, to_date, current_user.shop.id
+                current_user.shop.id, from_date, to_date,
+                current_user.shop.id, from_date, to_date
             ]
             
             cursor.execute(query, tuple(params))

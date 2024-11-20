@@ -7,18 +7,11 @@
 <div class="container-fluid card table-responsive">
     <form id="filter-frm" method="GET" class="row">
         <input type="hidden" id="page" name="page" value="{{ page }}" />
-        <div class="col-4">
+        <div class="col-6">
             <input class="text-center" onchange="applyFilter(1)" style="height: 25px" type="date" id="from_date" name="from_date"
                 required="required" value="{{ from_date }}" max="{{ current_date }}" />
         </div>
-        <div class="col-1 text-center">
-            <label class="text-white">TO</label>
-        </div>
-        <div class="col-4">
-            <input class="text-center" onchange="applyFilter(1)" style="height: 25px" type="date" id="to_date" name="to_date"
-                required="required" value="{{ to_date }}" max="{{ current_date }}" />
-        </div>
-        <div class="col-3">
+        <div class="col-6">
             <select class="text-center" onchange="applyFilter()" name="category_id" id="category_id" style="width: 100%;">
                 <option value="0">Filter by Category</option>
                 {% for product_category in product_categories %}
@@ -26,14 +19,10 @@
                 {% endfor %}
             </select>
         </div>
-        <!-- <div class="col-1 text-right">
-            <button type="submit" name="download" value="1" class="btn btn-xs btn-primary" style="width: 100%;">Export To PDF</button>
-        </div> -->
     </form><br />
     <table class="table-bordered table-striped">
         <thead>
             <tr>
-                <th class="text-center">DATE</th>
                 <th class="text-center">PRODUCT</th>
                 <th class="text-center">CATEGORY</th>
                 <th class="text-center">QTY</th>
@@ -45,7 +34,6 @@
             {% for purchase in purchases %}
             {% set total = purchase.purchase_price * purchase.additions %}
             <tr>
-                <td class="text-center">{{ purchase.report_date }}</td>
                 <td>{{ purchase.name }}</td>
                 <td>{{ purchase.category_name }}</td>
                 <td class="text-center">{{ helper.format_number_with_commas(helper.format_number(purchase.additions)) }}</td>
@@ -56,7 +44,7 @@
         </tbody>
         <tfoot>
             <tr>
-                <th class="text-right" colspan="4"><b><u>TOTAL PURCHASES</u></b></th>
+                <th class="text-right" colspan="3"><b><u>TOTAL PURCHASES</u></b></th>
                 <th class="text-center" colspan="2"><b><u>{{ helper.format_number_with_commas(helper.format_number(grand_total))}}</u></b></th>
             </tr>
         </tfoot>

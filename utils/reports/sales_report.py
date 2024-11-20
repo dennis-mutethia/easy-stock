@@ -90,25 +90,61 @@ class SalesReport():
         buffer.seek(0)
         return buffer
     
-    def fetch(self, from_date, to_date, category_id=0, page=0):
+    def fetch(self, from_date, category_id=0, page=0):
         self.db.ensure_connection()
         with self.db.conn.cursor() as cursor:
-            query = """
-            SELECT DATE(be.created_at) AS report_date, be.item_name, pc.name AS category_name, s.selling_price, SUM(COALESCE(be.qty,0)) sold 
-            FROM bill_entries be
-            JOIN stock s ON s.id=be.stock_id
-            LEFT JOIN product_categories pc ON pc.id= s.category_id   
-            WHERE (DATE(be.created_at) BETWEEN DATE(%s) AND DATE(%s)) AND be.shop_id = %s AND be.bill_id>0            
+            query = """            
+            WITH all_stock AS (
+                SELECT 
+                    stock.stock_date, 
+                    stock.product_id, 
+                    stock.name AS item_name, 
+                    stock.category_id,
+                    pc.name AS category_name, 
+                    COALESCE(stock.opening, 0) AS opening, 
+                    COALESCE(stock.additions, 0) AS additions, 
+                    stock.selling_price
+                FROM stock
+                LEFT JOIN product_categories pc ON pc.id= stock.category_id   
+                WHERE stock.shop_id = %s
+            ),
+            yesterday AS (
+                SELECT *
+                FROM all_stock
+                WHERE DATE(stock_date) = DATE(%s) - 1
+            ),
+            today AS (
+                SELECT *
+                FROM all_stock
+                WHERE DATE(stock_date) = DATE(%s)
+            ),
+            source AS(
+                SELECT 
+                    yesterday.stock_date AS report_date, 
+                    yesterday.item_name, 
+                    yesterday.category_id,
+                    yesterday.category_name,
+                    yesterday.selling_price,
+                    (today.opening-(yesterday.opening+yesterday.additions)) AS sold
+                FROM yesterday
+                INNER JOIN today ON today.product_id = yesterday.product_id
+            ) 
+            SELECT 
+                report_date,
+                item_name,
+                category_name,
+                selling_price,
+                sold
+            FROM source        
             """
-            params = [from_date, to_date, current_user.shop.id]
+            params = [current_user.shop.id, from_date, from_date]
             
             if category_id > 0:
-                query = query + " AND s.category_id = %s "
+                query = query + " WHERE category_id = %s "
                 params.append(category_id)
             
             query = query + """
-            GROUP BY report_date, be.item_name, pc.name, s.selling_price
-            ORDER BY report_date DESC, sold DESC
+            ORDER BY sold DESC
             """
             
             if page>0:
@@ -135,14 +171,13 @@ class SalesReport():
         if request.method == 'GET':   
             try:    
                 from_date = request.args.get('from_date', from_date)
-                to_date = request.args.get('to_date', to_date)
                 category_id = int(request.args.get('category_id', 0))
                 page = int(request.args.get('page', 1))
                 download = int(request.args.get('download', download))
             except Exception as e:
                 print(f"An error occurred: {e}")               
         
-        sales = self.fetch(from_date, to_date, category_id, page) 
+        sales = self.fetch(from_date, category_id, page) 
         prev_page = page-1 if page>1 else 0
         next_page = page+1 if len(sales)==50 else 0
         grand_total =  0

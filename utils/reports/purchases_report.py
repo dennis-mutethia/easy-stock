@@ -90,16 +90,16 @@ class PurchasesReport():
         buffer.seek(0)
         return buffer
     
-    def fetch(self, from_date, to_date, category_id=0, page=0):
+    def fetch(self, from_date, category_id=0, page=0):
         self.db.ensure_connection()
         with self.db.conn.cursor() as cursor:
             query = """
             SELECT DATE(s.updated_at) AS report_date, s.name, pc.name AS category_name, s.purchase_price, SUM(COALESCE(s.additions,0)) additions 
             FROM stock s
             LEFT JOIN product_categories pc ON pc.id= s.category_id   
-            WHERE (DATE(s.updated_at) BETWEEN DATE(%s) AND DATE(%s)) AND s.shop_id = %s AND s.additions IS NOT NULL AND s.additions>0
+            WHERE DATE(s.updated_at) = DATE(%s) AND s.shop_id = %s AND s.additions IS NOT NULL AND s.additions>0
             """
-            params = [from_date, to_date, current_user.shop.id]
+            params = [from_date, current_user.shop.id]
             
             if category_id > 0:
                 query = query + " AND s.category_id = %s "
@@ -134,14 +134,13 @@ class PurchasesReport():
         if request.method == 'GET':   
             try:    
                 from_date = request.args.get('from_date', from_date)
-                to_date = request.args.get('to_date', to_date)
                 category_id = int(request.args.get('category_id', 0))
                 page = int(request.args.get('page', 1))
                 download = int(request.args.get('download', download))
             except Exception as e:
                 print(f"An error occurred: {e}")               
         
-        purchases = self.fetch(from_date, to_date, category_id, page) 
+        purchases = self.fetch(from_date, category_id, page) 
         prev_page = page-1 if page>1 else 0
         next_page = page+1 if len(purchases)==50 else 0
         grand_total =  0
