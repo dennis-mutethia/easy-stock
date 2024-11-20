@@ -95,7 +95,7 @@ class BillsReport():
         current_date = datetime.now().strftime('%Y-%m-%d')
         from_date = (datetime.now() - timedelta(days=365)).strftime('%Y-%m-%d') #datetime(datetime.now().year, 1, 1).strftime('%Y-%m-%d')
         to_date = current_date
-        bill_status = 0
+        bill_status = 2
         customer_id = 0
         page = 1
         download = 0
