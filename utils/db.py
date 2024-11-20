@@ -31,12 +31,21 @@ class Db():
             # Reconnect if the connection is invalid
             self.conn = psycopg2.connect(**self.conn_params)
                    
-    def create_base_tables(self):
+    def migration(self):
         try:
             self.ensure_connection()  # Ensure your connection to PostgreSQL is established
             
             # Read the SQL script file
-            with open("pos.sql", "r") as f:
+            with open("db_schema.sql", "r") as f:
+                sql_script = f.read()
+                
+                # Execute the SQL script
+                with self.conn.cursor() as cursor:
+                    cursor.execute(sql_script)
+                    self.conn.commit()
+            
+            # Read the SQL script file
+            with open("db_data.sql", "r") as f:
                 sql_script = f.read()
                 
                 # Execute the SQL script
