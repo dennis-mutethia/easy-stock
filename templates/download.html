@@ -12,6 +12,16 @@
 
 <div class="container-fluid table-responsive">
     <div class="pt-3 pb-3 border-bottom border-secondary">
+
+        <div class="col-12 text-center">
+            <h6>How to Download:</h6>
+            Scan the QR code to launch this page on your Android device, and then download and install the APK.
+        </div>
+
+        <div class="col-12 text-center">
+            <img src="{{ url_for('static', filename='images/qr.png') }}" alt="homepage" class="light-logo" />
+        </div>
+        
         <h6 class="text-center">Installation Guide For Android</h6>
         <ol>
             <li>Open the settings on your phone</li>
@@ -19,27 +29,8 @@
             <li>Scroll to “Unknown sources” and select it</li>
             <li>Tap on “OK” to confirm your alteration</li>
         </ol>
-        <div class="col-12 text-center">
-            <h6>PLEASE NOTE:</h6>
-            This is the official Easy Stock App for Android.
-            Despite the warning message which appears after you tap on the button “Download”, installing
-            this app will NOT damage your device.
-        </div>
     </div>
 
-    <div class="pt-3 pb-3 text-white border-bottom border-secondary">
-        <div class="col-12 text-center">
-            <a href="{{ url_for('static', filename='dist/EasyStock.apk') }}" style="
-                background: none;
-                cursor:pointer;
-                border: none;
-              ">
-                <img src="{{ url_for('static', filename='images/download.png') }}" alt="homepage" class="light-logo"
-                    width="150" />
-            </a>
-            </a>
-        </div>
-    </div>
 </div>
 <!-- ============================================================== -->
 <!-- End Container fluid  -->
