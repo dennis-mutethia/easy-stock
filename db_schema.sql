@@ -157,22 +157,6 @@ CREATE TABLE IF NOT EXISTS bills (
   updated_by INT
 );
 
--- Table structure for table bill_entries
-CREATE TABLE IF NOT EXISTS bill_entries (
-  id SERIAL PRIMARY KEY,
-  bill_id INT,
-  stock_id INT,
-  item_name TEXT,
-  price DOUBLE PRECISION,
-  qty DOUBLE PRECISION,
-  shop_id INT,
-  created_at TIMESTAMP,
-  created_by INT,
-  updated_at TIMESTAMP,
-  updated_by INT,
-  UNIQUE (bill_id,stock_id,created_by)
-);
-
 -- Table structure for table customers
 CREATE TABLE IF NOT EXISTS customers (
   id SERIAL PRIMARY KEY,
@@ -229,7 +213,8 @@ CREATE TABLE IF NOT EXISTS payments (
 CREATE TABLE IF NOT EXISTS cashbox (
   id SERIAL PRIMARY KEY,
   date date,
-  amount DOUBLE PRECISION,
+  cash DOUBLE PRECISION,
+  mpesa DOUBLE PRECISION,
   shop_id INT,
   created_at TIMESTAMP,
   created_by INT,
