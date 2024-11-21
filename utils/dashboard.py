@@ -75,16 +75,17 @@ class Dashboard():
                     purchase_price,
                     selling_price
                 FROM stock
-                WHERE shop_id = %s AND DATE(stock_date) = DATE(%s)
+                WHERE shop_id = %s
             ),
             sales AS(
                 SELECT 
                     today.purchase_price,
                     today.selling_price,
-                    (tomorrow.opening-(today.opening+today.additions)) AS sold
+                    (today.opening + today.additions - tomorrow.opening) AS sold
                 FROM all_stock AS today
                 INNER JOIN all_stock AS tomorrow ON tomorrow.product_id = today.product_id
                     AND DATE(tomorrow.stock_date) = DATE(today.stock_date) + 1
+                WHERE DATE(today.stock_date) = DATE(%s)
             ),
             totals AS(
                 SELECT SUM(sold*selling_price) AS total_sales, SUM(sold*purchase_price) AS total_cost
@@ -164,14 +165,13 @@ class Dashboard():
             return dates, stocks, purchases
                  
     def __call__(self):
-        current_date = datetime.now().strftime('%Y-%m-%d')
         yesterday = datetime.now() - timedelta(days=1)
         max_date = yesterday.strftime('%Y-%m-%d')
         report_date = max_date
         
         if request.method == 'GET':   
             try:    
-                report_date = request.args.get('report_date', current_date)
+                report_date = request.args.get('report_date', report_date)
                 
             except Exception as e:
                 print(f"An error occurred: {e}")
