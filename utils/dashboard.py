@@ -17,7 +17,12 @@ class Dashboard():
         with self.db.conn.cursor() as cursor:
             query = """
             WITH all_stock AS (
-                SELECT stock_date, product_id, name, COALESCE(stock.opening 0) AS opening, COALESCE(stock.additions, 0) AS additions, 
+                SELECT 
+                    stock_date, 
+                    product_id, 
+                    name, 
+                    COALESCE(stock.opening, 0) AS opening, 
+                    COALESCE(stock.additions, 0) AS additions 
                 FROM stock
                 WHERE shop_id = %s
             ),
