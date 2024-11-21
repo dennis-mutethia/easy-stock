@@ -60,6 +60,49 @@ class Dashboard():
 
             return items, qtys, bgcolors
     
+    def get_total_sales(self, report_date):
+        self.db.ensure_connection()
+        total_sales = 0 
+        total_cost = 0
+        with self.db.conn.cursor() as cursor:
+            query = """                       
+            WITH all_stock AS (
+                SELECT 
+                    stock_date, 
+                    product_id, 
+                    COALESCE(opening, 0) AS opening, 
+                    COALESCE(additions, 0) AS additions, 
+                    purchase_price,
+                    selling_price
+                FROM stock
+                WHERE shop_id = %s AND DATE(stock_date) = DATE(%s)
+            ),
+            sales AS(
+                SELECT 
+                    today.purchase_price,
+                    today.selling_price,
+                    (tomorrow.opening-(today.opening+today.additions)) AS sold
+                FROM all_stock AS today
+                INNER JOIN all_stock AS tomorrow ON tomorrow.product_id = today.product_id
+                    AND DATE(tomorrow.stock_date) = DATE(today.stock_date) + 1
+            ),
+            totals AS(
+                SELECT SUM(sold*selling_price) AS total_sales, SUM(sold*purchase_price) AS total_cost
+                FROM sales  
+            )
+            SELECT total_sales, total_cost
+            FROM totals
+            """
+            params = [current_user.shop.id, report_date]
+            
+            cursor.execute(query, tuple(params))
+            data = cursor.fetchall()
+            for datum in data:   
+                total_sales = datum[0]   
+                total_cost = datum[1]        
+
+            return total_sales, total_cost 
+        
     def get_sales_and_expenses(self, report_date):
         self.db.ensure_connection()
         with self.db.conn.cursor() as cursor:
@@ -131,9 +174,7 @@ class Dashboard():
             except Exception as e:
                 print(f"An error occurred: {e}")
         
-        #total_cost, total_sales = BillEntries(self.db).get_total(report_date)
-        total_cost=0
-        total_sales=0
+        total_sales, total_cost = self.get_total_sales(report_date)
         total_expenses = Expenses(self.db).get_total(report_date)
         total_capital, total_stock = StockTake(self.db).get_total(report_date)
         total_unpaid_bills = Bills(self.db).get_total_unpaid_bills()
