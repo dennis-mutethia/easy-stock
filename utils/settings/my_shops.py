@@ -84,8 +84,55 @@ class MyShops():
         self.db.ensure_connection()
         with self.db.conn.cursor() as cursor:
             query = """
-            DELETE FROM shops
-            WHERE id = %s
+            DELETE FROM shops WHERE id = %s
+            """
+            cursor.execute(query, (id,))
+            self.db.conn.commit()
+            
+            query = """
+            DELETE FROM products WHERE shop_id = %s
+            """
+            cursor.execute(query, (id,))
+            self.db.conn.commit()
+            
+            query = """
+            DELETE FROM product_categories WHERE shop_id = %s
+            """
+            cursor.execute(query, (id,))
+            self.db.conn.commit()
+            
+            query = """
+            DELETE FROM stock WHERE shop_id = %s
+            """
+            cursor.execute(query, (id,))
+            self.db.conn.commit()
+            
+            query = """
+            DELETE FROM customers WHERE shop_id = %s
+            """
+            cursor.execute(query, (id,))
+            self.db.conn.commit()
+            
+            query = """
+            DELETE FROM bills WHERE shop_id = %s
+            """
+            cursor.execute(query, (id,))
+            self.db.conn.commit()
+            
+            query = """
+            DELETE FROM expenses WHERE shop_id = %s
+            """
+            cursor.execute(query, (id,))
+            self.db.conn.commit()
+            
+            query = """
+            DELETE FROM payments WHERE shop_id = %s
+            """
+            cursor.execute(query, (id,))
+            self.db.conn.commit()
+            
+            query = """
+            DELETE FROM cashbox WHERE shop_id = %s
             """
             cursor.execute(query, (id,))
             self.db.conn.commit()

@@ -12,8 +12,12 @@
                 <th class="text-center">LOCATION</th>
                 <th class="text-center">SHOP TYPE</th>
                 <th colspan="2" class="text-center">
+                    {% if current_user.user_level.id == 0 %}
                     <a href="#" class="btn btn-xs btn-primary btn-flat" style="width: 100%" data-toggle="modal"
                         data-target="#newModal">Add New Shop</a>
+                    {% else %}
+                    EDIT 
+                    {% endif %}
                 </th>
             </tr>
         </thead>
@@ -40,10 +44,12 @@
                         <i class="mdi mdi-border-color" style="color: blue" title="Edit Shop"></i>
                     </a>
                 </td>
-                <td>
+                <td class="text-center">
+                    {% if current_user.user_level.id == 0 and shop.id != current_user.shop.id and shop.id > 0 %}
                     <a href="#" onclick="deleteItem({{ shop.id }})" data-toggle="modal" data-target="#deleteModal">
                         <i class="mdi mdi-delete" style="color: red" title="Delete Shop"></i>
                     </a>
+                    {% endif %}
                 </td>
             </tr>
             {% endfor %}
