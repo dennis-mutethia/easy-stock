@@ -26,20 +26,20 @@ class Dashboard():
                 FROM stock
                 WHERE shop_id = %s
             ),
-            yesterday AS (
-                SELECT product_id, name, (opening + additions) AS total
-                FROM all_stock
-                WHERE DATE(stock_date) = DATE(%s) - 1
-            ),
             today AS (
-                SELECT product_id, opening
+                SELECT product_id, name, opening, additions
                 FROM all_stock
                 WHERE DATE(stock_date) = DATE(%s)
             ),
+            tomorrow AS (
+                SELECT product_id, opening
+                FROM all_stock
+                WHERE DATE(stock_date) = DATE(%s) + 1
+            ),
             source AS(
-                SELECT yesterday.name AS item_name, (today.opening-yesterday.total) AS sold
-                FROM yesterday
-                INNER JOIN today ON today.product_id = yesterday.product_id
+                SELECT today.name AS item_name, (today.opening + today.additions - tomorrow.opening) AS sold
+                FROM today
+                INNER JOIN tomorrow ON tomorrow.product_id = today.product_id
             )
         
             SELECT item_name, sold
@@ -104,38 +104,70 @@ class Dashboard():
 
             return total_sales, total_cost 
         
-    def get_sales_and_expenses(self, report_date):
+    def get_sales_purchases_and_expenses(self, report_date):
         self.db.ensure_connection()
         with self.db.conn.cursor() as cursor:
-            query = """
-            WITH exp AS(
-                SELECT date, SUM(amount) total_expenses
-                FROM expenses
-                GROUP BY date
+            query = """                                  
+            WITH all_stock AS (
+                SELECT 
+                    stock_date, 
+                    product_id, 
+                    COALESCE(opening, 0) AS opening, 
+                    COALESCE(additions, 0) AS additions, 
+                    purchase_price,
+                    selling_price
+                FROM stock
+                WHERE shop_id = %s
             ),
             sales AS(
-                SELECT DATE(created_at) AS report_date, SUM(total) AS total_sales
-                FROM bills
-                WHERE DATE(created_at) BETWEEN DATE(%s) - INTERVAL '30 days' AND DATE(%s) AND shop_id=%s AND total != 'Nan'
-                GROUP BY report_date
+                SELECT 
+                    today.stock_date,
+                    today.opening,
+                    today.additions,
+                    today.purchase_price,
+                    today.selling_price,
+                    (today.opening + today.additions - tomorrow.opening) AS sold
+                FROM all_stock AS today
+                INNER JOIN all_stock AS tomorrow ON tomorrow.product_id = today.product_id
+                    AND DATE(tomorrow.stock_date) = DATE(today.stock_date) + 1
+            ),
+            totals AS(
+                SELECT 
+                    stock_date AS report_date,
+                    SUM(additions*purchase_price) AS purchases,
+                    SUM((opening+additions)*selling_price) AS stocks,
+                    SUM(sold*selling_price) AS sales
+                FROM sales  
+                WHERE DATE(stock_date) BETWEEN DATE(%s) - INTERVAL '30 days' AND DATE(%s)
+                GROUP BY stock_date
+            ),
+            exp AS(
+                SELECT date, SUM(amount) expenses
+                FROM expenses
+                WHERE shop_id = %s
+                GROUP BY date
             )
-            SELECT report_date, total_sales, COALESCE(total_expenses,0) AS total_expenses
-            FROM sales
-            LEFT JOIN exp ON exp.date=sales.report_date         
+            SELECT report_date, COALESCE(purchases,0) AS purchases, stocks, COALESCE(sales,0) AS sales, COALESCE(expenses,0) AS expenses
+            FROM totals
+            LEFT JOIN exp ON exp.date=totals.report_date         
             """
-            params = [report_date, report_date, current_user.shop.id]
+            params = [current_user.shop.id, report_date, report_date, current_user.shop.id]
             
             cursor.execute(query, tuple(params))
             data = cursor.fetchall()
             dates = []
+            purchases_all = []
+            stocks_all = []
             sales_all = []
             expenses_all = []
             for datum in data:  
                 dates.append(f"'{datum[0]}'")
-                sales_all.append(datum[1] if datum[1] is not None else 0)
-                expenses_all.append(datum[2] if datum[2] is not None else 0)
+                purchases_all.append(datum[1] if datum[1] is not None else 0)
+                stocks_all.append(datum[2] if datum[2] is not None else 0)
+                sales_all.append(datum[3] if datum[3] is not None else 0)
+                expenses_all.append(datum[4] if datum[4] is not None else 0)
 
-            return dates, sales_all, expenses_all
+            return dates, purchases_all, stocks_all, sales_all, expenses_all
           
     def get_stock_trend(self, report_date):
         self.db.ensure_connection()
@@ -181,13 +213,12 @@ class Dashboard():
         total_capital, total_stock = StockTake(self.db).get_total(report_date)
         total_unpaid_bills = Bills(self.db).get_total_unpaid_bills()
         items, qtys, bgcolors = self.get_sales_per_item(report_date)
-        dates, sales_all, expenses_all = self.get_sales_and_expenses(report_date)
-        dates_2, stocks_2, purchases = self.get_stock_trend(report_date)
+        dates, purchases, stocks, sales, expenses = self.get_sales_purchases_and_expenses(report_date)
          
         return render_template('dashboard/index.html', page_title='Dashboard', helper=Helper(),
                                report_date=report_date, max_date=max_date,
                                total_cost=total_cost, total_sales=total_sales, total_expenses=total_expenses,
                                total_capital=total_capital, total_stock=total_stock, total_unpaid_bills=total_unpaid_bills,
-                               items=items, qtys=qtys, bgcolors=bgcolors, dates=dates, sales_all=sales_all, expenses_all=expenses_all,
-                               dates_2=dates_2, stocks_2=stocks_2, purchases=purchases
+                               items=items, qtys=qtys, bgcolors=bgcolors, 
+                               dates=dates, sales=sales, expenses=expenses, stocks=stocks, purchases=purchases
                                )

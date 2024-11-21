@@ -8,8 +8,8 @@
     <form id="filter-frm" method="GET" class="row">
         <input type="hidden" id="page" name="page" value="{{ page }}" />
         <div class="col-6">
-            <input class="text-center" onchange="applyFilter(1)" style="height: 25px" type="date" id="from_date" name="from_date"
-                required="required" value="{{ from_date }}" max="{{ current_date }}" />
+            <input class="text-center" onchange="applyFilter(1)" style="height: 25px" type="date" id="report_date" name="report_date"
+                required="required" value="{{ report_date }}" max="{{ max_date }}" />
         </div>
         <div class="col-6">
             <select class="text-center" onchange="applyFilter()" name="category_id" id="category_id" style="width: 100%;">
@@ -38,14 +38,14 @@
                 <td>{{ sale.category_name }}</td>
                 <td class="text-center">{{ helper.format_number_with_commas(helper.format_number(sale.sold)) }}</td>
                 <td class="text-center">{{ helper.format_number_with_commas(helper.format_number(sale.selling_price)) }}</td>
-                <td class="text-center">{{ helper.format_number_with_commas(helper.format_number(total))}}</td>
+                <td class="text-right">{{ helper.format_number_with_commas(helper.format_number(total))}}</td>
             </tr>
             {% endfor %}
         </tbody>
         <tfoot>
             <tr>
                 <th class="text-right" colspan="3"><b><u>TOTAL SALES</u></b></th>
-                <th class="text-center" colspan="2"><b><u>{{ helper.format_number_with_commas(helper.format_number(grand_total))}}</u></b></th>
+                <th class="text-right" colspan="2"><b><u>{{ helper.format_number_with_commas(helper.format_number(grand_total))}}</u></b></th>
             </tr>
         </tfoot>
     </table><br />

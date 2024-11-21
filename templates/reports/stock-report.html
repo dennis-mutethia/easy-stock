@@ -8,8 +8,8 @@
     <form id="filter-frm" method="GET" class="row">
         <input type="hidden" id="page" name="page" value="{{ page }}" />
         <div class="col-6">
-            <input class="text-center" onchange="applyFilter(1)" style="height: 25px" type="date" id="from_date" name="from_date"
-                required="required" value="{{ from_date }}" max="{{ current_date }}" />
+            <input class="text-center" onchange="applyFilter(1)" style="height: 25px" type="date" id="report_date" name="report_date"
+                required="required" value="{{ report_date }}" max="{{ max_date }}" />
         </div>
         <div class="col-6">
             <select class="text-center" onchange="applyFilter()" name="category_id" id="category_id" style="width: 100%;">

@@ -9,14 +9,14 @@
         <input type="hidden" id="page" name="page" value="{{ page }}" />
         <div class="col-5">
             <input class="text-center" onchange="applyFilter(1)" style="height: 25px" type="date" id="from_date" name="from_date"
-                required="required" value="{{ from_date }}" max="{{ current_date }}" />
+                required="required" value="{{ from_date }}" max="{{ max_date }}" />
         </div>
         <div class="col-2 text-center">
             <label class="text-white">TO</label>
         </div>
         <div class="col-5">
             <input class="text-center" onchange="applyFilter(1)" style="height: 25px" type="date" id="to_date" name="to_date"
-                required="required" value="{{ to_date }}" max="{{ current_date }}" />
+                required="required" value="{{ to_date }}" max="{{ max_date }}" />
         </div>
     </form><br />
     <table class="table-bordered table-striped">

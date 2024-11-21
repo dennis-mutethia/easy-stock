@@ -15,7 +15,7 @@
                     labels: [{{ dates | join(',') | safe }}],
                     datasets: [
                         {
-                            data: [{{ stocks_2 | join(',') | safe }}],
+                            data: [{{ stocks | join(',') | safe }}],
                             borderColor: "blue",
                             fill: false,
                             label: 'Stock'
@@ -27,13 +27,13 @@
                             label: 'Purchases'
                         },     
                         {
-                            data: [{{ sales_all | join(',') | safe }}],
+                            data: [{{ sales | join(',') | safe }}],
                             borderColor: "green",
                             fill: false,
                             label: 'Sales'
                         },                     
                         {
-                            data: [{{ expenses_all | join(',') | safe }}],
+                            data: [{{ expenses | join(',') | safe }}],
                             borderColor: "red",
                             fill: false,
                             label: 'Expenses'
