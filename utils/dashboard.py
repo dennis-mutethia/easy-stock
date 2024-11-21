@@ -1,5 +1,5 @@
 import random
-from datetime import datetime
+from datetime import datetime, timedelta
 from flask import render_template, request
 from flask_login import current_user
 
@@ -165,7 +165,9 @@ class Dashboard():
                  
     def __call__(self):
         current_date = datetime.now().strftime('%Y-%m-%d')
-        report_date = current_date
+        yesterday = datetime.now() - timedelta(days=1)
+        max_date = yesterday.strftime('%Y-%m-%d')
+        report_date = max_date
         
         if request.method == 'GET':   
             try:    
@@ -183,7 +185,7 @@ class Dashboard():
         dates_2, stocks_2, purchases = self.get_stock_trend(report_date)
          
         return render_template('dashboard/index.html', page_title='Dashboard', helper=Helper(),
-                               report_date=report_date,
+                               report_date=report_date, max_date=max_date,
                                total_cost=total_cost, total_sales=total_sales, total_expenses=total_expenses,
                                total_capital=total_capital, total_stock=total_stock, total_unpaid_bills=total_unpaid_bills,
                                items=items, qtys=qtys, bgcolors=bgcolors, dates=dates, sales_all=sales_all, expenses_all=expenses_all,
