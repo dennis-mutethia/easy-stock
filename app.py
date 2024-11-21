@@ -55,7 +55,7 @@ login_manager.init_app(app)
 login_manager.login_view = 'login'
 
 db = Db()
-#db.create_base_tables()
+#db.migration()
          
 # Callback to reload the user object
 @login_manager.user_loader
@@ -233,5 +233,5 @@ def download():
     return render_template('download.html', page_title='Download > Android App')
 
 if __name__ == '__main__':
-    debug_mode = os.getenv('IS_DEBUG', 'False').lower() in ['True', '1', 't']
+    debug_mode = os.getenv('IS_DEBUG', 'False') in ['True', '1', 't']
     app.run(debug=debug_mode)
