@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timedelta
 from flask import render_template, request
 from flask_login import current_user
 
@@ -23,18 +23,18 @@ class StatementOfAccount():
                     purchase_price,
                     selling_price
                 FROM stock
-                WHERE shop_id = %s AND DATE(stock_date) BETWEEN DATE(%s) AND DATE(%s)
+                WHERE shop_id = %s AND DATE(stock_date) BETWEEN DATE(%s) AND DATE(%s) + 1
             ),
             sales AS(
                 SELECT 
-                    yesterday.stock_date AS date, 
-                    yesterday.purchase_price,
-                    yesterday.selling_price,
-                    (today.opening-(yesterday.opening+yesterday.additions)) AS sold,
-                    yesterday.additions
+                    today.stock_date AS date, 
+                    today.purchase_price,
+                    today.selling_price,
+                    (today.opening + today.additions -tomorrow.opening) AS sold,
+                    today.additions
                 FROM all_stock AS today
-                INNER JOIN all_stock AS yesterday ON yesterday.product_id = today.product_id
-                    AND DATE(yesterday.stock_date) = DATE(today.stock_date) - 1
+                INNER JOIN all_stock AS tomorrow ON tomorrow.product_id = today.product_id
+                    AND DATE(tomorrow.stock_date) = DATE(today.stock_date) + 1
             ),
             totals AS(
                 SELECT date, SUM(sold*selling_price) AS total_sales, SUM(additions*purchase_price) AS total_purchases, 0 AS expenses
@@ -52,7 +52,7 @@ class StatementOfAccount():
                 UNION SELECT * FROM expenses
             )
             SELECT * FROM final 
-            ORDER BY date ASC
+            ORDER BY date ASC, total_sales DESC, total_purchases DESC
             """
             params = [
                 current_user.shop.id, from_date, to_date,
@@ -62,15 +62,18 @@ class StatementOfAccount():
             cursor.execute(query, tuple(params))
             data = cursor.fetchall()
             statements = []
-            for datum in data:                   
+            for datum in data: 
+                print(datum[0], datum[1], datum[2], datum[3])                  
                 statements.append(Statement(datum[0], datum[1], datum[2], datum[3]))
 
             return statements 
          
-    def __call__(self):
-        current_date = datetime.now().strftime('%Y-%m-%d')
+    def __call__(self):        
+        yesterday = datetime.now() - timedelta(days=1)
+        max_date = yesterday.strftime('%Y-%m-%d')
+        
         from_date = datetime.now().replace(day=1).strftime('%Y-%m-%d')
-        to_date = current_date
+        to_date = max_date
         
         if request.method == 'GET':   
             try:    
@@ -82,5 +85,5 @@ class StatementOfAccount():
         statements = self.fetch(from_date, to_date) 
                     
         return render_template('reports/statement-of-account.html', page_title='Reports >Statement of Account', helper=Helper(),
-                               statements=statements, from_date=from_date, to_date=to_date, current_date=current_date
+                               statements=statements, from_date=from_date, to_date=to_date, max_date=max_date
                                )
