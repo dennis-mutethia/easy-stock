@@ -8,8 +8,8 @@ from utils.settings.system_users import SystemUsers
 
 class Login():
     def __init__(self, db): 
-        self.db = db
-           
+        self.db = db        
+     
     def login(self):  
         if request.method == 'POST':
             if request.form['action'] == 'login':
@@ -52,6 +52,8 @@ class Login():
             SystemUsers(self.db).update(user_id, user_name, user_phone, 1, shop_id, password=user_password)
                     
         login_user(user)
+        self.db.import_product_categories_template_data(shop_id, shop_type_id)
+        self.db.import_products_template_data(shop_id, shop_type_id)
         StockTake(self.db).load(current_date) 
         return redirect(url_for('dashboard'))         
       

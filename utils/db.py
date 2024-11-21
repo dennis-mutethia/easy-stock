@@ -199,3 +199,45 @@ class Db():
                 return PaymentMode(data[0], data[1], data[2])
             else:
                 return None       
+    
+    def import_product_categories_template_data(self, shop_id, shop_type_id):
+        shop_type_id =  0 - int(shop_type_id)
+        self.ensure_connection()
+        with self.conn.cursor() as cursor:
+            query = """
+            WITH source AS(
+                SELECT name
+                FROM product_categories
+                WHERE shop_id = %s
+            )
+            INSERT INTO product_categories(name, shop_id, created_at, created_by)
+            SELECT name, %s AS shop_id, NOW(), %s AS created_by
+            FROM source            
+            """
+            params = [shop_type_id, shop_id, current_user.id]
+            cursor.execute(query, tuple(params))
+            self.conn.commit()
+    
+    def import_products_template_data(self, shop_id, shop_type_id):   
+        shop_type_id =  0 - int(shop_type_id)
+        self.ensure_connection()
+        with self.conn.cursor() as cursor:         
+            query = """
+            WITH pc AS (
+                SELECT id, name, shop_id 
+                FROM product_categories
+            ),
+            source AS(
+                SELECT products.name, products.purchase_price, products.selling_price, pc_2.id AS category_id
+                FROM products
+                JOIN pc AS pc_1 ON pc_1.id = products.category_id
+                JOIN pc AS pc_2 ON pc_2.name = pc_1.name AND pc_2.shop_id = %s
+                WHERE products.shop_id = %s
+            )            
+            INSERT INTO products(name, purchase_price, selling_price, category_id, shop_id, created_at, created_by)
+            SELECT name, purchase_price, selling_price, category_id, %s AS shop_id, NOW(), %s AS created_by
+            FROM source            
+            """
+            params = [shop_id, shop_type_id, shop_id, current_user.id]
+            cursor.execute(query, tuple(params))
+            self.conn.commit()

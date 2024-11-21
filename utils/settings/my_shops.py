@@ -1,8 +1,10 @@
+from datetime import datetime
 from flask import redirect, render_template, request, url_for
 from flask_login import current_user
 
 from utils.entities import Shop, ShopType
 from utils.helper import Helper
+from utils.stock.stock_take import StockTake
 
 class MyShops():
     def __init__(self, db): 
@@ -124,8 +126,13 @@ class MyShops():
                 account_no = request.form['account_no']       
                 till_no = request.form['till_no']    
                 created_by = current_user.id 
+                current_date = datetime.now().strftime('%Y-%m-%d')
+                
                 if request.form['action'] == 'add':
-                    self.add(name, shop_type_id, company_id, location, phone_1, phone_2, paybill, account_no, till_no, created_by)
+                    shop_id = self.add(name, shop_type_id, company_id, location, phone_1, phone_2, paybill, account_no, till_no, created_by)
+                    self.db.import_product_categories_template_data(shop_id, shop_type_id)
+                    self.db.import_products_template_data(shop_id, shop_type_id)
+                    StockTake(self.db).load(current_date)
                     toastr_message = f'{name} Added Successfully'
                 else:
                     shop_id = request.form['shop_id']
