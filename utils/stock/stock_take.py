@@ -71,8 +71,7 @@ class StockTake():
         FROM today
         INNER JOIN product_categories ON product_categories.id = today.category_id
         LEFT JOIN yesterday ON yesterday.product_id = today.product_id            
-        WHERE (today.opening + today.additions) >= %s
-        ORDER BY product_categories.name, today.name
+        WHERE (today.opening + today.additions) >= %s        
         """
         params = [current_user.shop.id, stock_date, stock_date, in_stock]
 
@@ -83,9 +82,11 @@ class StockTake():
             query += " AND today.category_id = %s"
             params.append(category_id)
         
+        query = query + """
+            ORDER BY today.category_id, today.name
+            """
         if page>0:
             query = query + """
-            ORDER BY today.category_id, today.name
             LIMIT 30 OFFSET %s
             """
             params.append((page - 1)*30)
