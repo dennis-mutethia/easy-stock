@@ -59,12 +59,30 @@
             {% endfor %}
         </tbody>
         <tfoot>
-            <tr style="border-top: 2px solid white;">
-                <th class="text-center" colspan="2"><b><u>TOTALS</u></b></th>
-                <th class="text-right"><b><u>{{ helper.format_number_with_commas(ns.total_sales) }}</u></b></th>
+            <tr style="border-top: 2px solid white; border-bottom: 2px solid white;">
+                <th class="text-center" colspan="2"><b>TOTALS</b></th>
+                <th class="text-right"><b>{{ helper.format_number_with_commas(ns.total_sales) }}</b></th>
                 <th></th>
-                <th class="text-right" colspan="3" style="border-left: double"><b><u>{{ helper.format_number_with_commas(ns.total_purchases+ns.total_expenses) }}</u></b></th>
-          </tr>
+                <th class="text-right" colspan="3" style="border-left: double"><b>{{ helper.format_number_with_commas(ns.total_purchases+ns.total_expenses) }}</b></th>
+            </tr>
+            <tr>
+                <th class="text-right" colspan="3"></th>
+                <th><br /></th>
+                <th class="text-right" colspan="3" style="border-left: double"></th>
+            </tr> 
+            {% if ns.total_sales > (ns.total_purchases+ns.total_expenses) %}
+            <tr>
+                <th class="text-right text-success" colspan="3"><b>+{{ helper.format_number_with_commas(ns.total_sales-(ns.total_purchases+ns.total_expenses)) }}</b></th>
+                <th></th>
+                <th class="text-right" colspan="3" style="border-left: double"></th>
+            </tr>
+            {% elif ns.total_sales < (ns.total_purchases+ns.total_expenses) %}
+            <tr>
+                <th class="text-right" colspan="3"></th>
+                <th></th>
+                <th class="text-right text-danger" colspan="3" style="border-left: double"><b>-{{ helper.format_number_with_commas(ns.total_purchases+ns.total_expenses-ns.total_sales) }}</b></th>
+            </tr>
+            {% endif %}
         </tfoot>
     </table><br />
 </div>
