@@ -17,19 +17,19 @@ class Dashboard():
         with self.db.conn.cursor() as cursor:
             query = """
             WITH all_stock AS (
-                SELECT stock_date, product_id, name, opening, additions
+                SELECT stock_date, product_id, name, COALESCE(stock.opening 0) AS opening, COALESCE(stock.additions, 0) AS additions, 
                 FROM stock
                 WHERE shop_id = %s
             ),
             yesterday AS (
-                SELECT product_id, name, (COALESCE(opening,0) + COALESCE(additions, 0)) AS total
+                SELECT product_id, name, (opening + additions) AS total
                 FROM all_stock
                 WHERE DATE(stock_date) = DATE(%s) - 1
             ),
             today AS (
                 SELECT product_id, opening
                 FROM all_stock
-                WHERE DATE(stock_date) = DATE(%s) - 1
+                WHERE DATE(stock_date) = DATE(%s)
             ),
             source AS(
                 SELECT yesterday.name AS item_name, (today.opening-yesterday.total) AS sold

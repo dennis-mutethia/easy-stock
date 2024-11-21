@@ -141,14 +141,22 @@
     {% include 'footer.html' %}
 
     <script>
-        if ($toastr_message)
-            toastr.success($toastr_message);
-        if ($toastr_err_message)
-            toastr.error($toastr_err_message);
-        $("#new_frm").submit(function () {
-            $("#action_2").html('Spinning up Your new Company');
-            $("#action_2").prop('disabled', true);
+
+        $(document).ready(function() {
+            $('#new_frm').submit(function() {
+                // Disable the submit button
+                $('#action_2').prop('disabled', true);
+                
+                // Change the button text
+                $('#action_2').text('Spinning company');
+            });
+
+            if ($toastr_message)
+                toastr.success($toastr_message);
+            if ($toastr_err_message)
+                toastr.error($toastr_err_message);
         });
+
     </script>
 </body>
 
