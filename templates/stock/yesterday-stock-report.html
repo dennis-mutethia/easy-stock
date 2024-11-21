@@ -16,19 +16,23 @@
         </div>
     </form><br />
     <table class="table-bordered table-striped">
+        
         <thead>
-           <tr>
-               <th>PRODUCT</th>
-               <th>CATEGORY</th>
-               <th class="text-center">YESTERDAY OPENING</th>
-               <th class="text-center">YESTERDAY PURCHASES</th>
-               <th class="text-center">YESTERDAY TOTAL</th>
-               <th class="text-center">TODAY OPENING</th>
-               <th class="text-center">SOLD YESTERDAY</th>
-               <th class="text-center">SELLING PRICE</th>
-               <th class="text-center">TOTAL AMOUNT</th>
-           </tr>
-       </thead>
+            <tr>
+                <th rowspan="2" class="text-center">PRODUCT</th>
+                <th rowspan="2" class="text-center">CATEGORY</th>
+                <th colspan="5" class="text-center">YESTERDAY</th>  
+                <th rowspan="2" class="text-center">SELLING PRICE</th>
+                <th rowspan="2" class="text-center">TOTAL AMOUNT</th>
+            </tr>
+            <tr>
+             <th class="text-center">OPENING</th>
+             <th class="text-center">PURCHASES</th>
+             <th class="text-center">TOTAL</th>
+             <th class="text-center">CLOSING</th>
+             <th class="text-center">SOLD</th>
+            </tr>
+        </thead>
         <tbody>
             {% set ns = namespace(total=0) %}
             {% for stock in stocks %}
