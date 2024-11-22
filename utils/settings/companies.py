@@ -96,7 +96,7 @@ class Companies():
                 shop_id = request.form['id']
                 self.access_shop(shop_id)
                 toastr_message = 'Successfully Switched Shop'
-                return redirect(url_for('companies'))
+                return redirect(url_for('logout'))
         
         companies = self.fetch() 
         packages = OurPackages(self.db).fetch_packages()
