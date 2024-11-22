@@ -6,6 +6,7 @@ from flask_session import Session
 from redis import Redis
 
 from utils.account_profile import AccountProfile
+from utils.cashbox import CashBox
 from utils.our_packages import OurPackages
 from utils.customers.customer_bills import CustomerBills
 from utils.customers.customers import Customers
@@ -41,7 +42,7 @@ app.config['SESSION_TYPE'] = 'redis'
 app.config['SESSION_REDIS'] = Redis(
     host=os.getenv('REDIS_HOSTNAME'),
     port=os.getenv('REDIS_PORT'),
-    password=os.getenv('REDIS_PASSWORD'),
+    password=os.getenv('REDIS_PASSWORD') if os.getenv('REDIS_SSL') in ['True', '1'] else None,
     ssl=False if os.getenv('REDIS_SSL') in ['False', '0'] else True
 )
 
@@ -156,6 +157,11 @@ def customerBills():
 @login_required
 def expenses():
     return Expenses(db)()
+
+@app.route('/cashbox', methods=['GET', 'POST'])
+@login_required
+def cashbox():
+    return CashBox(db)()
 
 @app.route('/bills-report', methods=['GET'])
 @login_required

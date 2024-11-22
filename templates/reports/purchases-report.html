@@ -38,14 +38,14 @@
                 <td>{{ purchase.category_name }}</td>
                 <td class="text-center">{{ helper.format_number_with_commas(helper.format_number(purchase.additions)) }}</td>
                 <td class="text-center">{{ helper.format_number_with_commas(helper.format_number(purchase.purchase_price)) }}</td>
-                <td class="text-center">{{ helper.format_number_with_commas(helper.format_number(total))}}</td>
+                <td class="text-right">{{ helper.format_number_with_commas(helper.format_number(total))}}</td>
             </tr>
             {% endfor %}
         </tbody>
         <tfoot>
             <tr>
                 <th class="text-right" colspan="3"><b><u>TOTAL PURCHASES</u></b></th>
-                <th class="text-center" colspan="2"><b><u>{{ helper.format_number_with_commas(helper.format_number(grand_total))}}</u></b></th>
+                <th class="text-right" colspan="2"><b><u>{{ helper.format_number_with_commas(helper.format_number(grand_total))}}</u></b></th>
             </tr>
         </tfoot>
     </table><br />

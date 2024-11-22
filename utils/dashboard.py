@@ -138,7 +138,7 @@ class Dashboard():
                     SUM((opening+additions)*selling_price) AS stocks,
                     SUM(sold*selling_price) AS sales
                 FROM sales  
-                WHERE DATE(stock_date) BETWEEN DATE(%s) - INTERVAL '30 days' AND DATE(%s)
+                WHERE DATE(stock_date) BETWEEN DATE(%s) - INTERVAL '7 days' AND DATE(%s)
                 GROUP BY stock_date
             ),
             exp AS(
@@ -168,34 +168,7 @@ class Dashboard():
                 expenses_all.append(datum[4] if datum[4] is not None else 0)
 
             return dates, purchases_all, stocks_all, sales_all, expenses_all
-          
-    def get_stock_trend(self, report_date):
-        self.db.ensure_connection()
-        with self.db.conn.cursor() as cursor:
-            query = """
-            WITH s AS(
-                SELECT DATE(created_at) AS report_date, (COALESCE(opening, 0) + COALESCE(additions, 0)) * selling_price AS stock, COALESCE(additions, 0) * purchase_price AS purchases 
-                FROM stock
-                WHERE DATE(created_at) BETWEEN DATE(%s) - INTERVAL '30 days' AND DATE(%s) AND shop_id=%s AND opening != 'Nan' AND additions != 'Nan'
-            )
-            SELECT report_date, SUM(stock) AS stock, SUM(purchases) AS purchases
-            FROM s
-            GROUP BY report_date        
-            """
-            params = [report_date, report_date, current_user.shop.id]
-            
-            cursor.execute(query, tuple(params))
-            data = cursor.fetchall()
-            dates = []
-            stocks = []
-            purchases = []
-            for datum in data:  
-                dates.append(f"'{datum[0]}'")
-                stocks.append(datum[1] if datum[1] is not None else 0)
-                purchases.append(datum[2] if datum[2] is not None else 0)
-
-            return dates, stocks, purchases
-                 
+                
     def __call__(self):
         yesterday = datetime.now() - timedelta(days=1)
         max_date = yesterday.strftime('%Y-%m-%d')

@@ -45,28 +45,28 @@ class MyShops():
             else:
                 return None    
     
-    def add(self, name, shop_type_id, company_id, location, phone_1, phone_2, paybill, account_no, till_no, created_by):
+    def add(self, name, shop_type_id, company_id, location, created_by):
         self.db.ensure_connection()
         with self.db.conn.cursor() as cursor:
             query = """
-            INSERT INTO shops(name, shop_type_id, company_id, location, phone_1, phone_2, paybill, account_no, till_no, created_at, created_by) 
-            VALUES(%s, %s, %s, %s, %s, %s, %s, %s, %s, NOW(), %s) 
+            INSERT INTO shops(name, shop_type_id, company_id, location, created_at, created_by) 
+            VALUES(%s, %s, %s, %s, NOW(), %s) 
             RETURNING id
             """
-            cursor.execute(query, (name.upper(), shop_type_id, company_id, location.upper(), phone_1, phone_2, paybill, account_no, till_no, created_by))
+            cursor.execute(query, (name.upper(), shop_type_id, company_id, location.upper(), created_by))
             self.db.conn.commit()
             shop_id = cursor.fetchone()[0]
             return shop_id
         
-    def update(self, shop_id, name, shop_type_id, company_id, location, phone_1, phone_2, paybill, account_no, till_no, updated_by):
+    def update(self, shop_id, name, shop_type_id, company_id, location, updated_by):
         self.db.ensure_connection()
         with self.db.conn.cursor() as cursor:
             query = """
             UPDATE shops 
-            SET name = %s, shop_type_id = %s, company_id = %s, location = %s, phone_1 = %s, phone_2 = %s, paybill = %s, account_no = %s, till_no = %s, updated_at=NOW(), updated_by = %s 
+            SET name = %s, shop_type_id = %s, company_id = %s, location = %s, updated_at=NOW(), updated_by = %s 
             WHERE id = %s          
             """
-            cursor.execute(query, (name.upper(), shop_type_id, company_id, location.upper(), phone_1, phone_2, paybill, account_no, till_no, updated_by, shop_id))
+            cursor.execute(query, (name.upper(), shop_type_id, company_id, location.upper(), updated_by, shop_id))
             self.db.conn.commit()
             
     def switch(self, shop_id):
@@ -167,23 +167,18 @@ class MyShops():
                 location = request.form['location']      
                 shop_type_id = request.form['shop_type_id']   
                 company_id = current_user.company.id  
-                phone_1 = request.form['phone_1']       
-                phone_2 = request.form['phone_2']       
-                paybill = request.form['paybill']       
-                account_no = request.form['account_no']       
-                till_no = request.form['till_no']    
                 created_by = current_user.id 
                 current_date = datetime.now().strftime('%Y-%m-%d')
                 
                 if request.form['action'] == 'add':
-                    shop_id = self.add(name, shop_type_id, company_id, location, phone_1, phone_2, paybill, account_no, till_no, created_by)
+                    shop_id = self.add(name, shop_type_id, company_id, location, created_by)
                     self.db.import_product_categories_template_data(shop_id, shop_type_id)
                     self.db.import_products_template_data(shop_id, shop_type_id)
                     StockTake(self.db).load(current_date)
                     toastr_message = f'{name} Added Successfully'
                 else:
                     shop_id = request.form['shop_id']
-                    self.update(shop_id, name, shop_type_id, company_id, location, phone_1, phone_2, paybill, account_no, till_no, created_by)
+                    self.update(shop_id, name, shop_type_id, company_id, location, created_by)
                     toastr_message = f'{name} Updated Successfully'
             
             elif request.form['action'] == 'switch':
@@ -191,7 +186,7 @@ class MyShops():
                 name = request.form['name']
                 self.switch(shop_id)
                 toastr_message = f'Successfully Switched Shop to {name}'
-                return redirect(url_for('myShops'))
+                return redirect(url_for('logout'))
                     
             elif request.form['action'] == 'delete':
                 shop_id = request.form['shop_id']

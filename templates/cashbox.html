@@ -1,0 +1,149 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<!-- ============================================================== -->
+<!-- Container fluid  -->
+<!-- ============================================================== -->
+<div class="container-fluid card table-responsive">
+    <form id="filter-frm" method="GET" class="row">        
+        <div class="col-6">
+            <input class="text-center" onchange="applyFilter(1)" style="height: 25px" type="date" id="report_date" name="report_date"
+                required="required" value="{{ report_date }}" max="{{ max_date }}" {{ 'disabled' if current_user.user_level.id not in [0, 1, 2]  }} />
+        </div>
+        <div class="col-6">
+            <a href="#" class="btn btn-xs btn-primary btn-flat" style="width: 100%" data-toggle="modal"
+                data-target="#newModal">Update CashBox</a>
+        </div>
+    </form><br />
+    <table class="table-striped">
+        <thead>
+            <tr><th class="text-right">TOTAL SALES:</th><th class="text-right" style="width: 20%;">{{ helper.format_number_with_commas(today.total_sales) }}</th><th></th></tr>
+            <tr><th class="text-right">(Add) PAID DEBTS:</th><th class="text-right" style="width: 20%;">+ {{ helper.format_number_with_commas(today.paid_bills) }}</th><th></th></tr>
+            <tr><th class="text-right">(Less) NEW DEBTS:</th><th class="text-right" style="width: 20%;">- {{ helper.format_number_with_commas(today.new_bills) }}</th><th></th></tr>
+            <tr><th class="text-right">(Less) EXPENSES:</th><th class="text-right" style="width: 20%;">- {{ helper.format_number_with_commas(today.total_expenses) }}</th><th></th></tr>
+            <tr style="border-top: 2px solid white;"><th class="text-right">TOTAL EXPECTED AMOUNT:</th><th class="text-right" style="width: 20%;">
+                {{ helper.format_number_with_commas(total_expected) }}</th><th></th></tr>
+            <tr>
+                <th class="text-right">CASH RECEIVED:</th><th></th>
+                <th class="text-right">{{ helper.format_number_with_commas(today.cash) }}</th>
+            </tr>
+            <tr>
+                <th class="text-right">MPESA RECEIVED:</th><th></th>
+                <th class="text-right">{{ helper.format_number_with_commas(today.mpesa) }}</th>
+            </tr>
+            <tr style="border-top: 2px solid white;"><th class="text-right">TOTAL RECEIVED AMOUNT:</th><th></th><th class="text-right" style="width: 20%;">{{ helper.format_number_with_commas(total_received) }}</th></tr>
+            <tr><td><br /></td></tr>
+            <tr style="border-bottom: 2px solid white;"><th class="text-right">DIFFERENCE:</th><th class="text-right" style="width: 20%;">{{ helper.format_number_with_commas(total_diff) }}</th>
+                <th class="text-right" style="color: {{ 'red' if total_diff < 0 else 'lime' }}">
+                    {% if total_diff < 0 %} 
+                    SHORT
+                    {% elif total_diff > 0 %} 
+                    TIPs
+                    {% endif %}
+                </th>
+            </tr>
+        </thead>
+    </table><br />
+    
+    <h5 class="text-white"><u>This Month Trend</u></h5>
+
+    <table class="table-bordered table-striped">
+        <thead>
+            <tr>
+                <th class="text-center">DATE</th>
+                <th class="text-center">EXPECTED AMOUNT</th>
+                <th class="text-center">TOTAL RECEIVED</th>
+                <th class="text-center">DIFFERENCE</th>
+                <th class="text-center"></th>
+            </tr>
+        </thead>
+        <tbody>
+            {% set ns = namespace(total_expected=0, total_received=0, total_diff=0) %}
+            {% for datum in data %}
+
+            {% set total_expected = datum.total_sales + datum.paid_bills - datum.new_bills + datum.total_expenses %}
+            {% set total_received =datum.cash + datum.mpesa %}
+            {% set ns.total_expected = ns.total_expected + total_expected %}    
+            {% set ns.total_received = ns.total_received + total_received %}   
+            {% set diff = total_received - total_expected %}
+            {% set ns.total_diff = ns.total_diff + diff %}  
+
+            <tr>
+                <td>{{ datum.date }}</td>
+                <td class="text-center">{{ helper.format_number_with_commas(total_expected) }}</td>
+                <td class="text-center">{{ helper.format_number_with_commas(total_received) }}</td>
+                <td class="text-center">{{ helper.format_number_with_commas(diff) }}</td>
+                <td class="text-center" style="color: {{ 'red' if diff < 0 else 'lime' }}">
+                    {% if diff < 0 %} 
+                    SHORT
+                    {% elif diff > 0 %} 
+                    TIPs
+                    {% endif %}
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+        <tfoot>
+            <tr>
+                <th class="text-center">TOTALS</th>
+                <th class="text-center">{{ helper.format_number_with_commas(ns.total_expected)}}</th>
+                <th class="text-center">{{ helper.format_number_with_commas(ns.total_received)}}</th>
+                <th class="text-center">{{ helper.format_number_with_commas(ns.total_diff)}}</th>
+                <th class="text-center" style="color: {{ 'red' if ns.total_diff < 0 else 'lime' }}">
+                    {% if ns.total_diff < 0 %} 
+                    SHORT
+                    {% elif ns.total_diff > 0 %} 
+                    TIPs
+                    {% endif %}
+                </th>
+            </tr>
+        </tfoot>
+    </table><br />
+
+    
+<div class="modal fade" id="newModal" tabindex="-1" role="dialog" aria-labelledby="newModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <form method="POST" class="form-horizontal">
+                <input type="hidden" id="report_date" name="report_date" value="{{ report_date }}" />
+                <div class="modal-header text-center">
+                    <h5 class="text-center">Update Cashbox</h5>
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group row">
+                        <div class="col-sm-12">
+                            <input required="required" type="number" name="cash" id="cash" value="{{ today.cash }}" min="0"
+                                class="form-control input-sm" placeholder="Enter Cash Amount">
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <div class="col-sm-12">
+                            <input required="required" type="number" name="mpesa" id="mpesa" value="{{ today.mpesa }}" min="0"
+                                class="form-control input-sm" placeholder="Enter Mpesa Amount">
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+                    <button type="submit" id="action" name="action" value="update"
+                        class="btn btn-success">Update Cashbox</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+</div>
+<!-- ============================================================== -->
+<!-- End Container fluid  -->
+<!-- ============================================================== -->
+
+<script>
+    function applyFilter(page) {
+        $("#page").val(page);
+        $("#filter-frm").submit();
+    }
+</script>
+
+{% endblock %}

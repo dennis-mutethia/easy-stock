@@ -13,8 +13,9 @@
                     <nav aria-label="breadcrumb">
                         <ol class="breadcrumb">
                             {% if current_user.license.validity < 7 %}
-                            <li class="breadcrumb-item active" aria-current="page" style="color: red; font-weight: bold;">
-                                Your License will Expire in {{ current_user.license.validity }} days. Kindly Contact <a href="https://wa.me/254105565532" title="Whatsapp +254 105 565532">0105 565 532</a> to Renew to avoid inconveniences.
+                            <li class="breadcrumb-item active text-center" aria-current="page" style="color: red; font-weight: bold;">
+                                Your License will Expire in {{ current_user.license.validity }} days - <a href="{{ url_for('ourPackages') }}">Click here to Renew</a> to avoid inconveniences. 
+                                Or Contact Support via <a href="https://wa.me/254105565532" title="Whatsapp +254 105 565532">Whatsapp 0105 565 532</a>.
                             </li>
                             {% endif %}
                             <li class="breadcrumb-item active" aria-current="page">{{ page_title }}</li>

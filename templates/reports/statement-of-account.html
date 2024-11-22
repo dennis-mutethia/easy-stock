@@ -23,10 +23,9 @@
         <thead>
             <tr style="border-bottom: 2px solid white;">
                 <th class="text-center">DATE</th>
-                <th class="text-center" colspan="2">MONEY IN</th>
-                <th></th>
-                <th class="text-center" style="border-left: double">DATE</th>
-                <th class="text-center" colspan="2" >MONEY OUT</th>
+                <th>DETAILS</th>
+                <th class="text-center">MONEY IN</th>
+                <th class="text-right" style="border-left: double">MONEY OUT</th>
             </tr>
         </thead>
         <tbody>
@@ -37,24 +36,23 @@
             {% set ns.total_purchases = ns.total_purchases + statement.purchases %}           
             <tr>
                 <td>
-                    {{ statement.date if statement.sales>0 }}
+                    {{ statement.date }}
                 </td>
-                <td class="text-right">{{ 'Sales:' if statement.sales>0 }}</td>
-                <td class="text-right">
-                    {{ helper.format_number_with_commas(statement.sales) if statement.sales>0 }}
-                </td>
+                <td>{{ 'Sales' if statement.sales>0 }}</td>
+                <td class="text-right"> {{ helper.format_number_with_commas(statement.sales) if statement.sales>0 }} </td>
+                <td class="text-right" style="border-left: double"></td>
+            </tr>
+            <tr>
                 <td></td>
-                <td class="text-center" style="border-left: double">
-                    {{ statement.date if statement.purchases>0 or statement.expenses>0 }}
-                </td>
-                <td class="text-right">
-                    {{ 'Purchases:' if statement.purchases>0 }}
-                    {{ 'Expenses:' if statement.expenses>0 }}
-                </td>
-                <td class="text-right">
-                    {{ helper.format_number_with_commas(statement.purchases) if statement.purchases>0 }}
-                    {{ helper.format_number_with_commas(statement.expenses) if statement.expenses>0 }}
-                </td>
+                <td>{{ 'Purchases' if statement.purchases>0 }}</td>
+                <td></td>
+                <td class="text-right" style="border-left: double">{{ helper.format_number_with_commas(statement.purchases) if statement.purchases>0 }}</td>
+            </tr>
+            <tr>
+                <td></td>
+                <td>{{ 'Expenses' if statement.expenses>0 }}</td>
+                <td></td>
+                <td class="text-right" style="border-left: double">{{ helper.format_number_with_commas(statement.expenses) if statement.expenses>0 }}</td>
             </tr>
             {% endfor %}
         </tbody>
@@ -62,25 +60,21 @@
             <tr style="border-top: 2px solid white; border-bottom: 2px solid white;">
                 <th class="text-center" colspan="2"><b>TOTALS</b></th>
                 <th class="text-right"><b>{{ helper.format_number_with_commas(ns.total_sales) }}</b></th>
-                <th></th>
-                <th class="text-right" colspan="3" style="border-left: double"><b>{{ helper.format_number_with_commas(ns.total_purchases+ns.total_expenses) }}</b></th>
+                <th class="text-right" style="border-left: double"><b>{{ helper.format_number_with_commas(ns.total_purchases+ns.total_expenses) }}</b></th>
             </tr>
             <tr>
-                <th class="text-right" colspan="3"></th>
-                <th><br /></th>
-                <th class="text-right" colspan="3" style="border-left: double"></th>
+                <th class="text-right" colspan="3"><br /></th>
+                <th class="text-right" style="border-left: double"></th>
             </tr> 
             {% if ns.total_sales > (ns.total_purchases+ns.total_expenses) %}
             <tr>
                 <th class="text-right text-success" colspan="3"><b>+{{ helper.format_number_with_commas(ns.total_sales-(ns.total_purchases+ns.total_expenses)) }}</b></th>
-                <th></th>
-                <th class="text-right" colspan="3" style="border-left: double"></th>
+                <th class="text-right" style="border-left: double"></th>
             </tr>
             {% elif ns.total_sales < (ns.total_purchases+ns.total_expenses) %}
             <tr>
                 <th class="text-right" colspan="3"></th>
-                <th></th>
-                <th class="text-right text-danger" colspan="3" style="border-left: double"><b>-{{ helper.format_number_with_commas(ns.total_purchases+ns.total_expenses-ns.total_sales) }}</b></th>
+                <th class="text-right text-danger" style="border-left: double"><b>-{{ helper.format_number_with_commas(ns.total_purchases+ns.total_expenses-ns.total_sales) }}</b></th>
             </tr>
             {% endif %}
         </tfoot>

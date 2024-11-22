@@ -42,7 +42,7 @@ class StatementOfAccount():
                 GROUP BY date
             ),
             expenses AS(
-                SELECT date,0,0,SUM(amount)
+                SELECT date,0 AS total_sales, 0 AS total_purchases, SUM(amount) AS expenses
                 FROM expenses
                 WHERE shop_id = %s AND date BETWEEN DATE(%s) AND DATE(%s)
                 GROUP BY date
@@ -51,8 +51,10 @@ class StatementOfAccount():
                 SELECT * FROM totals
                 UNION SELECT * FROM expenses
             )
-            SELECT * FROM final 
-            ORDER BY date ASC, total_sales DESC, total_purchases DESC
+            SELECT date, MAX(total_sales) AS total_sales, MAX(total_purchases) AS total_purchases, MAX(expenses) AS expenses
+            FROM final 
+            GROUP BY date
+            ORDER BY date ASC
             """
             params = [
                 current_user.shop.id, from_date, to_date,

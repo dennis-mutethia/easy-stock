@@ -23,7 +23,7 @@ class Login():
                     if user.user_level.id in [0, 1]:               
                         return redirect(url_for('dashboard'))
                     else:
-                        return redirect(url_for('posNewSale')) 
+                        return redirect(url_for('stockTake')) 
                 else: 
                     error = 'Login failed! Phone & Password do not match or Phone does not exist.'
                     shop_types = MyShops(self.db).fetch_shop_types()

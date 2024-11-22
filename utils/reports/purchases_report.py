@@ -10,24 +10,23 @@ class PurchasesReport():
     def __init__(self, db): 
         self.db = db
 
-    def fetch(self, from_date, category_id=0, page=0):
+    def fetch(self, report_date, category_id=0, page=0):
         self.db.ensure_connection()
         with self.db.conn.cursor() as cursor:
             query = """
-            SELECT DATE(s.updated_at) AS report_date, s.name, pc.name AS category_name, s.purchase_price, SUM(COALESCE(s.additions,0)) additions 
+            SELECT s.stock_date, s.name, pc.name AS category_name, s.purchase_price, additions 
             FROM stock s
             LEFT JOIN product_categories pc ON pc.id= s.category_id   
-            WHERE DATE(s.updated_at) = DATE(%s) AND s.shop_id = %s AND s.additions IS NOT NULL AND s.additions>0
+            WHERE DATE(s.stock_date) = DATE(%s) AND s.shop_id = %s AND s.additions IS NOT NULL AND s.additions>0
             """
-            params = [from_date, current_user.shop.id]
+            params = [report_date, current_user.shop.id]
             
             if category_id > 0:
                 query = query + " AND s.category_id = %s "
                 params.append(category_id)
             
             query = query + """
-            GROUP BY report_date, s.name, pc.name, s.purchase_price
-            ORDER BY report_date ASC, pc.name, s.name
+            ORDER BY pc.name, s.name
             """
             
             if page>0:

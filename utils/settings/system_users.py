@@ -19,8 +19,9 @@ class SystemUsers():
             WHERE shop_id IN(
                 SELECT id FROM shops WHERE company_id = %s
             )
+            AND user_level_id >= %s
             """
-            params = [current_user.company.id]
+            params = [current_user.company.id, current_user.user_level.id]
             
             cursor.execute(query, tuple(params))
             data = cursor.fetchall()

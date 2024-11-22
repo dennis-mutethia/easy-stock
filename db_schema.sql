@@ -220,5 +220,5 @@ CREATE TABLE IF NOT EXISTS cashbox (
   created_by INT,
   updated_at TIMESTAMP,
   updated_by INT,
-  UNIQUE (date)
+  UNIQUE (date, shop_id)
 );

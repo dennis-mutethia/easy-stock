@@ -63,13 +63,6 @@ class CustomerBills():
                 bill_amount = int(request.form['bill_amount'])     
                 customer_id = int(request.form['customer_id'])              
                 Bills(self.db).add(customer_id, bill_amount)
-                   
-            if request.form['action'] == 'edit':
-                bill_id = int(request.form['bill_id'])           
-                BillEntries(self.db).edit(bill_id)     
-                Bills(self.db).delete(bill_id)  
-                Payments(self.db).delete(bill_id)
-                return redirect(url_for('posNewSale'))               
                 
             elif request.form['action'] == 'submit_payment':
                 bill_id = int(request.form['bill_id'])
