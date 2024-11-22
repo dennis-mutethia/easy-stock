@@ -9,7 +9,7 @@
     </thead>
     <tbody>
         {% for shop in shops %}
- <form method="POST">
+ <form method="POST" id="access_shop_form_{{ shop.id }}">
         <tr>
             <td style="color: black;">{{ shop.name }}</td> 
             <td style="color: black;">{{ shop.type }}</td> 
