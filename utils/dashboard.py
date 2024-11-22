@@ -88,6 +88,7 @@ class Dashboard():
         self.db.ensure_connection()
         total_sales = 0 
         total_cost = 0
+        total_purchases = 0
         with self.db.conn.cursor() as cursor:
             query = """                       
             WITH all_stock AS (
@@ -105,6 +106,7 @@ class Dashboard():
                 SELECT 
                     today.purchase_price,
                     today.selling_price,
+                    today.additions,
                     (today.opening + today.additions - tomorrow.opening) AS sold
                 FROM all_stock AS today
                 INNER JOIN all_stock AS tomorrow ON tomorrow.product_id = today.product_id
@@ -112,10 +114,10 @@ class Dashboard():
                 WHERE DATE(today.stock_date) = DATE(%s)
             ),
             totals AS(
-                SELECT SUM(sold*selling_price) AS total_sales, SUM(sold*purchase_price) AS total_cost
+                SELECT SUM(sold*selling_price) AS total_sales, SUM(sold*purchase_price) AS total_cost, SUM(additions*purchase_price) AS total_purchases
                 FROM sales  
             )
-            SELECT total_sales, total_cost
+            SELECT total_sales, total_cost, total_purchases
             FROM totals
             """
             params = [current_user.shop.id, report_date]
@@ -124,9 +126,10 @@ class Dashboard():
             data = cursor.fetchall()
             for datum in data:   
                 total_sales = datum[0]   
-                total_cost = datum[1]        
+                total_cost = datum[1]  
+                total_purchases = datum[2]        
 
-            return total_sales, total_cost 
+            return total_sales, total_cost, total_purchases 
         
     def get_sales_purchases_and_expenses(self, report_date):
         self.db.ensure_connection()
@@ -205,7 +208,7 @@ class Dashboard():
             except Exception as e:
                 print(f"An error occurred: {e}")
         
-        total_sales, total_cost = self.get_total_sales(report_date)
+        total_sales, total_cost, total_purchases = self.get_total_sales(report_date)
         total_expenses = Expenses(self.db).get_total(report_date)
         total_capital, total_stock = StockTake(self.db).get_total(report_date)
         total_unpaid_bills = Bills(self.db).get_total_unpaid_bills(report_date)
@@ -215,8 +218,8 @@ class Dashboard():
          
         return render_template('dashboard/index.html', page_title='Dashboard', helper=Helper(),
                                report_date=report_date, max_date=max_date,
-                               total_cost=total_cost, total_sales=total_sales, total_expenses=total_expenses,
-                               total_capital=total_capital, total_stock=total_stock, total_unpaid_bills=total_unpaid_bills,
+                               total_purchases=total_purchases, total_sales=total_sales, total_expenses=total_expenses,
+                               total_capital=total_capital, total_stock=total_stock, total_cost=total_cost, total_unpaid_bills=total_unpaid_bills,
                                items=items, qtys=qtys, bgcolors=bgcolors, debts=debts, amounts=amounts, bgcolors_2=bgcolors_2,
                                dates=dates, sales=sales, expenses=expenses, stocks=stocks, purchases=purchases
                                )
