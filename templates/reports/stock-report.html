@@ -23,14 +23,13 @@
     <table class="table-bordered table-striped">
         <thead>
             <tr>
-                <th class="text-center">PRODUCT</th>
-                <th class="text-center">CATEGORY</th>
-                <th class="text-center">OPENING STOCK</th>
-                <th class="text-center">PURCHASES</th>
-                <th class="text-center">CLOSING STOCK</th>
-                <th class="text-center">SOLD</th>
-                <th class="text-center">SELLING PRICE</th>
-                <th class="text-center">TOTAL</th>
+                <th class="text-center" style="font-size: x-small;">PRODUCT</th>
+                <th class="text-center" style="font-size: x-small;">CATEGORY</th>
+                <th class="text-center" style="font-size: x-small;">OPENING STOCK</th>
+                <th class="text-center" style="font-size: x-small;">CLOSING STOCK</th>
+                <th class="text-center" style="font-size: x-small;">SOLD</th>
+                <th class="text-center" style="font-size: x-small;">SELLING PRICE</th>
+                <th class="text-center" style="font-size: x-small;">TOTAL</th>
             </tr>
         </thead>
         <tbody>
@@ -39,8 +38,7 @@
             <tr>
                 <td>{{ stock.name }}</td>
                 <td>{{ stock.category_name }}</td>
-                <td class="text-center">{{ helper.format_number_with_commas(helper.format_number(stock.opening)) }}</td>
-                <td class="text-center">{{ helper.format_number_with_commas(helper.format_number(stock.additions)) }}</td>
+                <td class="text-center">{{ helper.format_number_with_commas(stock.opening) }} {{ '+' ~ helper.format_number_with_commas(stock.additions) if stock.additions>0 }}</td> 
                 <td class="text-center">{{ helper.format_number_with_commas(helper.format_number(stock.opening + stock.additions - stock.sold)) }}</td>
                 <td class="text-center">{{ helper.format_number_with_commas(helper.format_number(stock.sold)) }}</td>
                 <td class="text-center">{{ helper.format_number_with_commas(helper.format_number(stock.selling_price)) }}</td>
@@ -50,7 +48,7 @@
         </tbody>
         <tfoot>
             <tr>
-                <th class="text-right" colspan="7"><b><u>TOTAL SALES</u></b></th>
+                <th class="text-right" colspan="6"><b><u>TOTAL SALES</u></b></th>
                 <th class="text-center"><b><u>{{ helper.format_number_with_commas(helper.format_number(grand_total))}}</u></b></th>
             </tr>
         </tfoot>

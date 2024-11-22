@@ -8,28 +8,20 @@
     <table class="table-striped table-bordered table-condensed">
         <thead>
             <tr>
-                <th class="text-right">ID</th>
-                <th class="text-center">COMPANY NAME</th>
-                <th class="text-center">PHONE</th>
-                <th class="text-center">CREATED ON</th>
-                <th class="text-center">LICENSE KEY</th>
-                <th class="text-center">PACKAGE</th>
-                <th class="text-center">EXPIRES ON</th>
-                <th class="text-center">VALIDITY</th>
-                <th class="text-center" colspan="2">ACTION</th>
-                <th class="text-center">VIEW</th>
+                <th class="text-center" style="font-size: x-small;">COMPANY NAME</th>
+                <th class="text-center" style="font-size: x-small;">CREATED ON</th>
+                <th class="text-center" style="font-size: x-small;">PACKAGE</th>
+                <th class="text-center" style="font-size: x-small;">VALIDITY</th>
+                <th class="text-center" colspan="2" style="font-size: x-small;">ACTION</th>
+                <th class="text-center" style="font-size: x-small;">VIEW</th>
             </tr>
         </thead>
         <tbody>
             {% for company in companies %}
             <tr> 
-                <td class="text-right">#{{ '%04d' | format(company.id) }}.</td>
                 <td>{{ company.name }}</td> 
-                <td>{{ company.phone }}</td> 
                 <td class="text-center">{{ company.created_at }}</td> 
-                <td class="text-center">{{ (company.license_key[:4] ~ '************' ~ company.license_key[-4:]).upper() }}</td> 
                 <td>{{ company.package }}</td> 
-                <td class="text-center">{{ company.expires_at }}</td> 
                 <td class="text-center" style="color: {{ 'red' if company.validity < 7 else 'green' }}">{{ company.validity }} days</td> 
                 <td class="text-center">
                     <button class="btn btn-success btn-xs text-white" data-toggle="modal" data-target="#renewModal" onclick="renewLicense({{ company.license_id }});">Renew</button>

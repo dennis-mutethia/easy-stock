@@ -11,7 +11,7 @@
                 required="required" value="{{ report_date }}" max="{{ max_date }}" {{ 'disabled' if current_user.user_level.id not in [0, 1, 2]  }} />
         </div>
         <div class="col-6">
-            <a href="#" class="btn btn-xs btn-primary btn-flat" style="width: 100%" data-toggle="modal"
+            <a href="#" class="btn btn-xs btn-primary btn-flat" style="width: 100%; font-weight: bold;" data-toggle="modal"
                 data-target="#newModal">Update CashBox</a>
         </div>
     </form><br />

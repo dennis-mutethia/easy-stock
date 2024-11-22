@@ -30,7 +30,7 @@ class Companies():
             LEFT JOIN users u ON u.id = c.created_by
             JOIN licenses l ON l.id = c.license_id
             JOIN packages p ON p.id = l.package_id
-            ORDER BY c.id
+            ORDER BY c.name
             """
             #params = [current_user.company.id]
             
