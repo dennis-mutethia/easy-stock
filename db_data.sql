@@ -29,8 +29,8 @@ ON CONFLICT (name) DO NOTHING;
 INSERT INTO user_levels (name, description) VALUES
 ('SUPER ADMIN', 'All Permissions<br />Can access admin portal'),
 ('ADMIN', 'All Permissions<br />Can Navigate Multiple Shops'),
-('SUPERVISOR', 'Stock<br /> \nInventory<br />Customer Bills<br />\nExpenses<br />\nCan Navigate Multiple Shops'),
-('SALES', 'Stock<br /> \nInventory<br />Customer Bills<br />\nExpenses<br />\nCannot Navigate Multiple Shops'),
+('SUPERVISOR', 'Stock<br /> Inventory<br />Customer Bills<br />Expenses<br />\nCan Navigate Multiple Shops'),
+('SALES', 'Stock<br /> Inventory<br />Customer Bills<br />\nExpenses<br />\nCannot Navigate Multiple Shops'),
 ('DIRECTOR', 'View Reports Only<br />Can Navigate Multiple Shops')
 ON CONFLICT (name) DO NOTHING;
 
