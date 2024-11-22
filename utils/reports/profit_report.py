@@ -45,10 +45,10 @@ class ProfitReport():
                 WHERE shop_id = %s
                 GROUP BY date
             )
-            SELECT report_date, total_sales, total_cost, COALESCE(total_expenses,0) AS total_expenses
+            SELECT COALESCE(report_date, date), COALESCE(total_sales,0), COALESCE(total_cost,0), COALESCE(total_expenses,0) AS total_expenses
             FROM totals
             LEFT JOIN exp ON exp.date=totals.report_date   
-            WHERE total_sales > 0 
+            WHERE total_sales > 0 OR total_expenses>0
             ORDER BY report_date     
             """
             params = [current_user.shop.id, from_date, to_date, current_user.shop.id]
