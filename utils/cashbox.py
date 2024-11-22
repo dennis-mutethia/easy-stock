@@ -124,7 +124,7 @@ class CashBox():
                 return None
                  
     def __call__(self):
-        yesterday = datetime.now(pytz.timezone("Africa/Nairobi")) - timedelta(days=1
+        yesterday = datetime.now(pytz.timezone("Africa/Nairobi")) - timedelta(days=1)
         max_date = yesterday.strftime('%Y-%m-%d')
         report_date = max_date
         
