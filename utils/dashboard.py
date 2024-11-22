@@ -199,7 +199,7 @@ class Dashboard():
     def __call__(self):
         yesterday = datetime.now(pytz.timezone("Africa/Nairobi")) - timedelta(days=1)
         report_date = yesterday.strftime('%Y-%m-%d')
-        max_date = datetime.now().strftime('%Y-%m-%d')
+        max_date = datetime.now(pytz.timezone("Africa/Nairobi")).strftime('%Y-%m-%d')
         
         if request.method == 'GET':   
             try:    
