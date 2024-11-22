@@ -197,7 +197,7 @@ class Dashboard():
             return dates, purchases_all, stocks_all, sales_all, expenses_all
                 
     def __call__(self):
-        yesterday = datetime.now() - timedelta(days=1)
+        yesterday = datetime.now(pytz.timezone("Africa/Nairobi")) - timedelta(days=1)
         report_date = yesterday.strftime('%Y-%m-%d')
         max_date = datetime.now().strftime('%Y-%m-%d')
         
