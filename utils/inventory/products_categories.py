@@ -34,7 +34,7 @@ class ProductsCategories():
         with self.db.conn.cursor() as cursor:
             query = """
             INSERT INTO product_categories(name, shop_id, created_at, created_by) 
-            VALUES(%s, %s, NOW(), %s) 
+            VALUES(%s, %s, CURRENT_TIMESTAMP AT TIME ZONE 'Africa/Nairobi', %s) 
             ON CONFLICT (name, shop_id) DO NOTHING
             RETURNING id
             """
@@ -48,7 +48,7 @@ class ProductsCategories():
         with self.db.conn.cursor() as cursor:
             query = """
             UPDATE product_categories
-            SET name=%s, updated_at=NOW(), updated_by=%s
+            SET name=%s, updated_at=CURRENT_TIMESTAMP AT TIME ZONE 'Africa/Nairobi', updated_by=%s
             WHERE id=%s
             """
             params = [name.upper(), current_user.shop.id, id]

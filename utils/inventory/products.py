@@ -42,7 +42,7 @@ class Products():
         with self.db.conn.cursor() as cursor:
             query = """
             INSERT INTO products(name, purchase_price, selling_price, category_id, shop_id, created_at, created_by) 
-            VALUES(%s, %s, %s, %s, %s, NOW(), %s) 
+            VALUES(%s, %s, %s, %s, %s, CURRENT_TIMESTAMP AT TIME ZONE 'Africa/Nairobi', %s) 
             ON CONFLICT (name, shop_id) DO NOTHING
             RETURNING id
             """
@@ -63,7 +63,7 @@ class Products():
         with self.db.conn.cursor() as cursor:
             query = """
             INSERT INTO stock (stock_date, product_id, name, category_id, purchase_price, selling_price, opening, additions, shop_id, created_at, created_by)               
-            VALUES(CURRENT_DATE, %s, %s, %s, %s, %s, %s, 0, %s, NOW(), %s) 
+            VALUES(CURRENT_DATE, %s, %s, %s, %s, %s, %s, 0, %s, CURRENT_TIMESTAMP AT TIME ZONE 'Africa/Nairobi', %s) 
             ON CONFLICT (stock_date, product_id, shop_id) DO NOTHING
             RETURNING id
             """
@@ -84,7 +84,7 @@ class Products():
         with self.db.conn.cursor() as cursor:
             query = """
             UPDATE products
-            SET name=%s, category_id=%s, purchase_price=%s, selling_price=%s, updated_at=NOW(), updated_by=%s
+            SET name=%s, category_id=%s, purchase_price=%s, selling_price=%s, updated_at=CURRENT_TIMESTAMP AT TIME ZONE 'Africa/Nairobi', updated_by=%s
             WHERE id=%s
             """
             params = [name.upper(), category_id, purchase_price, selling_price, current_user.id, id]
@@ -96,7 +96,7 @@ class Products():
         with self.db.conn.cursor() as cursor:
             query = """
             UPDATE stock
-            SET name=%s, category_id=%s, purchase_price=%s, selling_price=%s, opening=%s-additions, updated_at=NOW(), updated_by=%s
+            SET name=%s, category_id=%s, purchase_price=%s, selling_price=%s, opening=%s-additions, updated_at=CURRENT_TIMESTAMP AT TIME ZONE 'Africa/Nairobi', updated_by=%s
             WHERE id=%s
             RETURNING product_id
             """

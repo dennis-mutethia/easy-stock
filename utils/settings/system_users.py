@@ -97,7 +97,7 @@ class SystemUsers():
         with self.db.conn.cursor() as cursor:
             query = """
             INSERT INTO users(name, phone, user_level_id, shop_id, password, created_at, created_by) 
-            VALUES(%s, %s, %s, %s, %s, NOW(), 0)
+            VALUES(%s, %s, %s, %s, %s, CURRENT_TIMESTAMP AT TIME ZONE 'Africa/Nairobi', 0)
             RETURNING id
             """
             cursor.execute(query, (name.upper(), phone, user_level_id, shop_id, Helper().hash_password(password)))
@@ -110,7 +110,7 @@ class SystemUsers():
         with self.db.conn.cursor() as cursor:
             query = """
             UPDATE users 
-            SET name = %s, phone = %s, user_level_id = %s, shop_id = %s, updated_by = %s, updated_at=NOW()            
+            SET name = %s, phone = %s, user_level_id = %s, shop_id = %s, updated_by = %s, updated_at=CURRENT_TIMESTAMP AT TIME ZONE 'Africa/Nairobi'            
             """
             params = [name.upper(), phone, user_level_id, shop_id, current_user.id]
             if password is not None:
@@ -128,7 +128,7 @@ class SystemUsers():
         with self.db.conn.cursor() as cursor:
             query = """
             UPDATE users 
-            SET password = %s, updated_by = %s, updated_at=NOW()   
+            SET password = %s, updated_by = %s, updated_at=CURRENT_TIMESTAMP AT TIME ZONE 'Africa/Nairobi'   
             WHERE phone = %s         
             """
             params = [Helper().hash_password(phone), current_user.id, phone]            

@@ -33,7 +33,7 @@ class StockTake():
                 COALESCE(yesterday.selling_price, products.selling_price) AS selling_price,
                 COALESCE((yesterday.opening+yesterday.additions), 0) AS opening,
                 0 AS additions,
-                %s AS shop_id, NOW() AS created_at, %s AS created_by              
+                %s AS shop_id, CURRENT_TIMESTAMP AT TIME ZONE 'Africa/Nairobi' AS created_at, %s AS created_by              
             FROM products
             LEFT JOIN yesterday ON yesterday.product_id = products.id
         )
@@ -128,7 +128,7 @@ class StockTake():
         
         query = """
         UPDATE stock
-        SET opening=%s, additions=%s, updated_at=NOW(), updated_by=%s
+        SET opening=%s, additions=%s, updated_at=CURRENT_TIMESTAMP AT TIME ZONE 'Africa/Nairobi', updated_by=%s
         WHERE id=%s
         """
         params = [opening, additions, current_user.id, id]
@@ -142,7 +142,7 @@ class StockTake():
         
         query = """
         DELETE FROM stock
-        WHERE product_id=%s AND stock_date=CURRENT_DATE
+        WHERE product_id=%s AND stock_date=DATE(CURRENT_TIMESTAMP AT TIME ZONE 'Africa/Nairobi')
         """
             
         with self.db.conn.cursor() as cursor:
@@ -154,6 +154,8 @@ class StockTake():
         category_id = 0   
         current_date = datetime.now().strftime('%Y-%m-%d')
         stock_date = current_date   
+        self.load(stock_date)
+        
         if request.method == 'GET':   
             try:    
                 search = request.args.get('search', '')

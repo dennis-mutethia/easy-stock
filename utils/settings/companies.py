@@ -25,7 +25,7 @@ class Companies():
         self.db.ensure_connection()
         with self.db.conn.cursor() as cursor:
             query = """
-            SELECT c.id, c.name, u.phone, DATE(c.created_at), l.id, l.key, DATE(l.expires_at), p.name, EXTRACT(DAY FROM (l.expires_at - NOW()))
+            SELECT c.id, c.name, u.phone, DATE(c.created_at), l.id, l.key, DATE(l.expires_at), p.name, EXTRACT(DAY FROM (l.expires_at - CURRENT_TIMESTAMP AT TIME ZONE 'Africa/Nairobi'))
             FROM companies c
             LEFT JOIN users u ON u.id = c.created_by
             JOIN licenses l ON l.id = c.license_id
@@ -47,7 +47,7 @@ class Companies():
         with self.db.conn.cursor() as cursor:
             query = """
             UPDATE companies 
-            SET name = %s, updated_at=NOW(), updated_by = %s 
+            SET name = %s, updated_at=CURRENT_TIMESTAMP AT TIME ZONE 'Africa/Nairobi', updated_by = %s 
             WHERE id = %s       
             """
             cursor.execute(query, (name.upper(), current_user.id, id))
@@ -59,7 +59,7 @@ class Companies():
         with self.db.conn.cursor() as cursor:
             query = """
             UPDATE licenses 
-            SET package_id = %s, expires_at=NOW() + INTERVAL %s, updated_at=NOW(), updated_by = %s 
+            SET package_id = %s, expires_at=CURRENT_TIMESTAMP AT TIME ZONE 'Africa/Nairobi' + INTERVAL %s, updated_at=CURRENT_TIMESTAMP AT TIME ZONE 'Africa/Nairobi', updated_by = %s 
             WHERE id = %s         
             """
             cursor.execute(query, (package_id, f'+{package.validity} DAYS', current_user.id, id))

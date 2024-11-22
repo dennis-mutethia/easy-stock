@@ -50,7 +50,7 @@ class Expenses():
         self.db.ensure_connection()            
         query = """
         INSERT INTO expenses(date, name, amount, shop_id, created_at, created_by) 
-        VALUES(CURRENT_DATE, %s, %s, %s, NOW(), %s)
+        VALUES(DATE(CURRENT_TIMESTAMP AT TIME ZONE 'Africa/Nairobi'), %s, %s, %s, CURRENT_TIMESTAMP AT TIME ZONE 'Africa/Nairobi', %s)
         RETURNING id
         """
 

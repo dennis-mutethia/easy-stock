@@ -34,7 +34,7 @@ class Payments():
         with self.db.conn.cursor() as cursor:              
             query = """
             INSERT INTO payments(bill_id, amount, payment_mode_id, shop_id, created_at, created_by) 
-            VALUES(%s, %s, %s, %s, NOW(), %s) 
+            VALUES(%s, %s, %s, %s, CURRENT_TIMESTAMP AT TIME ZONE 'Africa/Nairobi', %s) 
             RETURNING id
             """
             params = (bill_id, amount, payment_mode_id, current_user.shop.id, current_user.id)

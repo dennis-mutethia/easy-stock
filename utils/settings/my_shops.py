@@ -50,7 +50,7 @@ class MyShops():
         with self.db.conn.cursor() as cursor:
             query = """
             INSERT INTO shops(name, shop_type_id, company_id, location, created_at, created_by) 
-            VALUES(%s, %s, %s, %s, NOW(), %s) 
+            VALUES(%s, %s, %s, %s, CURRENT_TIMESTAMP AT TIME ZONE 'Africa/Nairobi', %s) 
             RETURNING id
             """
             cursor.execute(query, (name.upper(), shop_type_id, company_id, location.upper(), created_by))
@@ -63,7 +63,7 @@ class MyShops():
         with self.db.conn.cursor() as cursor:
             query = """
             UPDATE shops 
-            SET name = %s, shop_type_id = %s, company_id = %s, location = %s, updated_at=NOW(), updated_by = %s 
+            SET name = %s, shop_type_id = %s, company_id = %s, location = %s, updated_at=CURRENT_TIMESTAMP AT TIME ZONE 'Africa/Nairobi', updated_by = %s 
             WHERE id = %s          
             """
             cursor.execute(query, (name.upper(), shop_type_id, company_id, location.upper(), updated_by, shop_id))

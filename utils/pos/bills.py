@@ -91,7 +91,7 @@ class Bills():
         self.db.ensure_connection()            
         query = """
         INSERT INTO bills(customer_id, total, paid, shop_id, created_at, created_by) 
-        VALUES(%s, %s, 0, %s, NOW(), %s)
+        VALUES(%s, %s, 0, %s, CURRENT_TIMESTAMP AT TIME ZONE 'Africa/Nairobi', %s)
         RETURNING id
         """
 
@@ -111,7 +111,7 @@ class Bills():
         with self.db.conn.cursor() as cursor:
             query = """
             UPDATE bills
-            SET customer_id=%s, updated_at=NOW(), updated_by=%s
+            SET customer_id=%s, updated_at=CURRENT_TIMESTAMP AT TIME ZONE 'Africa/Nairobi', updated_by=%s
             WHERE id=%s
             """
             params = [customer_id, current_user.shop.id, id]
@@ -123,7 +123,7 @@ class Bills():
         with self.db.conn.cursor() as cursor:
             query = """
             UPDATE bills
-            SET paid=paid+%s, updated_at=NOW(), updated_by=%s
+            SET paid=paid+%s, updated_at=CURRENT_TIMESTAMP AT TIME ZONE 'Africa/Nairobi', updated_by=%s
             WHERE id=%s
             """
             params = [paid, current_user.shop.id, id]

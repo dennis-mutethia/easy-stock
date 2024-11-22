@@ -68,7 +68,7 @@ class BillEntries():
         with self.db.conn.cursor() as cursor:
             query = """
             UPDATE bill_entries
-            SET bill_id=0, updated_at=NOW(), updated_by=%s
+            SET bill_id=0, updated_at=CURRENT_TIMESTAMP AT TIME ZONE 'Africa/Nairobi', updated_by=%s
             WHERE bill_id=%s
             """
             params = [current_user.shop.id, bill_id]
@@ -81,7 +81,7 @@ class BillEntries():
         
         query = """
         INSERT INTO bill_entries(bill_id, stock_id, item_name, price, qty, shop_id, created_at, created_by) 
-        VALUES (%s, %s, %s, %s, %s, %s, NOW(), %s) 
+        VALUES (%s, %s, %s, %s, %s, %s, CURRENT_TIMESTAMP AT TIME ZONE 'Africa/Nairobi', %s) 
         ON CONFLICT (bill_id, stock_id, created_by) DO UPDATE 
         SET price = EXCLUDED.price, qty = EXCLUDED.qty, updated_at = NOW(), updated_by = %s
         RETURNING id

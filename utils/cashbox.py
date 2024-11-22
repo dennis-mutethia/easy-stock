@@ -105,9 +105,9 @@ class CashBox():
         with self.db.conn.cursor() as cursor:
             query = """
             INSERT INTO cashbox (date, cash, mpesa, shop_id, created_at, created_by)               
-            VALUES(%s, %s, %s, %s, NOW(), %s) 
+            VALUES(%s, %s, %s, %s, CURRENT_TIMESTAMP AT TIME ZONE 'Africa/Nairobi', %s) 
             ON CONFLICT (date, shop_id) DO UPDATE 
-            SET cash = EXCLUDED.cash, mpesa = EXCLUDED.mpesa, updated_at = NOW(), updated_by = %s
+            SET cash = EXCLUDED.cash, mpesa = EXCLUDED.mpesa, updated_at = CURRENT_TIMESTAMP AT TIME ZONE 'Africa/Nairobi', updated_by = %s
             RETURNING id
             """
             params = [report_date, cash, mpesa, current_user.shop.id, current_user.id, current_user.id]

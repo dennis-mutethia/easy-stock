@@ -61,14 +61,14 @@ class Db():
         with self.conn.cursor() as cursor:
             query = """
             INSERT INTO product_categories(name, shop_id, created_at, created_by)
-            SELECT name, ?, NOW(), ? FROM product_categories WHERE shop_id = 0
+            SELECT name, ?, CURRENT_TIMESTAMP AT TIME ZONE 'Africa/Nairobi', ? FROM product_categories WHERE shop_id = 0
             """
             cursor.execute(query, (shop_id, current_user.id))
             self.conn.commit()            
             
             query = """
             INSERT INTO products(name, purchase_price, selling_price, category_id, shop_id, created_at, created_by)
-            SELECT name, purchase_price, selling_price, category_id, ?, NOW(), ? FROM products WHERE shop_id = 0
+            SELECT name, purchase_price, selling_price, category_id, ?, CURRENT_TIMESTAMP AT TIME ZONE 'Africa/Nairobi', ? FROM products WHERE shop_id = 0
             """
             cursor.execute(query, (shop_id, current_user.id))
             self.conn.commit()
@@ -78,7 +78,7 @@ class Db():
         with self.conn.cursor() as cursor:
             query = """
             INSERT INTO payments(bill_id, amount, payment_mode_id, created_at, created_by) 
-            VALUES(%s, %s, %s, NOW(), 0) 
+            VALUES(%s, %s, %s, CURRENT_TIMESTAMP AT TIME ZONE 'Africa/Nairobi', 0) 
             RETURNING id
             """
             cursor.execute(query, (bill_id, amount, payment_mode_id))
@@ -92,7 +92,7 @@ class Db():
             key = uuid.uuid4()
             query = """
             INSERT INTO licenses(key, package_id, payment_id, expires_at, created_at, created_by) 
-            VALUES(%s, %s, %s, NOW() + INTERVAL %s, NOW(), 0)
+            VALUES(%s, %s, %s, CURRENT_TIMESTAMP AT TIME ZONE 'Africa/Nairobi' + INTERVAL %s, CURRENT_TIMESTAMP AT TIME ZONE 'Africa/Nairobi', 0)
             RETURNING id
             """
             cursor.execute(query, (str(key), package.id, payment_id, f'+{package.validity} DAYS'))
@@ -105,7 +105,7 @@ class Db():
         with self.conn.cursor() as cursor:
             query = """
             INSERT INTO companies(name, license_id, created_at, created_by) 
-            VALUES(%s, %s, NOW(), 0) 
+            VALUES(%s, %s, CURRENT_TIMESTAMP AT TIME ZONE 'Africa/Nairobi', 0) 
             RETURNING id
             """
             cursor.execute(query, (name.upper(), license_id))
@@ -211,7 +211,7 @@ class Db():
                 WHERE shop_id = %s
             )
             INSERT INTO product_categories(name, shop_id, created_at, created_by)
-            SELECT name, %s AS shop_id, NOW(), %s AS created_by
+            SELECT name, %s AS shop_id, CURRENT_TIMESTAMP AT TIME ZONE 'Africa/Nairobi', %s AS created_by
             FROM source            
             """
             params = [shop_type_id, shop_id, current_user.id]
@@ -235,7 +235,7 @@ class Db():
                 WHERE products.shop_id = %s
             )            
             INSERT INTO products(name, purchase_price, selling_price, category_id, shop_id, created_at, created_by)
-            SELECT name, purchase_price, selling_price, category_id, %s AS shop_id, NOW(), %s AS created_by
+            SELECT name, purchase_price, selling_price, category_id, %s AS shop_id, CURRENT_TIMESTAMP AT TIME ZONE 'Africa/Nairobi', %s AS created_by
             FROM source            
             """
             params = [shop_id, shop_type_id, shop_id, current_user.id]

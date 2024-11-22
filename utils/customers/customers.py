@@ -50,7 +50,7 @@ class Customers():
         with self.db.conn.cursor() as cursor:
             query = """
             INSERT INTO customers(name, phone, shop_id, created_at, created_by) 
-            VALUES(%s, %s, %s, NOW(), %s) 
+            VALUES(%s, %s, %s, CURRENT_TIMESTAMP AT TIME ZONE 'Africa/Nairobi', %s) 
             ON CONFLICT (phone, shop_id) DO NOTHING
             RETURNING id
             """
@@ -64,7 +64,7 @@ class Customers():
         with self.db.conn.cursor() as cursor:
             query = """
             UPDATE customers
-            SET name=%s, phone=%s, updated_at=NOW(), updated_by=%s
+            SET name=%s, phone=%s, updated_at=CURRENT_TIMESTAMP AT TIME ZONE 'Africa/Nairobi', updated_by=%s
             WHERE id=%s
             """
             params = [name.upper(), phone, current_user.shop.id, id]
