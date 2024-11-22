@@ -12,6 +12,30 @@ class Dashboard():
     def __init__(self, db): 
         self.db = db
     
+    
+    def get_debts(self, report_date):
+        self.db.ensure_connection()
+        with self.db.conn.cursor() as cursor:
+            query = """
+            SELECT SUM(total - paid) AS unpaid_debts, SUM(paid) AS paid_debts
+            FROM bills
+            WHERE shop_id = %s AND total != 'Nan' AND DATE(created_at) <= %s
+            """
+            params = [current_user.shop.id, report_date]
+            
+            cursor.execute(query, tuple(params))
+            data = cursor.fetchall()
+            items = []
+            qtys = []
+            bgcolors = []
+            for datum in data:  
+                items.append(f"'UnPaid Debts', 'Paid Debts'")
+                qtys.append(datum[0] if datum[0] is not None else 0)
+                qtys.append(datum[1] if datum[1] is not None else 0)
+                bgcolors.append(f"'red','lime'")
+
+            return items, qtys, bgcolors
+    
     def get_sales_per_item(self, report_date):
         self.db.ensure_connection()
         with self.db.conn.cursor() as cursor:
@@ -186,12 +210,13 @@ class Dashboard():
         total_capital, total_stock = StockTake(self.db).get_total(report_date)
         total_unpaid_bills = Bills(self.db).get_total_unpaid_bills(report_date)
         items, qtys, bgcolors = self.get_sales_per_item(report_date)
+        debts, amounts, bgcolors_2 = self.get_debts(report_date)
         dates, purchases, stocks, sales, expenses = self.get_sales_purchases_and_expenses(report_date)
          
         return render_template('dashboard/index.html', page_title='Dashboard', helper=Helper(),
                                report_date=report_date, max_date=max_date,
                                total_cost=total_cost, total_sales=total_sales, total_expenses=total_expenses,
                                total_capital=total_capital, total_stock=total_stock, total_unpaid_bills=total_unpaid_bills,
-                               items=items, qtys=qtys, bgcolors=bgcolors, 
+                               items=items, qtys=qtys, bgcolors=bgcolors, debts=debts, amounts=amounts, bgcolors_2=bgcolors_2,
                                dates=dates, sales=sales, expenses=expenses, stocks=stocks, purchases=purchases
                                )

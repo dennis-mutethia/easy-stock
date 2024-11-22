@@ -1,8 +1,13 @@
-<!-- Pie Chart -->
+<!-- Pie Charts -->
 <div class="row">
     <div class="col-6 mt-3">
         <div class="bg-dark p-10 text-white text-center">
             <canvas id="myChart2" style="width:100%;"></canvas>
+        </div>
+    </div>
+    <div class="col-6 mt-3">
+        <div class="bg-dark p-10 text-white text-center">
+            <canvas id="myChart3" style="width:100%;"></canvas>
         </div>
     </div>
 </div>
@@ -22,6 +27,26 @@
             title: {
                 display: true,
                 text: "Sales per Product Comparison"
+            },
+            legend: {
+                display: false
+            }
+        }
+    });
+
+    new Chart("myChart3", {
+        type: "pie",
+        data: {
+            labels: [{{ debts | join(',') | safe }}],
+            datasets: [{
+                data: [{{ amounts | join(',') | safe }}],
+                backgroundColor: [{{ bgcolors_2 | join(',') | safe }}]
+            }]
+        },
+        options: {
+            title: {
+                display: true,
+                text: "Paid vs Unpaid Debts Comparison"
             },
             legend: {
                 display: false
