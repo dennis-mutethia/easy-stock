@@ -69,6 +69,7 @@ class StockReport():
                 sold,
                 selling_price
             FROM source  
+            WHERE sold > 0
             """
             params = [current_user.shop.id, from_date, from_date]
             
