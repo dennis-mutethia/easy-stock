@@ -15,7 +15,9 @@
             <td style="color: black;">{{ shop.location }}</td> 
             <td style="color: black;">
                 <input type="hidden" id="access_shop_id" name="id" value="{{ shop.id }}" />
+{% if current_user.shop.id != shop.id %}
                 <button type="submit" id="submit_access_shop" name="action" value="access" class="btn btn-xs btn-primary">Access</button>
+{% endif %}
             </td>
         </tr>
         {% endfor %}
