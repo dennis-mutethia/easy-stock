@@ -5,4 +5,3 @@ Flask-Login
 redis 
 flask-session
 user-agents
-reportlab
