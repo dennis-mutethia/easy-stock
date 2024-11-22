@@ -70,6 +70,7 @@ class StockReport():
                 selling_price
             FROM source  
             WHERE sold > 0
+            ORDER BY category_name, item_name
             """
             params = [current_user.shop.id, from_date, from_date]
             
