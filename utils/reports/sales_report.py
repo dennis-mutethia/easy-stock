@@ -55,7 +55,8 @@ class SalesReport():
                 category_name,
                 selling_price,
                 sold
-            FROM source        
+            FROM source   
+            WHERE sold > 0     
             """
             params = [current_user.shop.id, report_date, report_date]
             
