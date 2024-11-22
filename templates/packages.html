@@ -64,11 +64,11 @@
             </div>
         </div>
     </div>
-    <h3 class="col-12 text-center">Our Packages <small>(Tap/Click to Renew)</small></h3>
+    <h3 class="col-12 text-center">Our Packages <small>(Tap/Click to Buy)</small></h3>
     <div class="row">
         {% for pkg in packages %}
         {% if pkg.amount > 0 %}
-        <a class="col-6" href="#" onclick="popup({{ pkg.amount }}, '{{ pkg.description }}')" data-toggle="modal" data-target="#newModal">
+        <a class="col-6" href="#" onclick="popup({{ pkg.pay/2 }}, '{{ helper.format_number_with_commas(pkg.pay/2) }}', '{{ pkg.description }}')" data-toggle="modal" data-target="#newModal">
             <div class="alert alert-{{ pkg.color }}" role="alert" >
                 <h4 class="alert-heading">{{ pkg.name }}</h4>
                 <p>{{ pkg.description }}</p>
@@ -94,7 +94,7 @@
             <form method="POST" class="form-horizontal">
                 <input type="hidden" id="amount" name="amount" />
                 <div class="modal-header text-center">
-                    <h5 class="text-center">To Get <b id="package_desc"></b></h5>
+                    <h5 class="text-center">To Get <b id="package_desc"></b> License</h5>
                     <button type="button" class="close" data-dismiss="modal">&times;</button>
                 </div>
                 <div class="modal-body">                    
@@ -108,7 +108,7 @@
                     </ol>
                     <div class="form-group row">
                         <div class="col-sm-12">
-                            <input name="phone" id="phone" type="number" class="form-control input-sm text-center" style="font-weight: bolder;"
+                            <input name="phone" id="phone" type="number" class="form-control input-sm text-center" style="font-weight: bolder; background-color: chartreuse; color: black;"
                                 placeholder="Enter MPESA Phone No. here" required min="100000000" max="799999999" />
                         </div>
                     </div>
@@ -116,7 +116,7 @@
                 <div class="modal-footer">
                     <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
                     <button type="submit" id="action" name="action" value="pay"
-                        class="btn btn-success">Pay KSh.<b id="pay_amount"></b></button>
+                        class="btn btn-success">Pay Ksh.<b id="pay_amount"></b></button>
                 </div>
             </form>
         </div>
@@ -129,11 +129,10 @@
 
 
 <script>
-    function popup(amount, package_desc) {
+    function popup(amount, formatted_amount, package_desc) {
         $('#amount').html(amount);
-        $('#pay_amount').html(amount);
+        $('#pay_amount').html(formatted_amount);
         $('#package_desc').html(package_desc);
-        //document.getElementById("expense_id").value = id;
     }
 </script>
 

@@ -6,7 +6,7 @@ INSERT INTO packages (name, amount, pay, description, offer, color, validity) VA
 ('6-MONTHS S.T.S', 6000, 5000, '6 MONTHS SHORT TERM SUPPORT', 'SAVE UPTO 10%', 'primary', 186),
 ('1-YEAR L.T.S', 12000, 9000, '1 YEAR LONG TERM SUPPORT', 'SAVE UPTO 15%', 'secondary', 366),
 ('2-YEARS L.T.S', 24000, 16000, '2 YEARS LONG TERM SUPPORT', 'SAVE UPTO 20%', 'info', 732),
-('3-YEARS L.T.S', 36000, 25000, '3 YEARS LONG TERM SUPPORT', 'SAVE UPTO 30%', 'success', 1098)
+('3-YEARS L.T.S', 36000, 24000, '3 YEARS LONG TERM SUPPORT', 'SAVE UPTO 30%', 'success', 1098)
 ON CONFLICT (name) DO NOTHING;
 
 -- Dumping data for table shop_types
