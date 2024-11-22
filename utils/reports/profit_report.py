@@ -47,7 +47,8 @@ class ProfitReport():
             )
             SELECT report_date, total_sales, total_cost, COALESCE(total_expenses,0) AS total_expenses
             FROM totals
-            LEFT JOIN exp ON exp.date=totals.report_date    
+            LEFT JOIN exp ON exp.date=totals.report_date   
+            WHERE total_sales > 0 
             ORDER BY report_date     
             """
             params = [current_user.shop.id, from_date, to_date, current_user.shop.id]
