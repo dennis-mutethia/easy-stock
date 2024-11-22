@@ -103,7 +103,7 @@ class StockReport():
         
         if request.method == 'GET':   
             try:    
-                report_date = request.args.get('from_date', report_date)
+                report_date = request.args.get('report_date', report_date)
                 category_id = int(request.args.get('category_id', 0))
                 page = int(request.args.get('page', 1))
             except Exception as e:

@@ -70,15 +70,15 @@ class Bills():
             else:
                 return None   
         
-    def get_total_unpaid_bills(self):
+    def get_total_unpaid_bills(self, report_date):
         self.db.ensure_connection()
         with self.db.conn.cursor() as cursor:
             query = """
             SELECT SUM(total - paid) AS total_debts
             FROM bills
-            WHERE shop_id = %s AND total != 'Nan'
+            WHERE shop_id = %s AND total != 'Nan' AND DATE(created_at) <= %s
             """
-            params = [current_user.shop.id]
+            params = [current_user.shop.id, report_date]
             
             cursor.execute(query, tuple(params))
             data = cursor.fetchone()

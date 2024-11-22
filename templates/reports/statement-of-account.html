@@ -69,11 +69,11 @@
             <tr style="border-bottom: 2px solid white;">
                 <th class="text-center" colspan="2"><b>BALANCES</b></th>
             {% if ns.total_sales > (ns.total_purchases+ns.total_expenses) %}
-                <th class="text-right text-success"><b>+{{ helper.format_number_with_commas(ns.total_sales-(ns.total_purchases+ns.total_expenses)) }}</b></th>
+                <th class="text-right"><b class="text-success">+{{ helper.format_number_with_commas(ns.total_sales-(ns.total_purchases+ns.total_expenses)) }}</b></th>
                 <th class="text-right" style="border-left: double"></th>
             {% elif ns.total_sales < (ns.total_purchases+ns.total_expenses) %}
                 <th class="text-right"></th>
-                <th class="text-right text-danger" style="border-left: double"><b>-{{ helper.format_number_with_commas(ns.total_purchases+ns.total_expenses-ns.total_sales) }}</b></th>
+                <th class="text-right" style="border-left: double"><b class="text-danger">-{{ helper.format_number_with_commas(ns.total_purchases+ns.total_expenses-ns.total_sales) }}</b></th>
             {% endif %}
             </tr>
         </tfoot>

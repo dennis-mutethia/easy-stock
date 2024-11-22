@@ -171,8 +171,8 @@ class Dashboard():
                 
     def __call__(self):
         yesterday = datetime.now() - timedelta(days=1)
-        max_date = yesterday.strftime('%Y-%m-%d')
-        report_date = max_date
+        report_date = yesterday.strftime('%Y-%m-%d')
+        max_date = datetime.now().strftime('%Y-%m-%d')
         
         if request.method == 'GET':   
             try:    
@@ -184,7 +184,7 @@ class Dashboard():
         total_sales, total_cost = self.get_total_sales(report_date)
         total_expenses = Expenses(self.db).get_total(report_date)
         total_capital, total_stock = StockTake(self.db).get_total(report_date)
-        total_unpaid_bills = Bills(self.db).get_total_unpaid_bills()
+        total_unpaid_bills = Bills(self.db).get_total_unpaid_bills(report_date)
         items, qtys, bgcolors = self.get_sales_per_item(report_date)
         dates, purchases, stocks, sales, expenses = self.get_sales_purchases_and_expenses(report_date)
          

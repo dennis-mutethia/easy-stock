@@ -9,7 +9,7 @@
         </div>
     </a>
 
-    <a class="col-4 mt-3" href="{{ url_for('statementOfAccount') }}?report_date={{ report_date }}">
+    <a class="col-4 mt-3" href="{{ url_for('statementOfAccount') }}?from_date={{ report_date }}&to_date={{ report_date }}">
         <div class="bg-dark p-10 text-white text-center">
             <i class="mdi mdi-buffer fs-3 mb-1 font-16"></i>
             <h5 class="mb-0 mt-1">{{ helper.format_number_with_commas(helper.format_number(total_capital)) }}</h5>
