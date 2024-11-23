@@ -1,3 +1,4 @@
+import pytz
 from datetime import datetime, timedelta
 from flask import render_template, request
 from flask_login import current_user
@@ -83,7 +84,7 @@ class SalesReport():
             return sales 
          
     def __call__(self):
-        yesterday = datetime.now() - timedelta(days=1)
+        yesterday = datetime.now(pytz.timezone("Africa/Nairobi")) - timedelta(days=1)
         max_date = yesterday.strftime('%Y-%m-%d')
         report_date = max_date
         category_id = 0

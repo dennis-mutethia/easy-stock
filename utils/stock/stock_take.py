@@ -1,3 +1,4 @@
+import pytz
 from datetime import datetime
 from flask import render_template, request
 from flask_login import current_user
@@ -152,7 +153,7 @@ class StockTake():
     def __call__(self):
         search = ''
         category_id = 0   
-        current_date = datetime.now().strftime('%Y-%m-%d')
+        current_date = datetime.now(pytz.timezone("Africa/Nairobi")).strftime('%Y-%m-%d')
         stock_date = current_date   
         self.load(stock_date)
         

@@ -1,8 +1,7 @@
 from flask_login import current_user
 import os, uuid, psycopg2
 
-from utils.entities import Company, License, Package, PaymentMode, Shop, ShopType, User, UserLevel
-from utils.helper import Helper
+from utils.entities import Company, License, Package, PaymentMode, Shop
 
 class Db():
     def __init__(self):

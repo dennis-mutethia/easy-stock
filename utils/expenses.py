@@ -1,3 +1,4 @@
+import pytz
 from datetime import datetime
 from flask import render_template, request
 from flask_login import current_user
@@ -76,8 +77,8 @@ class Expenses():
             self.db.conn.commit()
         
     def __call__(self):
-        current_date = datetime.now().strftime('%Y-%m-%d')
-        from_date = datetime.now().replace(day=1).strftime('%Y-%m-%d')
+        current_date = datetime.now(pytz.timezone("Africa/Nairobi")).strftime('%Y-%m-%d')
+        from_date = datetime.now(pytz.timezone("Africa/Nairobi")).replace(day=1).strftime('%Y-%m-%d')
         to_date = current_date
         
         if request.method == 'GET':   

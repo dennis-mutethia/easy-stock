@@ -142,7 +142,7 @@ class Bills():
             self.db.conn.commit()    
              
     def __call__(self):
-        current_date = datetime.now().strftime('%Y-%m-%d')
+        current_date = datetime.now(pytz.timezone("Africa/Nairobi")).strftime('%Y-%m-%d')
         report_date = current_date
         bill_status = 0 
         page = 1

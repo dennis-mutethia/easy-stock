@@ -168,7 +168,7 @@ class MyShops():
                 shop_type_id = request.form['shop_type_id']   
                 company_id = current_user.company.id  
                 created_by = current_user.id 
-                current_date = datetime.now().strftime('%Y-%m-%d')
+                current_date = datetime.now(pytz.timezone("Africa/Nairobi")).strftime('%Y-%m-%d')
                 
                 if request.form['action'] == 'add':
                     shop_id = self.add(name, shop_type_id, company_id, location, created_by)

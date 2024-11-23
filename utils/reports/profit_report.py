@@ -1,3 +1,4 @@
+import pytz
 from datetime import datetime, timedelta
 from flask import render_template, request
 from flask_login import current_user
@@ -62,9 +63,9 @@ class ProfitReport():
             return profits 
          
     def __call__(self):        
-        yesterday = datetime.now() - timedelta(days=1)
+        yesterday = datetime.now(pytz.timezone("Africa/Nairobi")) - timedelta(days=1)
         max_date = yesterday.strftime('%Y-%m-%d')
-        from_date = datetime.now().replace(day=1).strftime('%Y-%m-%d')
+        from_date = datetime.now(pytz.timezone("Africa/Nairobi")).replace(day=1).strftime('%Y-%m-%d')
         to_date = max_date
         page = 1
         

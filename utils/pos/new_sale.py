@@ -60,7 +60,7 @@ class NewSale():
             elif request.form['action'] == 'clear':
                 BillEntries(self.db).clear()
         
-        current_date = datetime.now().strftime('%Y-%m-%d')
+        current_date = datetime.now(pytz.timezone("Africa/Nairobi")).strftime('%Y-%m-%d')
         product_categories = ProductsCategories(self.db).fetch()
         stocks = StockTake(self.db).fetch(current_date, search, category_id, in_stock, page)
         customers = Customers(self.db).fetch()

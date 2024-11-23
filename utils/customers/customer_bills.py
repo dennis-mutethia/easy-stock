@@ -1,10 +1,9 @@
+import pytz
 from datetime import datetime, timedelta
-from flask import redirect, render_template, request, url_for
-from flask_login import current_user
+from flask import render_template, request
 
 from utils.helper import Helper
 from utils.customers.customers import Customers
-from utils.pos.bill_entries import BillEntries
 from utils.pos.bills import Bills
 from utils.pos.payments import Payments
 
@@ -39,8 +38,8 @@ class CustomerBills():
             return bills
                
     def __call__(self):
-        current_date = datetime.now().strftime('%Y-%m-%d')
-        from_date = (datetime.now() - timedelta(days=365)).strftime('%Y-%m-%d') #datetime(datetime.now().year, 1, 1).strftime('%Y-%m-%d')
+        current_date = datetime.now(pytz.timezone("Africa/Nairobi")).strftime('%Y-%m-%d')
+        from_date = (datetime.now(pytz.timezone("Africa/Nairobi")) - timedelta(days=365)).strftime('%Y-%m-%d') #datetime(datetime.now(pytz.timezone("Africa/Nairobi")).year, 1, 1).strftime('%Y-%m-%d')
         to_date = current_date
         bill_status = 2
         customer_id = 0

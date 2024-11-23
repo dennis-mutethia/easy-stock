@@ -1,3 +1,4 @@
+import pytz
 from datetime import datetime
 from flask import redirect, render_template, request, url_for
 from flask_login import login_user
@@ -19,7 +20,7 @@ class Login():
                 
                 if user:        
                     login_user(user)
-                    StockTake(self.db).load(datetime.now().strftime('%Y-%m-%d'))
+                    StockTake(self.db).load(datetime.now(pytz.timezone("Africa/Nairobi")).strftime('%Y-%m-%d'))
                     if user.user_level.id in [0, 1]:               
                         return redirect(url_for('dashboard'))
                     else:
@@ -37,13 +38,13 @@ class Login():
         user_name = request.form['user_name']    
         user_phone = request.form['user_phone']
         user_password = request.form['user_password'] 
-        current_date = datetime.now().strftime('%Y-%m-%d')
+        current_date = datetime.now(pytz.timezone("Africa/Nairobi")).strftime('%Y-%m-%d')
         
         package = self.db.get_package_by_id(1)
         payment_id = self.db.save_payment(0, 0, 4)
         license_id = self.db.save_license(package, payment_id)
         company_id = self.db.save_company(company_name, license_id)
-        shop_id = MyShops(self.db).add(shop_name, shop_type_id, company_id, shop_location, phone_1='', phone_2='', paybill='', account_no='', till_no='', created_by=0)
+        shop_id = MyShops(self.db).add(shop_name, shop_type_id, company_id, shop_location, created_by=0)
         user = SystemUsers(self.db).get_by_phone(user_phone)
         if user is None:
             user_id = SystemUsers(self.db).add(user_name, user_phone, 1, shop_id, user_password)

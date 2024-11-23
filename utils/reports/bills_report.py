@@ -1,3 +1,4 @@
+import pytz
 from datetime import datetime, timedelta
 from flask import render_template, request
 
@@ -10,8 +11,8 @@ class BillsReport():
         self.db = db
       
     def __call__(self):
-        current_date = datetime.now().strftime('%Y-%m-%d')
-        from_date = (datetime.now() - timedelta(days=365)).strftime('%Y-%m-%d') #datetime(datetime.now().year, 1, 1).strftime('%Y-%m-%d')
+        current_date = datetime.now(pytz.timezone("Africa/Nairobi")).strftime('%Y-%m-%d')
+        from_date = (datetime.now(pytz.timezone("Africa/Nairobi")) - timedelta(days=365)).strftime('%Y-%m-%d') #datetime(datetime.now(pytz.timezone("Africa/Nairobi")).year, 1, 1).strftime('%Y-%m-%d')
         to_date = current_date
         bill_status = 2
         customer_id = 0
