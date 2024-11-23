@@ -1,8 +1,7 @@
-from datetime import datetime
 from flask import render_template, request
 from flask_login import current_user
 
-from utils.entities import Expense, User, UserLevel
+from utils.entities import User, UserLevel
 from utils.helper import Helper
 from utils.settings.my_shops import MyShops
 
