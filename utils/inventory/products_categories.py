@@ -71,14 +71,13 @@ class ProductsCategories():
                 name = request.form['name']
                 self.add(name)   
                 
-            elif request.form['action'] == 'update':
+            elif request.form['action'] == 'edit':
                 id = request.form['id']
                 name = request.form['name']    
                 self.update(id, name)
-                return 'success'
                    
             elif request.form['action'] == 'delete':
-                id = request.form['item_id']
+                id = request.form['id']
                 self.delete(id) 
         
         product_categories = self.fetch()

@@ -28,8 +28,9 @@
                 <th class="text-center" style="font-size: x-small;">BUYING PRICE</th>
                 <th class="text-center" style="font-size: x-small;">SELLING PRICE</th>
                 <th class="text-center" style="font-size: x-small;">IN STOCK</th>
-                <th class="text-center" style="font-size: x-small;">
-                    <a href="#" class="btn btn-xs btn-success btn-flat text-white" style="width: 100%; font-weight: bold;" data-toggle="modal" data-target="#newModal">ADD NEW
+                <th class="text-center" style="font-size: x-small;" colspan="2">
+                    <a href="#" class="btn btn-xs btn-success btn-flat text-white" style="width: 100%; font-weight: bold;" onclick="addNewProduct()"
+                    data-toggle="modal" data-target="#newModal">ADD NEW
                         <br />PRODUCT</a>
                 </th>
             </tr>
@@ -42,32 +43,18 @@
                 }
             </style>
             <tr>
-                <td>
-                    <input type="text" id="product_name_{{ product.id }}" name="product_name_{{ product.id }}"
-                        value="{{ product.name }}" onchange="updateProduct({{ product.id }});" />
-                </td>
-                <td>
-                    <select onchange="updateProduct({{ product.id }});" id="product_category_id_{{ product.id }}" name="product_category_id_{{ product.id }}" style="width: 100%;">
-                        {% for product_category in product_categories %}
-                        <option value="{{ product_category.id }}" {% if product_category.name==product.category_name %} selected {%
-                            endif %}>{{ product_category.name }}</option>
-                        {% endfor %}
-                    </select>
-                </td>
-                <td>
-                    <input type="number" id="product_purchase_{{ product.id }}" name="product_purchase_{{ product.id }}"
-                        value="{{ helper.format_number(product.purchase_price) }}" onchange="updateProduct({{ product.id }});" min="0" style="width: 100%;" />
-                </td>
-                <td>
-                    <input type="number" id="product_selling_{{ product.id }}" name="product_selling_{{ product.id }}"
-                        value="{{ helper.format_number(product.selling_price) }}" onchange="updateProduct({{ product.id }});" min="0" style="width: 100%;" />
-                </td>
-                <td>
-                    <input type="number" id="product_in_stock_{{ product.id }}" name="product_in_stock_{{ product.id }}"
-                        value="{{ helper.format_number(product.opening+product.additions) }}" onchange="updateProduct({{ product.id }});" min="0" style="width: 100%;" />
+                <td>{{ product.name }}</td>
+                <td>{{ product.category_name }}</td>
+                <td>{{ helper.format_number_with_commas(product.purchase_price) }}</td>
+                <td>{{ helper.format_number_with_commas(product.selling_price) }}</td>
+                <td>{{ helper.format_number_with_commas(product.opening+product.additions) }}</td>
+                <td class="text-center">
+                    <a href="#" onclick="editProduct({{ product.id }}, {{ product.product_id }}, '{{ product.name }}', '{{ product.category_name }}', {{ product.purchase_price }}, {{ product.selling_price }}, {{ product.opening+product.additions }})" data-toggle="modal"
+                        data-target="#newModal"><i class="mdi mdi-border-color" style="color: blue"
+                            title="Delete Item"></i></a>
                 </td>
                 <td class="text-center">
-                    <a href="#" onclick="deleteItem({{ product.id }})" data-toggle="modal" data-target="#deleteModal"><i
+                    <a href="#" onclick="deleteItem({{ product.product_id }}, '{{ product.name }}')" data-toggle="modal" data-target="#deleteModal"><i
                             class="mdi mdi-delete" style="color: red" title="Delete Item"></i></a>
                 </td>
             </tr>
@@ -84,6 +71,8 @@
     <div class="modal-dialog" role="document">
         <div class="modal-content">
             <form method="POST" class="form-horizontal">
+                <input type="hidden" id="edit_id" name="id" />
+                <input type="hidden" id="edit_product_id" name="product_id" />
                 <div class="modal-header text-center">
                     <h5 class="text-center">Add New Product</h5>
                     <button type="button" class="close" data-dismiss="modal">&times;</button>
@@ -91,13 +80,13 @@
                 <div class="modal-body">
                     <div class="form-group row">
                         <div class="col-sm-12">
-                            <input required="required" type="text" name="name" id="name" class="form-control input-sm"
+                            <input required="required" type="text" name="name" id="edit_product_name" class="form-control input-sm"
                                 placeholder="Enter Product Name">
                         </div>
                     </div>
                     <div class="form-group row">
                         <div class="col-sm-12">
-                            <select class="form-control input-sm" name="category_id_new" id="category_id_new" required>
+                            <select class="form-control input-sm" name="category_id_new" id="edit_category_name" required>
                                 <option value="0" disabled>Select Category</option>
                                 {% for product_category in product_categories %}
                                 <option value="{{ product_category.id }}" {% if product_category.id==category_id %}
@@ -106,23 +95,21 @@
                             </select>
                         </div>
                     </div>
-
-
                     <div class="form-group row">
                         <div class="col-sm-12">
-                            <input required="required" type="number" name="purchase_price" id="purchase_price"
+                            <input required="required" type="number" name="purchase_price" id="edit_purchase_price"
                                 class="form-control input-sm" placeholder="Enter Buying Price">
                         </div>
                     </div>
                     <div class="form-group row">
                         <div class="col-sm-12">
-                            <input required="required" type="number" name="selling_price" id="selling_price"
+                            <input required="required" type="number" name="selling_price" id="edit_selling_price"
                                 class="form-control input-sm" placeholder="Enter Selling Price">
                         </div>
                     </div>
                     <div class="form-group row">
                         <div class="col-sm-12">
-                            <input required="required" type="number" name="in_stock" id="in_stock"
+                            <input required="required" type="number" name="in_stock" id="edit_in_stock"
                                 class="form-control input-sm" placeholder="Enter Items in Stock">
                         </div>
                     </div>
@@ -142,9 +129,9 @@
     <div class="modal-dialog" role="document">
         <div class="modal-content">
             <form method="POST">
-                <input type="hidden" id="item_id" name="item_id" />
+                <input type="hidden" id="item_id" name="id" />
                 <div class="modal-header">
-                    <h5 class="modal-title" id="deleteModalLabel">Are you Sure You want to Delete this Product?</h5>
+                    <h5 class="modal-title" id="deleteModalLabel">Are you Sure You want to Delete <b id="delete_item_name"></b> Product?</h5>
                     <button class="close" type="button" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">×</span>
                     </button>
@@ -183,34 +170,30 @@
         $("#filter-frm").submit();
     }
 
-    function updateProduct(id) {
-        let name = $("#product_name_" + id).val();
-        let category_id = $("#product_category_id_" + id).val();        
-        let purchase_price = parseFloat($("#product_purchase_" + id).val());
-        let selling_price = parseFloat($("#product_selling_" + id).val());
-        let in_stock = parseFloat($("#product_in_stock_" + id).val());
-        let from = $("#from").val();
-        $.ajax({
-            type: 'post',
-            url: '{{ url_for('inventoryProductsUpdate') }}',
-            data: {
-                id: id,
-                category_id: category_id,
-                name: name,
-                purchase_price: purchase_price,
-                selling_price: selling_price,
-                in_stock: in_stock,
-                action: 'update'
-            },
-            success: function (data) {
-                toastr.success("Updated " + name);
-                $("#product_name_" + id).val(name.toUpperCase());
-            }
-        });
+    function deleteItem(id, name) {
+        document.getElementById("item_id").value = id;
+        $("#delete_item_name").html(name);
     }
 
-    function deleteItem(id) {
-        document.getElementById("item_id").value = id;
+    function addNewProduct(){
+        $("#product_header").html('Add New');
+        $("#edit_product_name").val('');
+        $("#edit_category_name").val(0);
+        $("#action").val('add');
+    }
+
+    function editProduct(id, product_id, name, category_name, purchase_price, selling_price, in_stock){
+        $("#product_header").html('Edit');
+        $("#edit_id").val(id);
+        $("#edit_product_id").val(product_id);
+        $("#edit_product_name").val(name);
+        $('#edit_category_name option').filter(function () {
+            return $(this).text() === category_name;
+        }).prop('selected', true);
+        $("#edit_purchase_price").val(purchase_price);
+        $("#edit_selling_price").val(selling_price);
+        $("#edit_in_stock").val(in_stock);
+        $("#action").val('edit');
     }
 
 </script>

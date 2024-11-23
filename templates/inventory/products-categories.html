@@ -10,23 +10,26 @@
             <tr>
                 <th>CATEGORY NAME</th>
                 <th class="text-center">PRODUCTS</th>
-                <th class="text-center">
-                    <a href="#" class="btn btn-xs btn-success btn-flat text-white" style="width: 100%; font-weight: bold;" data-toggle="modal" data-target="#newModal">ADD
+                <th class="text-center" colspan="2">
+                    <a href="#" class="btn btn-xs btn-success btn-flat text-white" style="width: 100%; font-weight: bold;" onclick="addNewCategory()"
+                    data-toggle="modal" data-target="#newModal">ADD
                         NEW <br />CATEGORY</a>
                 </th>
             </tr>
         </thead>
         <tbody>
             {% for product_category in product_categories %}
+            
             <tr>
-                <td>
-                    <input type="text" id="category_name_{{ product_category.id }}"
-                        name="category_name_{{ product_category.id }}" value="{{ product_category.name }}"
-                        onchange="updateCategory({{ product_category.id }});" style="width: 100%" />
-                </td>
-                <td class="text-center">{{ helper.format_number(product_category.products_count) }}</td>
+                <td>{{ product_category.name }}</td>
+                <td class="text-center">{{ helper.format_number_with_commas(product_category.products_count) }}</td>
                 <td class="text-center">
-                    <a href="#" onclick="deleteItem({{ product_category.id }})" data-toggle="modal"
+                    <a href="#" onclick="editCategory({{ product_category.id }}, '{{ product_category.name }}')" data-toggle="modal"
+                        data-target="#newModal"><i class="mdi mdi-border-color" style="color: blue"
+                            title="Delete Item"></i></a>
+                </td>
+                <td class="text-center">
+                    <a href="#" onclick="deleteItem({{ product_category.id }}, '{{ product_category.name }}')" data-toggle="modal"
                         data-target="#deleteModal"><i class="mdi mdi-delete" style="color: red"
                             title="Delete Item"></i></a>
                 </td>
@@ -44,14 +47,15 @@
     <div class="modal-dialog" role="document">
         <div class="modal-content">
             <form method="POST" class="form-horizontal">
+                <input type="hidden" id="edit_category_id" name="id" />
                 <div class="modal-header text-center">
-                    <h5 class="text-center">Add New Product Category</h5>
+                    <h5 class="text-center"><span id="product_category_header"></span> Product Category</h5>
                     <button type="button" class="close" data-dismiss="modal">&times;</button>
                 </div>
                 <div class="modal-body">
                     <div class="form-group row">
                         <div class="col-sm-12">
-                            <input required="required" type="text" name="name" id="name" class="form-control input-sm"
+                            <input required="required" type="text" name="name" id="edit_category_name" class="form-control input-sm"
                                 placeholder="Enter Product Category Name">
                         </div>
                     </div>
@@ -71,9 +75,9 @@
     <div class="modal-dialog" role="document">
         <div class="modal-content">
             <form method="POST">
-                <input type="hidden" id="item_id" name="item_id" />
+                <input type="hidden" id="item_id" name="id" />
                 <div class="modal-header">
-                    <h5 class="modal-title" id="deleteModalLabel">Are you Sure You want to Delete this Product Category?</h5>
+                    <h5 class="modal-title" id="deleteModalLabel">Are you Sure You want to Delete <b id="delete_item_name"></b> Product Category?</h5>
                     <button class="close" type="button" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">×</span>
                     </button>
@@ -95,26 +99,23 @@
 <script>
     if ($toastr_message) toastr.success($toastr_message);
 
-    function updateCategory(id) {
-        let name = $("#category_name_" + id).val();
-        $.ajax({
-            type: 'post',
-            url: '{{ url_for('inventoryProductsCategoriesUpdate') }}',
-            data: {
-                id: id,
-                name: name,
-                action: 'update'
-            },
-            success: function (data) {
-                toastr.success("Updated " + name);
-                $("#category_name_" + id).val(name.toUpperCase());
-            }
-        });
+    function deleteItem(id, name) {
+        $("#item_id").val(id);
+        $("#delete_item_name").html(name);
     }
 
+    function addNewCategory(){
+        $("#product_category_header").html('Add New');
+        $("#edit_category_id").val('');
+        $("#edit_category_name").val('');
+        $("#action").val('add');
+    }
 
-    function deleteItem(id) {
-        document.getElementById("item_id").value = id;
+    function editCategory(id, name){
+        $("#product_category_header").html('Edit');
+        $("#edit_category_id").val(id);
+        $("#edit_category_name").val(name);
+        $("#action").val('edit');
     }
 
 </script>
