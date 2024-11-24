@@ -8,7 +8,7 @@ class DemoSTock():
     def __init__(self): 
         self.db = Db()
                     
-    def load(self, stock_date):
+    def load(self, stock_date, shop_id):
         self.db.create_current_month_partition()
         
         self.db.ensure_connection()
@@ -41,12 +41,12 @@ class DemoSTock():
             SELECT * FROM today
             ON CONFLICT (stock_date, product_id, shop_id) DO NOTHING
             """
-            params = [17, stock_date, stock_date, 17, 0]
+            params = [shop_id, stock_date, stock_date, shop_id, 0]
      
             cursor.execute(query, tuple(params))
             self.db.conn.commit()
     
-    def fetch(self, stock_date):
+    def fetch(self, stock_date, shop_id):
         self.db.ensure_connection()
     
         query = """
@@ -71,7 +71,7 @@ class DemoSTock():
         INNER JOIN product_categories ON product_categories.id = today.category_id
         LEFT JOIN yesterday ON yesterday.product_id = today.product_id   
         """
-        params = [17, stock_date, stock_date]
+        params = [shop_id, stock_date, stock_date]
         
         query = query + """
             ORDER BY today.category_id, today.name
@@ -86,8 +86,8 @@ class DemoSTock():
 
             return stocks
     
-    def update(self, stock_date):
-        stocks = self.fetch(stock_date)
+    def update(self, stock_date, shop_id):
+        stocks = self.fetch(stock_date, shop_id)
         self.db.ensure_connection()
         for stock in stocks:
             old_opening = opening = stock.yesterday_opening + stock.yesterday_additions
@@ -114,8 +114,9 @@ class DemoSTock():
         
     def __call__(self):
         current_date = datetime.now(pytz.timezone("Africa/Nairobi")).strftime('%Y-%m-%d')
-        stock_date = current_date   
-        self.load(stock_date)
-        self.update(stock_date)
+        stock_date = current_date 
+        for shop_id in [17, 20]:  
+            self.load(stock_date, shop_id)
+            self.update(stock_date, shop_id)
 
 DemoSTock()()
