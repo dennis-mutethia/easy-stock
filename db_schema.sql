@@ -127,22 +127,23 @@ CREATE TABLE IF NOT EXISTS products (
 
 -- Table structure for table stock
 CREATE TABLE IF NOT EXISTS stock (
-  id SERIAL PRIMARY KEY,
-  stock_date date,
-  product_id INT,
+  id SERIAL NOT NULL,
+  stock_date DATE NOT NULL,
+  product_id INT NOT NULL,
+  shop_id INT NOT NULL,
   name TEXT,
   category_id INT,
   purchase_price DOUBLE PRECISION,
   selling_price DOUBLE PRECISION,
   opening DOUBLE PRECISION,
   additions DOUBLE PRECISION,
-  shop_id INT,
   created_at TIMESTAMP,
   created_by INT,
   updated_at TIMESTAMP,
   updated_by INT,
-  UNIQUE (stock_date,product_id,shop_id)
-);
+  PRIMARY KEY (stock_date, product_id, shop_id) -- Includes the partitioning column
+) PARTITION BY RANGE (stock_date);
+
 
 -- Table structure for table bills
 CREATE TABLE IF NOT EXISTS bills (

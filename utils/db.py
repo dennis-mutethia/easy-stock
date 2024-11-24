@@ -1,3 +1,5 @@
+import random, pytz
+from datetime import datetime, timedelta
 from flask_login import current_user
 import os, uuid, psycopg2
 
@@ -240,3 +242,24 @@ class Db():
             params = [shop_id, shop_type_id, shop_id, current_user.id]
             cursor.execute(query, tuple(params))
             self.conn.commit()
+            
+    def create_current_month_partition(self):        
+        self.ensure_connection()
+        with self.conn.cursor() as cursor:  
+            # Get the first day of the current month
+            current_date = datetime.now(pytz.timezone("Africa/Nairobi")).replace(day=1)
+
+            # Get the first day of the next month
+            next_month = (current_date + timedelta(days=31)).replace(day=1)
+
+            # Partition name based on current month
+            partition_name = f"stock_{current_date.year}_{current_date.month:02d}"       
+            query = f"""
+            CREATE TABLE IF NOT EXISTS {partition_name} PARTITION OF stock
+            FOR VALUES FROM ('{current_date.strftime("%Y-%m-%d")}') 
+            TO ('{next_month.strftime("%Y-%m-%d")}');     
+            """
+            cursor.execute(query)
+            self.conn.commit()
+            print(f"Partition {partition_name} created successfully.")
+           
