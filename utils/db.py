@@ -1,17 +1,18 @@
-import random, pytz
+import pytz, os, uuid, psycopg2
 from datetime import datetime, timedelta
 from flask_login import current_user
-import os, uuid, psycopg2
+from dotenv import load_dotenv 
 
 from utils.entities import Company, License, Package, PaymentMode, Shop
 
 class Db():
     def __init__(self):
+        load_dotenv()
         # Access the environment variables
         self.conn_params = {
             'host': os.getenv('DB_HOST'),
-            'database': os.getenv('DB_NAME'),
             'port': os.getenv('DB_PORT'),
+            'database': os.getenv('DB_NAME'),
             'user': os.getenv('DB_USER'),
             'password': os.getenv('DB_PASSWORD')
         }
