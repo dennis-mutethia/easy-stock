@@ -90,16 +90,16 @@ class DemoSTock():
         stocks = self.fetch(stock_date)
         self.db.ensure_connection()
         for stock in stocks:
-            opening = stock.yesterday_opening + stock.yesterday_additions
+            old_opening = opening = stock.yesterday_opening + stock.yesterday_additions
+            new_opening = random.randint(math.ceil(opening * 0.7), opening)
             additions = 0            
-            if (opening > 5 and opening % 5 == 0) or (opening > 3 and opening % 3 == 0) or opening <= 3:
-                opening = random.randint(math.ceil(stock.opening * 0.7), stock.opening)
-                sold = stock.yesterday_opening + stock.yesterday_additions - opening
+            if (new_opening > 5 and new_opening % 5 == 0) or (new_opening > 3 and new_opening % 3 == 0) or new_opening <= 3:
+                sold = opening - new_opening
                 additions = random.randint(0, sold)
+                opening = new_opening  
                 
-            if opening == 0:
-                opening = stock.yesterday_opening + stock.yesterday_additions
-                additions = 0
+                if old_opening != new_opening or additions > 0:
+                    print(f'Updating {stock.name} opening={opening} additions={additions}')               
                 
             query = """
             UPDATE stock
@@ -110,9 +110,7 @@ class DemoSTock():
             
             with self.db.conn.cursor() as cursor:                
                 cursor.execute(query, tuple(params))
-                self.db.conn.commit()
-                if opening != stock.yesterday_opening + stock.yesterday_additions or additions > 0:
-                    print(f'Updated {stock.name} opening={opening} additions={additions}')            
+                self.db.conn.commit()           
         
     def __call__(self):
         current_date = datetime.now(pytz.timezone("Africa/Nairobi")).strftime('%Y-%m-%d')
