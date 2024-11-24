@@ -12,23 +12,21 @@ class Login():
         self.db = db        
      
     def login(self):  
-        if request.method == 'POST':
-            if request.form['action'] == 'login':
-                phone = request.form['phone']
-                password = request.form['password']   
-                user = SystemUsers(self.db).authenticate(phone, password)
-                
-                if user:        
-                    login_user(user)
-                    StockTake(self.db).load(datetime.now(pytz.timezone("Africa/Nairobi")).strftime('%Y-%m-%d'))
-                    if user.user_level.id in [0, 1]:               
-                        return redirect(url_for('dashboard'))
-                    else:
-                        return redirect(url_for('stockTake')) 
-                else: 
-                    error = 'Login failed! Phone & Password do not match or Phone does not exist.'
-                    shop_types = MyShops(self.db).fetch_shop_types()
-                    return render_template('login.html', shop_types=shop_types, error=error)
+        phone = request.form['phone']
+        password = request.form['password']   
+        user = SystemUsers(self.db).authenticate(phone, password)
+        
+        if user:        
+            login_user(user)
+            StockTake(self.db).load(datetime.now(pytz.timezone("Africa/Nairobi")).strftime('%Y-%m-%d'))
+            if user.user_level.id in [0, 1]:               
+                return redirect(url_for('dashboard'))
+            else:
+                return redirect(url_for('stockTake')) 
+        else: 
+            error = 'Login failed! Phone & Password do not match or Phone does not exist.'
+            shop_types = MyShops(self.db).fetch_shop_types()
+            return render_template('login.html', shop_types=shop_types, error=error)
     
     def register(self):           
         company_name = request.form['company_name']
