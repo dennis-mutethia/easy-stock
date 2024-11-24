@@ -1,4 +1,4 @@
-import pytz, random
+import pytz, random, math
 from datetime import datetime
 
 from utils.db import Db
@@ -90,14 +90,17 @@ class DemoSTock():
         stocks = self.fetch(stock_date)
         self.db.ensure_connection()
         for stock in stocks:
-            opening = random.randint(0, stock.opening)
+            opening = stock.yesterday_opening + stock.yesterday_additions
+            additions = 0            
             if (opening > 5 and opening % 5 == 0) or (opening > 3 and opening % 3 == 0) or opening <= 3:
+                opening = random.randint(math.ceil(stock.opening * 0.7), stock.opening)
                 sold = stock.yesterday_opening + stock.yesterday_additions - opening
                 additions = random.randint(0, sold)
-            else:
+                
+            if opening == 0:
                 opening = stock.yesterday_opening + stock.yesterday_additions
                 additions = 0
-            
+                
             query = """
             UPDATE stock
             SET opening=%s, additions=%s, updated_at=CURRENT_TIMESTAMP AT TIME ZONE 'Africa/Nairobi', updated_by=%s
@@ -105,11 +108,11 @@ class DemoSTock():
             """
             params = [opening, additions, 0, stock.id]
             
-            with self.db.conn.cursor() as cursor:
+            with self.db.conn.cursor() as cursor:                
                 cursor.execute(query, tuple(params))
                 self.db.conn.commit()
-                       
-            print(f'Updated {stock.name} opening={opening} additions={additions}')            
+                if opening != stock.yesterday_opening + stock.yesterday_additions or additions > 0:
+                    print(f'Updated {stock.name} opening={opening} additions={additions}')            
         
     def __call__(self):
         current_date = datetime.now(pytz.timezone("Africa/Nairobi")).strftime('%Y-%m-%d')
