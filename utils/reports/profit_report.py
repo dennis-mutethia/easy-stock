@@ -67,21 +67,16 @@ class ProfitReport():
         max_date = yesterday.strftime('%Y-%m-%d')
         from_date = datetime.now(pytz.timezone("Africa/Nairobi")).replace(day=1).strftime('%Y-%m-%d')
         to_date = max_date
-        page = 1
         
         if request.method == 'GET':   
             try:    
                 from_date = request.args.get('from_date', from_date)
                 to_date = request.args.get('to_date', to_date)
-                page = int(request.args.get('page', 1))
             except Exception as e:
                 print(f"An error occurred: {e}")               
         
         profits = self.fetch(from_date, to_date) 
-        prev_page = page-1 if page>1 else 0
-        next_page = page+1 if len(profits)==50 else 0
                
         return render_template('reports/profit-report.html', page_title='Reports > Profit & Loss', helper=Helper(), menu='reports', sub_menu='profit_report',
-                               profits=profits, from_date=from_date, to_date=to_date, max_date=max_date,
-                               page=page, prev_page=prev_page, next_page=next_page
+                               profits=profits, from_date=from_date, to_date=to_date, max_date=max_date
                                )

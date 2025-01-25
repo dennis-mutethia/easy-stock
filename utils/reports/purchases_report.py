@@ -11,7 +11,7 @@ class PurchasesReport():
     def __init__(self, db): 
         self.db = db
 
-    def fetch(self, report_date, category_id=0, page=0):
+    def fetch(self, report_date, category_id=0):
         self.db.ensure_connection()
         with self.db.conn.cursor() as cursor:
             query = """
@@ -29,13 +29,7 @@ class PurchasesReport():
             query = query + """
             ORDER BY pc.name, s.name
             """
-            
-            if page>0:
-                query = query + """
-                LIMIT 50 OFFSET %s
-                """
-                params.append((page - 1)*50)
-            
+                        
             cursor.execute(query, tuple(params))
             data = cursor.fetchall()
             purchases = []
@@ -47,20 +41,16 @@ class PurchasesReport():
     def __call__(self):
         current_date = datetime.now(pytz.timezone("Africa/Nairobi")).strftime('%Y-%m-%d')
         from_date = to_date = current_date
-        page = 1
         category_id = 0
         
         if request.method == 'GET':   
             try:    
                 from_date = request.args.get('from_date', from_date)
                 category_id = int(request.args.get('category_id', 0))
-                page = int(request.args.get('page', 1))
             except Exception as e:
                 print(f"An error occurred: {e}")               
         
-        purchases = self.fetch(from_date, category_id, page) 
-        prev_page = page-1 if page>1 else 0
-        next_page = page+1 if len(purchases)==50 else 0
+        purchases = self.fetch(from_date, category_id) 
         grand_total =  0
         for purchase in purchases:
             total = purchase.purchase_price * purchase.additions
@@ -69,5 +59,5 @@ class PurchasesReport():
         product_categories = ProductsCategories(self.db).fetch()
         return render_template('reports/purchases-report.html', page_title='Reports > Purchases', helper=Helper(), menu='reports', sub_menu='purchases_report',
                                purchases=purchases, grand_total=grand_total, product_categories=product_categories, category_id=category_id,
-                               current_date=current_date, from_date=from_date, to_date=to_date, 
-                                page=page, prev_page=prev_page, next_page=next_page)
+                               current_date=current_date, from_date=from_date, to_date=to_date
+                            )

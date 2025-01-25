@@ -11,7 +11,7 @@ class SalesReport():
     def __init__(self, db): 
         self.db = db
 
-    def fetch(self, report_date, category_id=0, page=0):
+    def fetch(self, report_date, category_id=0):
         self.db.ensure_connection()
         with self.db.conn.cursor() as cursor:
             query = """            
@@ -68,13 +68,7 @@ class SalesReport():
             query = query + """
             ORDER BY sold DESC
             """
-            
-            if page>0:
-                query = query + """
-                LIMIT 50 OFFSET %s
-                """
-                params.append((page - 1)*50)
-            
+                        
             cursor.execute(query, tuple(params))
             data = cursor.fetchall()
             sales = []
@@ -88,19 +82,15 @@ class SalesReport():
         max_date = yesterday.strftime('%Y-%m-%d')
         report_date = max_date
         category_id = 0
-        page = 1
         
         if request.method == 'GET':   
             try:    
                 report_date = request.args.get('from_date', report_date)
                 category_id = int(request.args.get('category_id', 0))
-                page = int(request.args.get('page', 1))
             except Exception as e:
                 print(f"An error occurred: {e}")               
         
-        sales = self.fetch(report_date, category_id, page) 
-        prev_page = page-1 if page>1 else 0
-        next_page = page+1 if len(sales)==50 else 0
+        sales = self.fetch(report_date, category_id) 
         grand_total =  0
         for sale in sales:
             total = sale.selling_price * sale.sold
@@ -109,5 +99,4 @@ class SalesReport():
         product_categories = ProductsCategories(self.db).fetch()
         return render_template('reports/sales-report.html', page_title='Reports > Sales', helper=Helper(), menu='reports', sub_menu='sales_report',
                                sales=sales, grand_total=grand_total, product_categories=product_categories, category_id=category_id,
-                               report_date=report_date, max_date=max_date,
-                                page=page, prev_page=prev_page, next_page=next_page)
+                               report_date=report_date, max_date=max_date)

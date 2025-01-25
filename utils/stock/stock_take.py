@@ -49,7 +49,7 @@ class StockTake():
             cursor.execute(query, tuple(params))
             self.db.conn.commit()
     
-    def fetch(self, stock_date, search, category_id, in_stock=0, page=0):
+    def fetch(self, stock_date, search, category_id, in_stock=0):
         self.db.ensure_connection()
     
         query = """
@@ -87,11 +87,6 @@ class StockTake():
         query = query + """
             ORDER BY today.category_id, today.name
             """
-        if page>0:
-            query = query + """
-            LIMIT 30 OFFSET %s
-            """
-            params.append((page - 1)*30)
             
         with self.db.conn.cursor() as cursor:    
             cursor.execute(query, tuple(params))

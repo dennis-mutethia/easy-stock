@@ -7,7 +7,7 @@
 <div class="container-fluid card table-responsive">
     <form id="filter-frm" method="GET" class="row">        
         <div class="col-6">
-            <input class="text-center" onchange="applyFilter(1)" style="height: 25px" type="date" id="report_date" name="report_date"
+            <input class="text-center" onchange="applyFilter()" style="height: 25px" type="date" id="report_date" name="report_date"
                 required="required" value="{{ report_date }}" max="{{ max_date }}" {{ 'disabled' if current_user.user_level.id not in [0, 1, 2]  }} />
         </div>
         <div class="col-6">

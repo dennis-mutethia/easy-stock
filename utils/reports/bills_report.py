@@ -16,7 +16,6 @@ class BillsReport():
         to_date = current_date
         bill_status = 2
         customer_id = 0
-        page = 1
         
         if request.method == 'GET':   
             try:    
@@ -24,16 +23,13 @@ class BillsReport():
                 to_date = request.args.get('to_date', to_date)
                 bill_status = int(request.args.get('bill_status', bill_status))
                 customer_id = int(request.args.get('customer_id', customer_id))
-                page = int(request.args.get('page', 1))
             except ValueError as e:
                 print(f"Error converting bill_status: {e}")
             except Exception as e:
                 print(f"An error occurred: {e}")               
         
         customers = Customers(self.db).fetch()
-        bills = Bills(self.db).fetch(from_date, to_date, bill_status, customer_id, page) 
-        prev_page = page-1 if page>1 else 0
-        next_page = page+1 if len(bills)==50 else 0
+        bills = Bills(self.db).fetch(from_date, to_date, bill_status, customer_id) 
         grand_total = grand_paid = cash_total = mpesa_total =  0
         for bill in bills:
             grand_total = grand_total + bill.total
@@ -44,5 +40,5 @@ class BillsReport():
         return render_template('reports/bills-report.html', page_title='Reports > Bills', helper=Helper(), menu='reports', sub_menu='bills_report',
                                customers=customers, bills=bills, current_date=current_date, bill_status=bill_status, 
                                 from_date=from_date, to_date=to_date, customer_id=customer_id,
-                                grand_total=grand_total, grand_paid=grand_paid, cash_total=cash_total, mpesa_total=mpesa_total,
-                                page=page, prev_page=prev_page, next_page=next_page)
+                                grand_total=grand_total, grand_paid=grand_paid, cash_total=cash_total, mpesa_total=mpesa_total
+                            )

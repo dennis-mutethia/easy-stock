@@ -12,8 +12,7 @@
                 <th class="text-center" style="font-size: x-small;">CREATED ON</th>
                 <th class="text-center" style="font-size: x-small;">PACKAGE</th>
                 <th class="text-center" style="font-size: x-small;">VALIDITY</th>
-                <th class="text-center" colspan="2" style="font-size: x-small;">ACTION</th>
-                <th class="text-center" style="font-size: x-small;">VIEW</th>
+                <th class="text-center" colspan="3" style="font-size: x-small;">ACTION</th>
             </tr>
         </thead>
         <tbody>
@@ -23,16 +22,20 @@
                 <td class="text-center">{{ company.created_at }}</td> 
                 <td>{{ company.package }}</td> 
                 <td class="text-center" style="color: {{ 'red' if company.validity < 7 else 'green' }}">{{ company.validity }} days</td> 
-                <td class="text-center">
-                    <button class="btn btn-success btn-xs text-white" data-toggle="modal" data-target="#renewModal" onclick="renewLicense({{ company.license_id }});">Renew</button>
+                <td class="text-center">                  
+                    <a href="#" data-toggle="modal" data-target="#renewModal" onclick="renewLicense({{ company.license_id }});">
+                        <i class="mdi mdi-check" style="color: lime;" title="Renew {{ company.name }}">renew</i>
+                    </a>
+                </td>
+                <td class="text-center">                    
+                    <a href="#" data-toggle="modal" data-target="#editModal" onclick="editCompany({{ company.id }}, '{{ company.name }}');">
+                        <i class="mdi mdi-border-color" title="Edit {{ company.name }}">edit</i>
+                    </a>
                 </td>
                 <td class="text-center">
-                    <button class="btn btn-warning btn-xs text-white" data-toggle="modal" data-target="#editModal" onclick="editCompany({{ company.id }}, '{{ company.name }}');">Edit</button>
-                </td>
-                <td class="text-center">
-                    <a href="#" class="text-primary mdi mdi-eye" title="View Shops" 
-                       data-toggle="modal" data-target="#shopsModal" onclick="fetchShops({{ company.id }});"
-                       >Shops</a>
+                    <a href="#" data-toggle="modal" data-target="#shopsModal" onclick="fetchShops({{ company.id }});">
+                        <i class="mdi mdi-eye" style="color: orange;" title="View Shops">shops</i>
+                    </a>
                 </td>
             </tr>
             {% endfor %}

@@ -6,9 +6,8 @@
 <!-- ============================================================== -->
 <div class="container-fluid card table-responsive">
     <form id="filter-frm" method="GET" class="row">
-        <input type="hidden" id="page" name="page" value="{{ page }}" />
         <div class="col-6">
-            <input class="text-center" onchange="applyFilter(1)" style="height: 25px" type="date" id="report_date" name="report_date"
+            <input class="text-center" onchange="applyFilter()" style="height: 25px" type="date" id="report_date" name="report_date"
                 required="required" value="{{ report_date }}" max="{{ max_date }}" />
         </div>
         <div class="col-6">
@@ -48,35 +47,14 @@
                 <th class="text-right" colspan="2"><b><u>{{ helper.format_number_with_commas(helper.format_number(grand_total))}}</u></b></th>
             </tr>
         </tfoot>
-    </table><br />
-
-    <!--Pagination-->
-    <div class="row">
-        <div class="col-md-5"></div>
-        <div class="col-md-4 text-center">
-            <nav aria-label="Page navigation example" class="text-center">
-                <ul class="pagination" class="text-center">
-                    <li class="page-item {{ '' if prev_page > 0 else 'disabled' }}">
-                        <button class="page-link" id="prev_page"
-                            onclick="applyFilter({{ prev_page }})">Previous</button>
-                    </li>
-                    <li class="page-item {{ '' if next_page > 0 else 'disabled' }}">
-                        <button class="page-link" id="next_page" onclick="applyFilter({{ next_page }})">Next</button>
-                    </li>
-                </ul>
-            </nav>
-        </div>
-
-    </div>
-    <!-- End Pagination-->
+    </table>
 </div>
 <!-- ============================================================== -->
 <!-- End Container fluid  -->
 <!-- ============================================================== -->
 
 <script>
-    function applyFilter(page) {
-        $("#page").val(page);
+    function applyFilter() {
         $("#filter-frm").submit();
     }
 

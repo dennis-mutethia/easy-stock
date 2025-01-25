@@ -35,21 +35,16 @@ class ExpensesReport():
         current_date = datetime.now(pytz.timezone("Africa/Nairobi")).strftime('%Y-%m-%d')
         from_date = datetime.now(pytz.timezone("Africa/Nairobi")).replace(day=1).strftime('%Y-%m-%d')
         to_date = current_date
-        page = 1
         
         if request.method == 'GET':   
             try:    
                 from_date = request.args.get('from_date', from_date)
                 to_date = request.args.get('to_date', to_date)
-                page = int(request.args.get('page', 1))
             except Exception as e:
                 print(f"An error occurred: {e}")               
         
         expenses = self.fetch(from_date, to_date) 
-        prev_page = page-1 if page>1 else 0
-        next_page = page+1 if len(expenses)==50 else 0
                   
         return render_template('reports/expenses-report.html', page_title='Reports > Expenses', helper=Helper(), menu='reports', sub_menu='expenses_report',
-                               expenses=expenses, from_date=from_date, to_date=to_date, current_date=current_date,
-                               page=page, prev_page=prev_page, next_page=next_page
+                               expenses=expenses, from_date=from_date, to_date=to_date, current_date=current_date                               
                                )
