@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html dir="ltr" lang="en">
-    {% include 'head.html' %}
+{% include 'head.html' %}
 
 <body class="bg-dark">
     {% include 'preloader.html' %}
@@ -17,7 +17,7 @@
                     </b>
                     <!--End Logo icon -->
                     <!-- Logo text -->
-                    <span class="logo-text ms-2">Easy <sup>Stock</sup></span><br />
+                    <span class="logo-text ms-2">Easy <sup>STOCK</sup></span><br />
                     <small>User Login</small>
                     <!--End Logo icon -->
                 </div>
@@ -59,6 +59,13 @@
                 <div class="col-12">
                     <a class="btn btn-default btn-sm btn-block" data-toggle="modal" data-target="#newModal" href="#">
                         Register New Company
+                    </a>
+                </div>
+
+                <div class="col-12 text-center">
+                    <br />
+                    <a data-toggle="modal" data-target="#resetModal" href="#">
+                        Forgot Passord
                     </a>
                 </div>
 
@@ -138,25 +145,53 @@
         </div>
     </div>
 
+    <div class="modal fade" id="resetModal" tabindex="-1" role="dialog" aria-labelledby="resetModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <form method="POST" class="form-horizontal" id="new_frm">
+                    <div class="modal-header text-center">
+                        <h5 class="text-center">Enter Phone Number to Reset Password</h5>
+                        <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="form-group row">
+                            <div class="col-sm-12">
+                                <input required="required" type="number" name="phone"
+                                    min="100000000" max="999999999" class="form-control input-sm"
+                                    placeholder="Enter Your Phone">
+                            </div>
+                        </div>
+                        <div class="col-sm-12 text-center">
+                            <small style="color: black">A 4-digit Reset Code will be sent via SMS to above Phone Number. <br />
+                                Use that code as your temporary Password. <br />
+                                Once Logged in - Go to Account Profile and Update Your Password.
+                            </small>
+
+                        </div>
+
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+                        <button type="submit" id="action_2" name="action" value="reset_password" class="btn btn-success">Send
+                            Reset Code</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
     {% include 'footer.html' %}
 
     <script>
-
-        $(document).ready(function() {
-            $('#new_frm').submit(function() {
-                // Disable the submit button
-                // $('#action_2').prop('disabled', true);
-                
-                // Change the button text
-                $('#action_2').text('Spinning company');
-            });
-
-            if ($toastr_message)
-                toastr.success($toastr_message);
-            if ($toastr_err_message)
-                toastr.error($toastr_err_message);
+        if ($toastr_message)
+            toastr.success($toastr_message);
+        if ($toastr_err_message)
+            toastr.error($toastr_err_message);
+        $("#new_frm").submit(function () {
+            $("#action_2").html('Spinning up Your new Company');
+            $("#action_2").prop('disabled', true);
         });
-
     </script>
 </body>
 

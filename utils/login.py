@@ -1,4 +1,4 @@
-import pytz
+import pytz, random
 from datetime import datetime
 from flask import redirect, render_template, request, url_for
 from flask_login import login_user
@@ -55,13 +55,24 @@ class Login():
         self.db.import_products_template_data(shop_id, shop_type_id)
         StockTake(self.db).load(current_date) 
         return redirect(url_for('dashboard'))         
-      
+    
+    def reset_password(self):
+        phone = request.form['phone']
+        password = str(random.randint(1000, 9999))
+        print(password)
+        ## send SMS
+        SystemUsers(self.db).reset_password(phone, password, 0)
+        shop_types = MyShops(self.db).fetch_shop_types()
+        return render_template('login.html', shop=None, shop_types=shop_types, error=None)
+     
     def __call__(self):
         if request.method == 'POST':
             if request.form['action'] == 'register':
                 return self.register()
             elif request.form['action'] == 'login':
                 return self.login()
+            elif request.form['action'] == 'reset_password':
+                return self.reset_password()
 
         shop_types = MyShops(self.db).fetch_shop_types()
         return render_template('login.html', shop=None, shop_types=shop_types, error=None)
