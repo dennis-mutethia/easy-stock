@@ -43,7 +43,7 @@
                 <td class="text-center">
                     <a href="#" onclick="deleteItem({{ expense.id }})" data-toggle="modal"
                         data-target="#deleteModal"><i class="mdi mdi-delete" style="color: red"
-                            title="Delete Item"></i></a>
+                            title="Delete {{ expense.name }}">delete</i></a>
                 </td>
             </tr>
             {% endfor %}

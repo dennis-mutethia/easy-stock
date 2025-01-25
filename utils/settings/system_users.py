@@ -1,7 +1,8 @@
+from datetime import datetime
 from flask import render_template, request
 from flask_login import current_user
 
-from utils.entities import User, UserLevel
+from utils.entities import Expense, User, UserLevel
 from utils.helper import Helper
 from utils.settings.my_shops import MyShops
 
@@ -18,9 +19,8 @@ class SystemUsers():
             WHERE shop_id IN(
                 SELECT id FROM shops WHERE company_id = %s
             )
-            AND user_level_id >= %s
             """
-            params = [current_user.company.id, current_user.user_level.id]
+            params = [current_user.company.id]
             
             cursor.execute(query, tuple(params))
             data = cursor.fetchall()
@@ -96,7 +96,7 @@ class SystemUsers():
         with self.db.conn.cursor() as cursor:
             query = """
             INSERT INTO users(name, phone, user_level_id, shop_id, password, created_at, created_by) 
-            VALUES(%s, %s, %s, %s, %s, CURRENT_TIMESTAMP AT TIME ZONE 'Africa/Nairobi', 0)
+            VALUES(%s, %s, %s, %s, %s, NOW(), 0)
             RETURNING id
             """
             cursor.execute(query, (name.upper(), phone, user_level_id, shop_id, Helper().hash_password(password)))
@@ -109,7 +109,7 @@ class SystemUsers():
         with self.db.conn.cursor() as cursor:
             query = """
             UPDATE users 
-            SET name = %s, phone = %s, user_level_id = %s, shop_id = %s, updated_by = %s, updated_at=CURRENT_TIMESTAMP AT TIME ZONE 'Africa/Nairobi'            
+            SET name = %s, phone = %s, user_level_id = %s, shop_id = %s, updated_by = %s, updated_at=NOW()            
             """
             params = [name.upper(), phone, user_level_id, shop_id, current_user.id]
             if password is not None:
@@ -122,15 +122,15 @@ class SystemUsers():
             cursor.execute(query, tuple(params))
             self.db.conn.commit()
             
-    def reset_password(self, phone):
+    def reset_password(self, phone, password, updated_by):
         self.db.ensure_connection()
         with self.db.conn.cursor() as cursor:
             query = """
             UPDATE users 
-            SET password = %s, updated_by = %s, updated_at=CURRENT_TIMESTAMP AT TIME ZONE 'Africa/Nairobi'   
+            SET password = %s, updated_by = %s, updated_at=NOW()   
             WHERE phone = %s         
             """
-            params = [Helper().hash_password(phone), current_user.id, phone]            
+            params = [Helper().hash_password(password), updated_by, phone]            
             cursor.execute(query, tuple(params))
             self.db.conn.commit()
             
@@ -150,14 +150,13 @@ class SystemUsers():
             query = """
             SELECT id, name, level, description
             FROM user_levels 
-            WHERE id >= %s
             ORDER BY id
             """
-            cursor.execute(query, (current_user.user_level.id,))
+            cursor.execute(query)
             data = cursor.fetchall()
             user_levels = []
             for datum in data:      
-                user_levels.append(UserLevel(datum[0], datum[1], datum[2], datum[3].replace('\\n','')))
+                user_levels.append(UserLevel(datum[0], datum[1], datum[2], datum[3]))
 
             return user_levels 
         
@@ -185,8 +184,8 @@ class SystemUsers():
                 shop_id = request.form['shop_id']     
                 self.add(name, phone, user_level_id, shop_id, password=phone)
                    
-            if request.form['action'] == 'update':
-                user_id = request.form['user_id']
+            if request.form['action'] == 'edit':
+                user_id = request.form['id']
                 name = request.form['name']
                 phone = request.form['phone']      
                 user_level_id = request.form['user_level_id']     
@@ -195,10 +194,10 @@ class SystemUsers():
                 
             if request.form['action'] == 'reset_password':
                 phone = request.form['phone']                    
-                self.reset_password(phone)                 
+                self.reset_password(phone, phone, current_user.id)                 
                 
             elif request.form['action'] == 'delete':
-                user_id = request.form['user_id']
+                user_id = request.form['id']
                 self.delete(user_id)
                 
                 

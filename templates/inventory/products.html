@@ -50,12 +50,12 @@
                 <td>{{ helper.format_number_with_commas(product.opening+product.additions) }}</td>
                 <td class="text-center">
                     <a href="#" onclick="editProduct({{ product.id }}, {{ product.product_id }}, '{{ product.name }}', '{{ product.category_name }}', {{ product.purchase_price }}, {{ product.selling_price }}, {{ product.opening+product.additions }})" data-toggle="modal"
-                        data-target="#newModal"><i class="mdi mdi-border-color" style="color: blue"
-                            title="Delete Item"></i></a>
+                        data-target="#newModal"><i class="mdi mdi-border-color"
+                            title="Delete {{ product.name }}">edit</i></a>
                 </td>
                 <td class="text-center">
                     <a href="#" onclick="deleteItem({{ product.product_id }}, '{{ product.name }}')" data-toggle="modal" data-target="#deleteModal"><i
-                            class="mdi mdi-delete" style="color: red" title="Delete Item"></i></a>
+                            class="mdi mdi-delete" style="color: red" title="Delete {{ product.name }}">delete</i></a>
                 </td>
             </tr>
             {% endfor %}

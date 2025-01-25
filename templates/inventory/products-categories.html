@@ -25,13 +25,13 @@
                 <td class="text-center">{{ helper.format_number_with_commas(product_category.products_count) }}</td>
                 <td class="text-center">
                     <a href="#" onclick="editCategory({{ product_category.id }}, '{{ product_category.name }}')" data-toggle="modal"
-                        data-target="#newModal"><i class="mdi mdi-border-color" style="color: blue"
-                            title="Delete Item"></i></a>
+                        data-target="#newModal"><i class="mdi mdi-border-color"
+                            title="Delete {{ product_category.name }}">edit</i></a>
                 </td>
                 <td class="text-center">
                     <a href="#" onclick="deleteItem({{ product_category.id }}, '{{ product_category.name }}')" data-toggle="modal"
                         data-target="#deleteModal"><i class="mdi mdi-delete" style="color: red"
-                            title="Delete Item"></i></a>
+                            title="Delete {{ product_category.name }}">delete</i></a>
                 </td>
             </tr>
             {% endfor %}

@@ -13,7 +13,7 @@
                     <th>PHONE</th>
                     <th>ATTACHED SHOP</th>
                     <th>ROLE</th>
-                    <th class="text-center" colspan="2">
+                    <th class="text-center" colspan="3">
                         <a href="#" class="btn btn-xs btn-primary btn-flat" style="width: 100%" data-toggle="modal"
                             data-target="#newModal">Add New User</a>
                     </th>
@@ -22,41 +22,28 @@
             <tbody>
                 {% for user in users %}
                 <tr title="{{ user.user_level.description }}">
-                    <td>
-                        <input type="text" id="name_{{ user.id }}" name="name_{{ user.id }}" value="{{ user.name }}"
-                            onchange="updateUser({{ user.id }});" />
-                    </td>
-                    <td>
-                        <input type="text" id="phone_{{ user.id }}" name="phone_{{ user.id }}" value="{{ user.phone }}"
-                            onchange="updateUser({{ user.id }});" />
-                    </td>
-                    <td>
-                        <select onchange="updateUser({{ user.id }});" id="shop_id_{{ user.id }}"
-                            name="shop_id_{{ user.id }}" style="width: 100%;">
-                            {% for company_shop in company_shops %}
-                            <option value="{{ company_shop.id }}" {% if company_shop.name==user.shop.name %} selected {%
-                                endif %}>{{ company_shop.name }}</option>
-                            {% endfor %}
-                        </select>
-                    </td>
-                    <td>
-                        <select onchange="updateUser({{ user.id }});" id="user_level_id_{{ user.id }}"
-                            name="user_level_id_{{ user.id }}" style="width: 100%;">
-                            {% for user_level in user_levels %}
-                            <option value="{{ user_level.id }}" {% if user_level.name==user.user_level.name %} selected
-                                {% endif %}>{{ user_level.name }}</option>
-                            {% endfor %}
-                        </select>
-                    </td>
+                    <td>{{ user.name }}</td>
+                    <td>{{ user.phone }}</td>
+                    <td>{{ user.shop.name }}</td>
+                    <td>{{ user.user_level.name }}</td>
                     <td class="text-center">
                         <a href="#" onclick="resetPassword('{{ user.phone }}')" data-toggle="modal"
-                            data-target="#resetModal">
-                            <i class="mdi mdi-lock-open" style="color: blue" title="Reset Password"></i>
+                            data-target="#resetModal" {{ 'disabled' if user.user_level.id < current_user.user_level.id }}>
+                            <i class="mdi mdi-lock-open" style="color: orange"
+                                title="Reset {{ user.name }} Password"></i>
                         </a>
                     </td>
                     <td class="text-center">
-                        <a href="#" onclick="deleteItem({{ user.id }})" data-toggle="modal" data-target="#deleteModal">
-                            <i class="mdi mdi-delete" style="color: red" title="Delete Item"></i>
+                        <a href="#"
+                            onclick="editUser({{ user.id }}, '{{ user.name }}', '{{ user.phone }}', '{{ user.shop.name }}', '{{ user.user_level.name }}')"
+                            data-toggle="modal" data-target="#newModal" {{ 'disabled' if user.user_level.id <
+                            current_user.user_level.id }}><i class="mdi mdi-border-color"
+                                title="Edit {{ user.name }}"></i></a>
+                    </td>
+                    <td class="text-center">
+                        <a href="#" onclick="deleteItem({{ user.id }})" data-toggle="modal" data-target="#deleteModal"
+                            {{ 'disabled' if user.user_level.id < current_user.user_level.id }}>
+                            <i class="mdi mdi-delete" style="color: red" title="Delete {{ user.name }}"></i>
                         </a>
                     </td>
                 </tr>
@@ -95,26 +82,28 @@
     <div class="modal-dialog" role="document">
         <div class="modal-content">
             <form method="POST" class="form-horizontal">
+                <input type="hidden" id="edit_id" name="id" />
                 <div class="modal-header text-center">
-                    <h5 class="text-center">Add New System User in This Company</h5>
+                    <h5 class="text-center"><b id="user_header">Add New</b> System User in This Company</h5>
                     <button type="button" class="close" data-dismiss="modal">&times;</button>
                 </div>
                 <div class="modal-body">
                     <div class="form-group row">
                         <div class="col-sm-12">
-                            <input required="required" type="text" name="name" id="name" class="form-control input-sm"
-                                placeholder="Enter User Name">
+                            <input required="required" type="text" name="name" id="edit_name"
+                                class="form-control input-sm" placeholder="Enter User Name">
                         </div>
                     </div>
                     <div class="form-group row">
                         <div class="col-sm-12">
-                            <input required="required" type="number" name="phone" id="phone" min="100000000"
+                            <input required="required" type="number" name="phone" id="edit_phone" min="100000000"
                                 max="999999999" class="form-control input-sm" placeholder="Enter User Phone">
                         </div>
                     </div>
                     <div class="form-group row">
                         <div class="col-sm-12">
-                            <input type="text" name="password" id="password" class="form-control input-sm" placeholder="Default Password will be same as Phone No." disabled>
+                            <input type="text" name="password" id="edit_password" class="form-control input-sm"
+                                placeholder="Default Password will be same as Phone No." disabled>
                         </div>
                     </div>
                     <div class="form-group row">
@@ -122,7 +111,7 @@
                             <label name="shop_id">Attached Shop: <label>
                         </div>
                         <div class="col-sm-6">
-                            <select name="shop_id" id="shop_id" style="width: 100%;">
+                            <select name="shop_id" id="edit_shop" style="width: 100%;">
                                 {% for company_shop in company_shops %}
                                 <option value="{{ company_shop.id }}">{{ company_shop.name }}</option>
                                 {% endfor %}
@@ -132,9 +121,11 @@
                             <label name="user_level">User Level: <label>
                         </div>
                         <div class="col-sm-6">
-                            <select name="user_level_id" id="user_level_id" style="width: 100%;">
+                            <select name="user_level_id" id="edit_user_level" style="width: 100%;">
                                 {% for user_level in user_levels %}
-                                <option value="{{ user_level.id }}">{{ user_level.name }}</option>
+                                    {% if user_level.id >= current_user.user_level.id%}
+                                    <option value="{{ user_level.id }}">{{ user_level.name }}</option>
+                                    {% endif %}
                                 {% endfor %}
                             </select>
                         </div>
@@ -142,8 +133,8 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
-                    <button type="submit" id="submit_add_item" name="action" value="add"
-                        class="btn btn-success">Save User</button>
+                    <button type="submit" id="action" name="action" value="add" class="btn btn-success">Save
+                        User</button>
                 </div>
             </form>
         </div>
@@ -182,7 +173,7 @@
     <div class="modal-dialog" role="document">
         <div class="modal-content">
             <form method="POST">
-                <input type="hidden" id="item_id" name="user_id" />
+                <input type="hidden" id="item_id" name="id" />
                 <div class="modal-header">
                     <h5 class="modal-title" id="deleteModalLabel">Are you Sure You want to Delete this User?</h5>
                     <button class="close" type="button" data-dismiss="modal" aria-label="Close">
@@ -210,27 +201,27 @@
     if ($toastr_err_message)
         toastr.error($toastr_err_message);
 
-    function updateUser(id) {
-        let name = $("#name_" + id).val().toUpperCase();
-        let phone = $("#phone_" + id).val();
-        let user_level_id = $("#user_level_id_" + id).val();
-        let shop_id = $("#shop_id_" + id).val();
-        $.ajax({
-            type: 'post',
-            url: '{{ url_for('systemUserUpdate') }}',
-            data: {
-                user_id: id,
-                name: name,
-                phone: phone,
-                user_level_id: user_level_id,
-                shop_id: shop_id,
-                action: 'update'
-            },
-            success: function (data) {
-                toastr.success('Updated ' + name);
-                $("#name_" + id).val(name);
-            }
-        });
+
+
+    function addNewUser() {
+        $("#user_header").html('Add New');
+        $("#edit_name").val('');
+        $("#edit_category_name").val(0);
+        $("#action").val('add');
+    }
+
+    function editUser(id, name, phone, shop_name, user_level_name) {
+        $("#user_header").html('Edit');
+        $("#edit_id").val(id);
+        $("#edit_name").val(name);
+        $("#edit_phone").val(phone);
+        $('#edit_shop option').filter(function () {
+            return $(this).text() === shop_name;
+        }).prop('selected', true);
+        $('#edit_user_level option').filter(function () {
+            return $(this).text() === user_level_name;
+        }).prop('selected', true);
+        $("#action").val('edit');
     }
 
     function deleteItem(id) {

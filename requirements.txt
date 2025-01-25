@@ -1,8 +1,8 @@
-python-dotenv
-psycopg2-binary
 Flask
 Flask-Login
 flask-session
-user-agents
-redis
+psycopg2-binary
+python-dotenv
 pytz
+redis
+user-agents
