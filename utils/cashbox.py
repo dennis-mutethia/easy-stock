@@ -153,6 +153,6 @@ class CashBox():
                 total_received = today.cash + today.mpesa   
                 total_diff = total_received - total_expected          
         
-        return render_template('cashbox.html', page_title='Cashbox', helper=Helper(),
+        return render_template('cashbox.html', page_title='Cashbox', helper=Helper(), menu = 'cashbox',
                                data=data, today=today, total_expected=total_expected, total_received=total_received, total_diff=total_diff,
                                report_date=report_date, max_date=max_date)

@@ -159,6 +159,6 @@ class Products():
         
         product_categories = ProductsCategories(self.db).fetch()
         products = StockTake(self.db).fetch(current_date, search, category_id)
-        return render_template('inventory/products.html', helper=Helper(), 
+        return render_template('inventory/products.html', helper=Helper(), menu='inventory', sub_menu='products_list',
                                product_categories=product_categories, products=products, 
                                page_title='Products', search=search, category_id=category_id)

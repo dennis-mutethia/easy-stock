@@ -41,7 +41,7 @@ class BillsReport():
             cash_total = cash_total + bill.cash
             mpesa_total = mpesa_total + bill.mpesa
         
-        return render_template('reports/bills-report.html', page_title='Reports > Bills', helper=Helper(),
+        return render_template('reports/bills-report.html', page_title='Reports > Bills', helper=Helper(), menu='reports', sub_menu='bills_report',
                                customers=customers, bills=bills, current_date=current_date, bill_status=bill_status, 
                                 from_date=from_date, to_date=to_date, customer_id=customer_id,
                                 grand_total=grand_total, grand_paid=grand_paid, cash_total=cash_total, mpesa_total=mpesa_total,

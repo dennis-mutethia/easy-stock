@@ -87,6 +87,6 @@ class StatementOfAccount():
         
         statements = self.fetch(from_date, to_date) 
                     
-        return render_template('reports/statement-of-account.html', page_title='Reports >Statement of Account', helper=Helper(),
+        return render_template('reports/statement-of-account.html', page_title='Reports >Statement of Account', helper=Helper(), menu='reports', sub_menu='statement_of_account',
                                statements=statements, from_date=from_date, to_date=to_date, max_date=max_date
                                )

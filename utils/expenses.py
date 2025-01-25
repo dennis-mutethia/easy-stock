@@ -102,5 +102,5 @@ class Expenses():
                 
         expenses = self.fetch(from_date, to_date) 
             
-        return render_template('expenses.html', page_title='Expenses > [Do not include Purchases]', helper=Helper(),
+        return render_template('expenses.html', page_title='Expenses > [Do not include Purchases]', helper=Helper(), menu = 'expenses',
                                expenses=expenses, from_date=from_date, to_date=to_date, current_date=current_date )

@@ -91,7 +91,7 @@ class CustomerBills():
             cash_total = cash_total + bill.cash
             mpesa_total = mpesa_total + bill.mpesa
             
-        return render_template('customers/bills.html', page_title='Customer > Debts', helper=Helper(),
+        return render_template('customers/bills.html', page_title='Customer > Debts', helper=Helper(), menu='customers', sub_menu='customer_debts',
                                customers=customers, payment_modes=payment_modes, bills=bills, current_date=current_date, bill_status=bill_status, 
                                from_date=from_date, to_date=to_date, customer_id=customer_id,
                                grand_total=grand_total, grand_paid=grand_paid, cash_total=cash_total, mpesa_total=mpesa_total,

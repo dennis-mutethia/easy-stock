@@ -35,6 +35,6 @@ class StockAdjustment():
         
         product_categories = ProductsCategories(self.db).fetch()
         stocks = StockTake(self.db).fetch(stock_date, search, category_id)
-        return render_template('inventory/stock-adjustment.html', helper=Helper(), 
+        return render_template('inventory/stock-adjustment.html', helper=Helper(), menu='inventory', sub_menu='stock_adjustment',
                                product_categories=product_categories, stocks=stocks, 
                                page_title='Stock Adjustments', stock_date=stock_date, current_date=current_date, search=search, category_id=category_id)

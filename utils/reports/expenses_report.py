@@ -49,7 +49,7 @@ class ExpensesReport():
         prev_page = page-1 if page>1 else 0
         next_page = page+1 if len(expenses)==50 else 0
                   
-        return render_template('reports/expenses-report.html', page_title='Reports > Expenses', helper=Helper(),
+        return render_template('reports/expenses-report.html', page_title='Reports > Expenses', helper=Helper(), menu='reports', sub_menu='expenses_report',
                                expenses=expenses, from_date=from_date, to_date=to_date, current_date=current_date,
                                page=page, prev_page=prev_page, next_page=next_page
                                )

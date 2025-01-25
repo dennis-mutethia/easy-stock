@@ -216,7 +216,7 @@ class Dashboard():
         debts, amounts, bgcolors_2 = self.get_debts(report_date)
         dates, purchases, stocks, sales, expenses = self.get_sales_purchases_and_expenses(report_date)
          
-        return render_template('dashboard/index.html', page_title='Dashboard', helper=Helper(),
+        return render_template('dashboard/index.html', page_title='Dashboard', helper=Helper(), menu = 'dashboard',
                                report_date=report_date, max_date=max_date,
                                total_purchases=total_purchases, total_sales=total_sales, total_expenses=total_expenses,
                                total_capital=total_capital, total_stock=total_stock, total_cost=total_cost, total_unpaid_bills=total_unpaid_bills,

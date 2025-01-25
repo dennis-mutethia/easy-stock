@@ -178,6 +178,6 @@ class StockTake():
              
         product_categories = ProductsCategories(self.db).fetch()
         stocks = self.fetch(stock_date, search, category_id)
-        return render_template('stock/stock-take.html', helper=Helper(), 
+        return render_template('stock/stock-take.html', helper=Helper(), menu='stock', sub_menu='stock_take',
                                product_categories=product_categories, stocks=stocks, 
                                page_title='Stock Take', stock_date=stock_date, current_date=current_date, search=search, category_id=category_id)

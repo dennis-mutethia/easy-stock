@@ -75,7 +75,7 @@ class StockReport():
             params = [current_user.shop.id, from_date, from_date]
             
             if category_id > 0:
-                query = query + " WHERE category_id = %s "
+                query = query + " AND category_id = %s "
                 params.append(category_id)
             
             query = query + """
@@ -120,7 +120,7 @@ class StockReport():
             grand_total = grand_total + total
         
         product_categories = ProductsCategories(self.db).fetch()
-        return render_template('reports/stock-report.html', page_title='Reports > Stock', helper=Helper(),
+        return render_template('reports/stock-report.html', page_title='Reports > Stock', helper=Helper(), menu='reports', sub_menu='stock_report',
                                stocks=stocks, grand_total=grand_total, product_categories=product_categories, category_id=category_id,
                                max_date=max_date, report_date=report_date,
                                 page=page, prev_page=prev_page, next_page=next_page)

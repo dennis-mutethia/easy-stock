@@ -62,7 +62,7 @@ class SalesReport():
             params = [current_user.shop.id, report_date, report_date]
             
             if category_id > 0:
-                query = query + " WHERE category_id = %s "
+                query = query + " AND category_id = %s "
                 params.append(category_id)
             
             query = query + """
@@ -107,7 +107,7 @@ class SalesReport():
             grand_total = grand_total + total
         
         product_categories = ProductsCategories(self.db).fetch()
-        return render_template('reports/sales-report.html', page_title='Reports > Sales', helper=Helper(),
+        return render_template('reports/sales-report.html', page_title='Reports > Sales', helper=Helper(), menu='reports', sub_menu='sales_report',
                                sales=sales, grand_total=grand_total, product_categories=product_categories, category_id=category_id,
                                report_date=report_date, max_date=max_date,
                                 page=page, prev_page=prev_page, next_page=next_page)

@@ -81,7 +81,7 @@ class ProfitReport():
         prev_page = page-1 if page>1 else 0
         next_page = page+1 if len(profits)==50 else 0
                
-        return render_template('reports/profit-report.html', page_title='Reports > Profit & Loss', helper=Helper(),
+        return render_template('reports/profit-report.html', page_title='Reports > Profit & Loss', helper=Helper(), menu='reports', sub_menu='profit_report',
                                profits=profits, from_date=from_date, to_date=to_date, max_date=max_date,
                                page=page, prev_page=prev_page, next_page=next_page
                                )
