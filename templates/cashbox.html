@@ -112,29 +112,29 @@
                 </div>
                 <div class="modal-body">
                     <div class="form-group row">                        
-                        <label for="phone" class="col-3 text-end control-label col-form-label">Cash:</label>
+                        <label class="col-3 text-end control-label col-form-label">Cash:</label>
                         <div class="col-9">
                             <input required="required" type="number" name="cash" id="cash" value="{{ helper.format_number(today.cash) if today.cash>0 else ''  }}" min="0" onkeyup="updateReceived()"
                                 class="form-control input-sm" placeholder="Enter Cash Amount">
                         </div>
                     </div>
                     <div class="form-group row">
-                        <label for="phone" class="col-3 text-end control-label col-form-label">MPesa:</label>
+                        <label class="col-3 text-end control-label col-form-label">MPesa:</label>
                         <div class="col-9">
                             <input required="required" type="number" name="mpesa" id="mpesa" value="{{ helper.format_number(today.mpesa) if today.mpesa>0 else '' }}" min="0" onkeyup="updateReceived()"
                                 class="form-control input-sm" placeholder="Enter Mpesa Amount">
                         </div>
                     </div>
                     <div class="form-group row">
-                        <label for="phone" class="col-9 text-end control-label col-form-label">TOTAL RECEIVED:</label>
+                        <label class="col-9 text-end control-label col-form-label">TOTAL RECEIVED:</label>
                         <div class="col-3 text-right" id="total_received">{{ helper.format_number_with_commas(ns.total_received)}}</div>
                     </div>
                     <div class="form-group row">
-                        <label for="phone" class="col-9 text-end control-label col-form-label">TOTAL EXPECTED:</label>
+                        <label class="col-9 text-end control-label col-form-label">TOTAL EXPECTED:</label>
                         <div class="col-3 text-right" id="total_expected">{{ helper.format_number_with_commas(ns.total_expected)}}</div>
                     </div>
                     <div class="form-group row">
-                        <label for="phone" class="col-9 text-end control-label col-form-label">DIFFERENCE:</label>
+                        <label class="col-9 text-end control-label col-form-label">DIFFERENCE:</label>
                         <div class="col-3 text-right" id="total_diff">{{ helper.format_number_with_commas(ns.total_diff)}}</div>
                     </div>
                 </div>

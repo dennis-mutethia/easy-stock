@@ -57,12 +57,16 @@
                     <button type="button" class="close" data-dismiss="modal">&times;</button>
                 </div>
                 <div class="modal-body">
-                    <select name="package_id" id="package_id" style="width: 100%;" class="text-center">
-                        <option value="0">-- Select Package --</option>
-                        {% for package in packages %}
-                        <option value="{{ package.id }}">{{ package.name ~ ' @ ' ~ helper.format_number_with_commas(package.pay) }}</option>
-                        {% endfor %}
-                    </select>
+                    <div class="form-group row">
+                        <label class="col-4 text-end control-label col-form-label">Select Package:</label>
+                        <div class="col-8">
+                            <select name="package_id" id="package_id" class="form-control input-xs" required>
+                                {% for package in packages %}
+                                <option value="{{ package.id }}">{{ package.name ~ ' @ ' ~ helper.format_number_with_commas(package.pay) }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
@@ -86,7 +90,8 @@
                 </div>
                 <div class="modal-body">
                     <div class="form-group row">
-                        <div class="col-sm-12">
+                        <label class="col-3 text-end control-label col-form-label">Name:</label>
+                        <div class="col-9">
                             <input required="required" type="text" name="name" id="editable_company_name" 
                                    class="form-control input-sm" placeholder="Enter New Company Name">
                         </div>

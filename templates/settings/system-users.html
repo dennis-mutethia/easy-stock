@@ -89,39 +89,39 @@
                 </div>
                 <div class="modal-body">
                     <div class="form-group row">
-                        <div class="col-sm-12">
+                        <label class="col-4 text-end control-label col-form-label">Name:</label>
+                        <div class="col-8">
                             <input required="required" type="text" name="name" id="edit_name"
                                 class="form-control input-sm" placeholder="Enter User Name">
                         </div>
                     </div>
                     <div class="form-group row">
-                        <div class="col-sm-12">
+                        <label class="col-4 text-end control-label col-form-label">Phone:</label>
+                        <div class="col-8">
                             <input required="required" type="number" name="phone" id="edit_phone" min="100000000"
                                 max="999999999" class="form-control input-sm" placeholder="Enter User Phone">
                         </div>
                     </div>
                     <div class="form-group row">
                         <div class="col-sm-12">
-                            <input type="text" name="password" id="edit_password" class="form-control input-sm"
+                            <input type="text" name="password" id="edit_password" class="form-control input-sm text-center"
                                 placeholder="Default Password will be same as Phone No." disabled>
                         </div>
                     </div>
                     <div class="form-group row">
-                        <div class="col-sm-6">
-                            <label name="shop_id">Attached Shop: <label>
-                        </div>
-                        <div class="col-sm-6">
-                            <select name="shop_id" id="edit_shop" style="width: 100%;">
+                        <label class="col-6 text-end control-label col-form-label">Select Attached Shop:</label>
+                        <div class="col-6">
+                            <select name="shop_id" id="edit_shop" class="form-control input-sm">
                                 {% for company_shop in company_shops %}
                                 <option value="{{ company_shop.id }}">{{ company_shop.name }}</option>
                                 {% endfor %}
                             </select>
                         </div>
-                        <div class="col-sm-6">
-                            <label name="user_level">User Level: <label>
-                        </div>
-                        <div class="col-sm-6">
-                            <select name="user_level_id" id="edit_user_level" style="width: 100%;">
+                    </div>
+                    <div class="form-group row">
+                        <label class="col-6 text-end control-label col-form-label">Select User Level:</label>
+                        <div class="col-6">
+                            <select name="user_level_id" id="edit_user_level" class="form-control input-sm">
                                 {% for user_level in user_levels %}
                                     {% if user_level.id >= current_user.user_level.id%}
                                     <option value="{{ user_level.id }}">{{ user_level.name }}</option>
