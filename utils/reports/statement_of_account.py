@@ -29,17 +29,20 @@ class StatementOfAccount():
             sales AS(
                 SELECT 
                     today.stock_date AS date, 
-                    today.purchase_price,
                     today.selling_price,
-                    (today.opening + today.additions -tomorrow.opening) AS sold,
-                    today.additions
+                    (today.opening + today.additions -tomorrow.opening) AS sold
                 FROM all_stock AS today
                 INNER JOIN all_stock AS tomorrow ON tomorrow.product_id = today.product_id
                     AND DATE(tomorrow.stock_date) = DATE(today.stock_date) + 1
             ),
             totals AS(
-                SELECT date, SUM(sold*selling_price) AS total_sales, SUM(additions*purchase_price) AS total_purchases, 0 AS expenses
+                SELECT date, SUM(sold*selling_price) AS total_sales, 0 AS total_purchases, 0 AS expenses
                 FROM sales  
+                GROUP BY date
+            ),
+            purchases AS(                
+                SELECT stock_date AS date, 0 AS total_sales, SUM(additions*purchase_price) AS total_purchases, 0 AS expenses
+                FROM all_stock  
                 GROUP BY date
             ),
             expenses AS(
@@ -50,6 +53,7 @@ class StatementOfAccount():
             ),
             final AS(
                 SELECT * FROM totals
+                UNION SELECT * FROM purchases
                 UNION SELECT * FROM expenses
             )
             SELECT date, MAX(total_sales) AS total_sales, MAX(total_purchases) AS total_purchases, MAX(expenses) AS expenses

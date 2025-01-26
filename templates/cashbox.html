@@ -4,7 +4,7 @@
 <!-- ============================================================== -->
 <!-- Container fluid  -->
 <!-- ============================================================== -->
-<div class="container-fluid card table-responsive">
+<div class="container-fluid card table-responsive bg-dark">
     <form id="filter-frm" method="GET" class="row">        
         <div class="col-6">
             <input class="text-center" onchange="applyFilter()" style="height: 25px" type="date" id="report_date" name="report_date"
@@ -113,15 +113,27 @@
                 <div class="modal-body">
                     <div class="form-group row">
                         <div class="col-sm-12">
-                            <input required="required" type="number" name="cash" id="cash" value="{{ today.cash }}" min="0"
+                            <input required="required" type="number" name="cash" id="cash" value="{{ helper.format_number(today.cash) if today.cash>0 else ''  }}" min="0" onkeyup="updateReceived()"
                                 class="form-control input-sm" placeholder="Enter Cash Amount">
                         </div>
                     </div>
                     <div class="form-group row">
                         <div class="col-sm-12">
-                            <input required="required" type="number" name="mpesa" id="mpesa" value="{{ today.mpesa }}" min="0"
+                            <input required="required" type="number" name="mpesa" id="mpesa" value="{{ helper.format_number(today.mpesa) if today.mpesa>0 else '' }}" min="0" onkeyup="updateReceived()"
                                 class="form-control input-sm" placeholder="Enter Mpesa Amount">
                         </div>
+                    </div>
+                    <div class="form-group row">
+                        <div class="col-9 text-right">TOTAL RECEIVED: </div>
+                        <div class="col-3 text-right" id="total_received">{{ helper.format_number_with_commas(ns.total_received)}}</div>
+                    </div>
+                    <div class="form-group row">
+                        <div class="col-9 text-right">TOTAL EXPECTED: </div>
+                        <div class="col-3 text-right" id="total_expected">{{ helper.format_number_with_commas(ns.total_expected)}}</div>
+                    </div>
+                    <div class="form-group row">
+                        <div class="col-9 text-right">DIFFERENCE: </div>
+                        <div class="col-3 text-right" id="total_diff">{{ helper.format_number_with_commas(ns.total_diff)}}</div>
                     </div>
                 </div>
                 <div class="modal-footer">
@@ -141,8 +153,17 @@
 
 <script>
     function applyFilter(page) {
-        $("#page").val(page);
         $("#filter-frm").submit();
+    }
+
+    function updateReceived(){
+        let cash = parseFloat( $("#cash").val());
+        let mpesa = parseFloat($("#mpesa").val());
+        let total_expected = parseFloat($("#total_expected").html().replace(',',''));
+        let total_received = (!isNaN(cash) ? cash : 0) + (!isNaN(mpesa) ? mpesa : 0);
+        let total_diff = total_received - total_expected;
+        $("#total_received").html(total_received.toLocaleString());  
+        $("#total_diff").html(total_diff.toLocaleString());          
     }
 </script>
 

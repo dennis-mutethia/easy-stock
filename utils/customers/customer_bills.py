@@ -4,8 +4,8 @@ from flask import render_template, request
 
 from utils.helper import Helper
 from utils.customers.customers import Customers
-from utils.pos.bills import Bills
-from utils.pos.payments import Payments
+from utils.customers.bills import Bills
+from utils.customers.payments import Payments
 
 class CustomerBills():
     def __init__(self, db): 
@@ -57,9 +57,13 @@ class CustomerBills():
                 
         if request.method == 'POST':       
             if request.form['action'] == 'assign_customer_bill':
+                bill_id = int(request.form['bill_id'], 0)
                 bill_amount = int(request.form['bill_amount'])     
-                customer_id = int(request.form['customer_id'])              
-                Bills(self.db).add(customer_id, bill_amount)
+                customer_id = int(request.form['customer_id'])  
+                if bill_id > 0:         
+                    Bills(self.db).add(customer_id, bill_amount)
+                else:
+                    Bills(self.db).update(bill_id, customer_id, bill_amount)
                 
             elif request.form['action'] == 'submit_payment':
                 bill_id = int(request.form['bill_id'])

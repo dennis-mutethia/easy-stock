@@ -1,19 +1,18 @@
 from datetime import datetime
-from flask import redirect, render_template, request, url_for
+from flask import render_template, request
 from flask_login import current_user
 
 from utils.customers.customers import Customers
 from utils.entities import Bill
 from utils.helper import Helper
-from utils.pos.bill_entries import BillEntries
-from utils.pos.payments import Payments
+from utils.customers.payments import Payments
 from utils.settings.system_users import SystemUsers
 
 class Bills():
     def __init__(self, db): 
         self.db = db
             
-    def fetch(self, from_date, to_date, bill_status, customer_id=0, page=0):
+    def fetch(self, from_date, to_date, bill_status, customer_id=0):
         self.db.ensure_connection()
         with self.db.conn.cursor() as cursor:
             query = """
@@ -32,12 +31,9 @@ class Bills():
                 query = query + " AND customer_id=%s"
                 params.append(customer_id)
             
-            if page>0:
-                query = query + """
-                ORDER BY id DESC
-                LIMIT 50 OFFSET %s
-                """
-                params.append((page - 1)*50)
+            query = query + """
+            ORDER BY id DESC
+            """
             
             cursor.execute(query, tuple(params))
             data = cursor.fetchall()
@@ -106,15 +102,15 @@ class Bills():
             self.db.conn.rollback()
             raise e        
             
-    def assign_customer(self, id, customer_id):
+    def update(self, id, customer_id, bill_amount):
         self.db.ensure_connection()
         with self.db.conn.cursor() as cursor:
             query = """
             UPDATE bills
-            SET customer_id=%s, updated_at=CURRENT_TIMESTAMP AT TIME ZONE 'Africa/Nairobi', updated_by=%s
+            SET customer_id=%s, total=%s, updated_at=CURRENT_TIMESTAMP AT TIME ZONE 'Africa/Nairobi', updated_by=%s
             WHERE id=%s
             """
-            params = [customer_id, current_user.shop.id, id]
+            params = [customer_id, bill_amount, current_user.shop.id, id]
             cursor.execute(query, tuple(params))
             self.db.conn.commit()    
             
@@ -140,49 +136,4 @@ class Bills():
             params = [id]
             cursor.execute(query, tuple(params))
             self.db.conn.commit()    
-             
-    def __call__(self):
-        current_date = datetime.now(pytz.timezone("Africa/Nairobi")).strftime('%Y-%m-%d')
-        report_date = current_date
-        bill_status = 0 
-        page = 1
-        
-        if request.method == 'GET':   
-            try:    
-                report_date = request.args.get('report_date', current_date)
-                bill_status = int(request.args.get('bill_status', 0))
-                page = int(request.args.get('page', 1))
-            except ValueError as e:
-                print(f"Error converting bill_status: {e}")
-            except Exception as e:
-                print(f"An error occurred: {e}")
-                
-        if request.method == 'POST':       
-            if request.form['action'] == 'assign_customer_bill':
-                bill_id = int(request.form['bill_id'])
-                customer_id = int(request.form['customer_id'])               
-                self.assign_customer(bill_id, customer_id)                                    
-                
-            elif request.form['action'] == 'submit_payment':
-                bill_id = int(request.form['bill_id'])
-                amount_paid = request.form['amount_paid']                
-                payment_mode_id = int(request.form['payment_mode_id'])
-                Payments(self.db).add(bill_id, amount_paid, payment_mode_id)                    
-                self.pay(bill_id, amount_paid) 
-        
-        customers = Customers(self.db).fetch()
-        payment_modes = self.db.fetch_payment_modes()
-        bills = self.fetch(report_date, report_date, bill_status, 0, page)
-        prev_page = page-1 if page>1 else 0
-        next_page = page+1 if len(bills)==50 else 0
-        grand_total = grand_paid = cash_total = mpesa_total =  0
-        for bill in bills:
-            grand_total = grand_total + bill.total
-            grand_paid = grand_paid + bill.paid
-            cash_total = cash_total + bill.cash
-            mpesa_total = mpesa_total + bill.mpesa
-            
-        return render_template('pos/bills.html', page_title='POS > Bills', helper=Helper(),
-                               customers=customers, payment_modes=payment_modes, bills=bills, current_date=current_date, bill_status=bill_status, report_date=report_date,
-                               grand_total=grand_total, grand_paid=grand_paid, cash_total=cash_total, mpesa_total=mpesa_total,
-                               page=page, prev_page=prev_page, next_page=next_page)
+     

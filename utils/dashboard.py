@@ -6,7 +6,7 @@ from flask_login import current_user
 from utils.expenses import Expenses
 from utils.helper import Helper
 from utils.stock.stock_take import StockTake
-from utils.pos.bills import Bills
+from utils.customers.bills import Bills
 
 class Dashboard():
     def __init__(self, db): 

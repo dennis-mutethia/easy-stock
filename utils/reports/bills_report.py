@@ -4,7 +4,7 @@ from flask import render_template, request
 
 from utils.customers.customers import Customers
 from utils.helper import Helper
-from utils.pos.bills import Bills
+from utils.customers.bills import Bills
 
 class BillsReport():
     def __init__(self, db): 

@@ -97,9 +97,15 @@ class SystemUsers():
             query = """
             INSERT INTO users(name, phone, user_level_id, shop_id, password, created_at, created_by) 
             VALUES(%s, %s, %s, %s, %s, NOW(), 0)
+            ON CONFLICT (phone)
+                DO UPDATE SET 
+                    name=%s,
+                    user_level_id=%s,
+                    shop_id=%s,
+                    updated_at=NOW()
             RETURNING id
             """
-            cursor.execute(query, (name.upper(), phone, user_level_id, shop_id, Helper().hash_password(password)))
+            cursor.execute(query, (name.upper(), phone, user_level_id, shop_id, Helper().hash_password(password), name.upper(), user_level_id, shop_id))
             self.db.conn.commit()
             user_id = cursor.fetchone()[0]
             return user_id  
