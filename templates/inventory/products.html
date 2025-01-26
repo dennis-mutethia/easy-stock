@@ -6,10 +6,7 @@
 <!-- ============================================================== -->
 <div class="container-fluid table-responsive bg-dark">
     <form id="filter-frm" method="GET" class="row">
-        <div class="col-6">
-            <input onkeyup="onchange()" style="height: 25px" type="text" id="search" name="search" value="{{ search }}"
-                placeholder="Search Item" autofocus onfocus="this.value = this.value;" />
-        </div>
+        <div class="col-6"></div>
         <div class="col-6">
             <select onchange="applyFilter()" name="category_id" id="category_id" style="width: 100%;">
                 <option value="0">Filter by Category</option>
@@ -79,41 +76,39 @@
                 </div>
                 <div class="modal-body">
                     <div class="form-group row">
-                        <label class="col-4 text-end control-label col-form-label">Product Name:</label>
-                        <div class="col-8">
+                        <label class="col-5 text-end control-label col-form-label">Product Name:</label>
+                        <div class="col-7">
                             <input required="required" type="text" name="name" id="edit_product_name" class="form-control input-sm"
                                 placeholder="Enter Product Name">
                         </div>
                     </div>
                     <div class="form-group row">
-                        <label class="col-4 text-end control-label col-form-label">Category:</label>
-                        <div class="col-8">
+                        <label class="col-5 text-end control-label col-form-label">Select Category:</label>
+                        <div class="col-7">
                             <select class="form-control input-sm" name="category_id_new" id="edit_category_name" required>
-                                <option value="0" disabled>Select Category</option>
                                 {% for product_category in product_categories %}
-                                <option value="{{ product_category.id }}" {% if product_category.id==category_id %}
-                                    selected {% endif %}>{{ product_category.name }}</option>
+                                <option value="{{ product_category.id }}" {{ 'selected' if product_category.id==category_id }}>{{ product_category.name }}</option>
                                 {% endfor %}
                             </select>
                         </div>
                     </div>
                     <div class="form-group row">
-                        <label class="col-4 text-end control-label col-form-label">Buying Price:</label>
-                        <div class="col-8">
+                        <label class="col-5 text-end control-label col-form-label">Buying Price:</label>
+                        <div class="col-7">
                             <input required="required" type="number" name="purchase_price" id="edit_purchase_price"
                                 class="form-control input-sm" placeholder="Enter Buying Price">
                         </div>
                     </div>
                     <div class="form-group row">
-                        <label class="col-4 text-end control-label col-form-label">Selling Price:</label>
-                        <div class="col-8">
+                        <label class="col-5 text-end control-label col-form-label">Selling Price:</label>
+                        <div class="col-7">
                             <input required="required" type="number" name="selling_price" id="edit_selling_price"
                                 class="form-control input-sm" placeholder="Enter Selling Price">
                         </div>
                     </div>
                     <div class="form-group row">
-                        <label class="col-4 text-end control-label col-form-label">Items in Stock:</label>
-                        <div class="col-8">
+                        <label class="col-5 text-end control-label col-form-label">Items in Stock:</label>
+                        <div class="col-7">
                             <input required="required" type="number" name="in_stock" id="edit_in_stock"
                                 class="form-control input-sm" placeholder="Enter Items in Stock">
                         </div>
@@ -183,7 +178,7 @@
     function addNewProduct(){
         $("#product_header").html('Add New');
         $("#edit_product_name").val('');
-        $("#edit_category_name").val(0);
+        $("#edit_category_name").val({{ category_id }});
         $("#action").val('add');
     }
 

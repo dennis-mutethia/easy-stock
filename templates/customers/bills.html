@@ -70,7 +70,7 @@
                 <td class="text-center">
                     {% if bill.total > bill.paid %}
                     <a href="#" onclick="updateBillAmount({{ bill.id }},{{ helper.format_number(bill.total-bill.paid) }});" data-toggle="modal" data-target="#newModal">
-                        <i class="mdi mdi-cash-multiple" title="Pay this Bill">Pay</i>
+                        <i class="mdi mdi-cash-multiple" title="Pay this Bill" style="color: limegreen;">Pay</i>
                     </a>
                     {% endif %}
                 </td>
@@ -116,8 +116,8 @@
                 <div class="modal-body">
                     <div class="form-group row">
                         <h5 class="text-center">Unpaid Bill Amount: <b id="bill_amount"></b></h5>
-                        <label class="col-4 text-end control-label col-form-label">Payment Mode:</label>
-                        <div class="col-8">
+                        <label class="col-6 text-end control-label col-form-label">Select Payment Mode:</label>
+                        <div class="col-6">
                             <select name="payment_mode_id" id="payment_mode_id" class="form-control input-xs"> 
                                 {% for payment_mode in payment_modes %}
                                 <option value="{{ payment_mode.id }}">{{ payment_mode.name }}</option>
@@ -126,8 +126,8 @@
                         </div>
                     </div>
                     <div class="form-group row">
-                        <label class="col-4 text-end control-label col-form-label">Amount Paid:</label>
-                        <div class="col-8">
+                        <label class="col-6 text-end control-label col-form-label">Amount Paid:</label>
+                        <div class="col-6">
                             <input type="hidden" name="bill_id" id="bill_id" />
                             <input type="number" name="amount_paid" id="amount_paid" min="0" required
                                 class="form-control input-sm" placeholder="Enter Amount Paid" />
@@ -156,17 +156,16 @@
                 </div>
                 <div class="modal-body">  
                     <div class="form-group row">
-                        <label class="col-3 text-end control-label col-form-label">Amount:</label>
-                        <div class="col-9">
+                        <label class="col-5 text-end control-label col-form-label">Amount:</label>
+                        <div class="col-7">
                             <input type="number" name="bill_amount" id="assign_bill_amount" min="0" required
                                 class="form-control input-sm" placeholder="Enter Bill Amount" />
                         </div>
                     </div>
                     <div class="form-group row">
-                        <label class="col-3 text-end control-label col-form-label">Customer:</label>
-                        <div class="col-9">
-                            <select name="customer_id" id="assign_customer_id" class="form-control input-xs"> 
-                                <option value="0">-- Select Customer --</option>
+                        <label class="col-5 text-end control-label col-form-label">Select Customer:</label>
+                        <div class="col-7">
+                            <select name="customer_id" id="assign_customer_id" class="form-control input-xs" required> 
                                 {% for customer in customers %}
                                 <option value="{{ customer.id }}">{{ customer.name }} - {{ customer.phone }}</option>
                                 {% endfor %}
