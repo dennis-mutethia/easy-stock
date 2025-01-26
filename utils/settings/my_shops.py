@@ -84,59 +84,11 @@ class MyShops():
     def delete(self, id):
         self.db.ensure_connection()
         with self.db.conn.cursor() as cursor:
-            query = """
-            DELETE FROM shops WHERE id = %s
-            """
-            cursor.execute(query, (id,))
-            self.db.conn.commit()
-            
-            query = """
-            DELETE FROM products WHERE shop_id = %s
-            """
-            cursor.execute(query, (id,))
-            self.db.conn.commit()
-            
-            query = """
-            DELETE FROM product_categories WHERE shop_id = %s
-            """
-            cursor.execute(query, (id,))
-            self.db.conn.commit()
-            
-            query = """
-            DELETE FROM stock WHERE shop_id = %s
-            """
-            cursor.execute(query, (id,))
-            self.db.conn.commit()
-            
-            query = """
-            DELETE FROM customers WHERE shop_id = %s
-            """
-            cursor.execute(query, (id,))
-            self.db.conn.commit()
-            
-            query = """
-            DELETE FROM bills WHERE shop_id = %s
-            """
-            cursor.execute(query, (id,))
-            self.db.conn.commit()
-            
-            query = """
-            DELETE FROM expenses WHERE shop_id = %s
-            """
-            cursor.execute(query, (id,))
-            self.db.conn.commit()
-            
-            query = """
-            DELETE FROM payments WHERE shop_id = %s
-            """
-            cursor.execute(query, (id,))
-            self.db.conn.commit()
-            
-            query = """
-            DELETE FROM cashbox WHERE shop_id = %s
-            """
-            cursor.execute(query, (id,))
-            self.db.conn.commit()
+            tables = ['shops', 'product_categories', 'products', 'stock', 'customers', 'bills', 'expenses', 'payments', 'cashbox' ]
+            for table in tables:
+                query = f"DELETE FROM {table} WHERE id = %s"
+                cursor.execute(query, (id,))
+                self.db.conn.commit()
             
     def fetch_shop_types(self):
         self.db.ensure_connection() 

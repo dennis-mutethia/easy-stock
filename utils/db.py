@@ -1,13 +1,11 @@
 import pytz, os, uuid, psycopg2
 from datetime import datetime, timedelta
 from flask_login import current_user
-from dotenv import load_dotenv 
 
 from utils.entities import Company, License, Package, PaymentMode, Shop
 
 class Db():
     def __init__(self):
-        load_dotenv()
         # Access the environment variables
         self.conn_params = {
             'host': os.getenv('DB_HOST'),
@@ -58,23 +56,6 @@ class Db():
         except psycopg2.Error as e:
             print(f"Error executing SQL script: {e}")
     
-    def load_shop_template_data(self, shop_id):        
-        self.ensure_connection()
-        with self.conn.cursor() as cursor:
-            query = """
-            INSERT INTO product_categories(name, shop_id, created_at, created_by)
-            SELECT name, ?, CURRENT_TIMESTAMP AT TIME ZONE 'Africa/Nairobi', ? FROM product_categories WHERE shop_id = 0
-            """
-            cursor.execute(query, (shop_id, current_user.id))
-            self.conn.commit()            
-            
-            query = """
-            INSERT INTO products(name, purchase_price, selling_price, category_id, shop_id, created_at, created_by)
-            SELECT name, purchase_price, selling_price, category_id, ?, CURRENT_TIMESTAMP AT TIME ZONE 'Africa/Nairobi', ? FROM products WHERE shop_id = 0
-            """
-            cursor.execute(query, (shop_id, current_user.id))
-            self.conn.commit()
-        
     def save_payment(self, bill_id, amount, payment_mode_id):
         self.ensure_connection()
         with self.conn.cursor() as cursor:
@@ -165,14 +146,14 @@ class Db():
         self.ensure_connection()
         with self.conn.cursor() as cursor:
             query = """
-            SELECT id, name, amount, description, color, validity
+            SELECT id, name, amount, description, color, validity, pay
             FROM packages 
             WHERE id = %s 
             """
             cursor.execute(query, (id,))
             data = cursor.fetchone()
             if data:
-                return Package(data[0], data[1], data[2], data[3], data[4], data[5])
+                return Package(data[0], data[1], data[2], data[3], data[4], data[5], data[6])
             else:
                 return None   
             

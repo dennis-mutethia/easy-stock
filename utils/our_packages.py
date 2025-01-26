@@ -1,4 +1,4 @@
-from flask import render_template
+from flask import render_template, request
 from flask_login import current_user
 
 from utils.entities import Package
@@ -24,8 +24,23 @@ class OurPackages():
                 packages.append(Package(datum[0], datum[1], datum[2], datum[3], datum[4], datum[5], datum[6], datum[7]))
 
             return packages 
+        
+    def pay(self, phone, amount):
+        tx_id = Helper().send_stk_push(phone, amount)
+        print(tx_id)
+        
+        #insert to db         
+        print(phone)
+        print(amount)
+        print(current_user.license.id)
           
-    def __call__(self):
+    def __call__(self):    
+        if request.method == 'POST':       
+            if request.form['action'] == 'pay':
+                phone = request.form['phone']
+                amount = request.form['amount']
+                self.pay(phone, amount)                   
+                
         toastr_message = None   
         package_id = current_user.license.package_id
         package = self.db.get_package_by_id(package_id)  

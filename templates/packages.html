@@ -46,7 +46,7 @@
                         <tr>
                             <th>AMOUNT:</th>
                             <td>
-                                {{ helper.format_number_with_commas(package.amount/2) }}
+                                {{ helper.format_number_with_commas(package.pay/2) }}
                             </td>
                         </tr>
                         <tr>
@@ -130,7 +130,7 @@
 
 <script>
     function popup(amount, formatted_amount, package_desc) {
-        $('#amount').html(amount);
+        $('#amount').val(amount);
         $('#pay_amount').html(formatted_amount);
         $('#package_desc').html(package_desc);
     }

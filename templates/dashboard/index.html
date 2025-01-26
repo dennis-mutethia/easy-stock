@@ -1,10 +1,17 @@
 {% extends 'base.html' %}
 
 {% block content %}
+<style>
+    .p-10 {
+        background-color: #20242c;
+        color: whitesmoke;
+    }
+</style>
+
 <!-- ============================================================== -->
 <!-- Container fluid  -->
 <!-- ============================================================== -->
-<div class="container-fluid table-responsive">
+<div class="container-fluid table-responsive bg-dark">
     <form id="filter-frm" method="GET" class="row">
         <div class="col-6 text-right">
             <label class="text-white">ON THIS DATE (filter)</label>

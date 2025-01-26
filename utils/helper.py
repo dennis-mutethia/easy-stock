@@ -21,3 +21,7 @@ class Helper():
             return "{:,.0f}".format(value)
         else:
             return value
+    
+    def send_stk_push(self, phone, amount): 
+        #send stk push 
+        return 0
