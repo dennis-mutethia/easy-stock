@@ -41,7 +41,7 @@
                 <td>{{ expense.user.name }}</td>
                 <td class="text-right">{{ helper.format_number_with_commas(expense.amount) }}</td>
                 <td class="text-center">
-                    <a href="#" onclick="deleteItem({{ expense.id }})" data-toggle="modal"
+                    <a href="#" onclick="deleteItem({{ expense.id }}, '{{ expense.name }}')" data-toggle="modal"
                         data-target="#deleteModal"><i class="mdi mdi-delete" style="color: red"
                             title="Delete {{ expense.name }}">delete</i></a>
                 </td>
@@ -100,14 +100,14 @@
     <div class="modal-dialog" role="document">
         <div class="modal-content">
             <form method="POST">
-                <input type="hidden" id="expense_id" name="expense_id" />
+                <input type="hidden" id="delete_expense_id" name="expense_id" />
                 <div class="modal-header">
-                    <h5 class="modal-title" id="deleteModalLabel">Are you Sure You want to Delete this Expense?</h5>
+                    <h5 class="modal-title" id="deleteModalLabel">Are you Sure You want to Delete <code class="text-xs" style="color: black;" id="delete_expense_name"></code> Expense from the System?</h5>
                     <button class="close" type="button" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">×</span>
                     </button>
                 </div>
-                <div style="color: black" class="modal-body">Select "Confirm Delete" below if you want to delete this
+                <div style="color: black" class="modal-body">"Confirm Delete" below if you want to delete <code class="text-xs" style="color: black;" id="delete_expense_name_2"></code>
                     Expense from the System.
                     <p style="color: red">This action is not reversible!!</p>
                 </div>
@@ -127,8 +127,10 @@
         $("#filter-frm").submit();
     }
 
-    function deleteItem(id) {
-        document.getElementById("expense_id").value = id;
+    function deleteItem(id, name) {        
+        $("#delete_expense_id").val(id);
+        $("#delete_expense_name").html(name);
+        $("#delete_expense_name_2").html(name);
     }
 </script>
 

@@ -23,7 +23,7 @@
                 <td>{{ company.package }}</td> 
                 <td class="text-center" style="color: {{ 'red' if company.validity < 7 else 'green' }}">{{ company.validity }} days</td> 
                 <td class="text-center">                  
-                    <a href="#" data-toggle="modal" data-target="#renewModal" onclick="renewLicense({{ company.license_id }});">
+                    <a href="#" data-toggle="modal" data-target="#renewModal" onclick="renewLicense({{ company.license_id }}, '{{ company.name }}');">
                         <i class="mdi mdi-check" style="color: lime;" title="Renew {{ company.name }}">renew</i>
                     </a>
                 </td>
@@ -47,13 +47,13 @@
 <!-- ============================================================== -->
 
 
-<div class="modal fade" id="renewModal" tabindex="-1" role="dialog" aria-labelledby="renenewModalLabel" aria-hidden="true">
+<div class="modal fade" id="renewModal" tabindex="-1" role="dialog" aria-labelledby="renewModalLabel" aria-hidden="true">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
             <form method="POST" class="form-horizontal">
                 <input type="hidden" id="license_id" name="id" />
                 <div class="modal-header text-center">
-                    <h5 class="text-center">Renew Company License</h5>
+                    <h5 class="text-center">Renew <code class="text-xs" style="color: black;" id="renew_company_name"></code> License</h5>
                     <button type="button" class="close" data-dismiss="modal">&times;</button>
                 </div>
                 <div class="modal-body">
@@ -83,7 +83,7 @@
             <form method="POST">
                 <input type="hidden" id="editable_company_id" name="id" />
                 <div class="modal-header">
-                    <h5 class="modal-title" id="editModalLabel">Edit Company Name</h5>
+                    <h5 class="modal-title" id="editModalLabel">Edit <code class="text-xs" style="color: black;" id="edit_company_name"></code></h5>
                     <button class="close" type="button" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">×</span>
                     </button>
@@ -127,13 +127,15 @@
     toastr.success('{{ toastr_message }}');
     {% endif %}
 
-    function renewLicense(id) {
+    function renewLicense(id, name) {
         $('#license_id').val(id);
+        $('#renew_company_name').html(name);
     }
 
     function editCompany(id, name) {
         $('#editable_company_id').val(id);
         $('#editable_company_name').val(name);
+        $('#edit_company_name').html(name);
     }
 
     function fetchShops(id) {

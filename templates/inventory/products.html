@@ -129,15 +129,14 @@
     <div class="modal-dialog" role="document">
         <div class="modal-content">
             <form method="POST">
-                <input type="hidden" id="item_id" name="id" />
+                <input type="hidden" id="delete_item_id" name="id" />
                 <div class="modal-header">
-                    <h5 class="modal-title" id="deleteModalLabel">Are you Sure You want to Delete <b id="delete_item_name"></b> Product?</h5>
+                    <h5 class="modal-title text-center" id="deleteModalLabel">Are you Sure You want to Delete <code class="text-xs" style="color: black;" id="delete_item_name"></code> from the System?</h5>
                     <button class="close" type="button" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">×</span>
                     </button>
                 </div>
-                <div style="color: black" class="modal-body">Select "Confirm Delete" below if you want to delete this
-                    Product from the System.
+                <div style="color: black" class="modal-body">"Confirm Delete" below if you want to delete <code class="text-xs" style="color: black;" id="delete_item_name_2"></code> from the System.
                     <p style="color: red">This action is not reversible!!</p>
                 </div>
                 <div class="modal-footer">
@@ -171,14 +170,17 @@
     }
 
     function deleteItem(id, name) {
-        document.getElementById("item_id").value = id;
+        $("#delete_item_id").val(id);
         $("#delete_item_name").html(name);
+        $("#delete_item_name_2").html(name);
     }
 
     function addNewProduct(){
         $("#product_header").html('Add New');
         $("#edit_product_name").val('');
-        $("#edit_category_name").val({{ category_id }});
+        $("#edit_purchase_price").val('');
+        $("#edit_selling_price").val('');
+        $("#edit_in_stock").val('');
         $("#action").val('add');
     }
 

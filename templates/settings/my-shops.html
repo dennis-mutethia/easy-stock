@@ -13,7 +13,7 @@
                 <th class="text-center">SHOP TYPE</th>
                 <th colspan="2" class="text-center">
                     {% if current_user.user_level.id == 0 %}
-                    <a href="#" class="btn btn-xs btn-primary btn-flat" style="width: 100%" data-toggle="modal"
+                    <a href="#" class="btn btn-xs btn-primary btn-flat" style="width: 100%" data-toggle="modal" onclick="addNewShop();"
                         data-target="#newModal">Add New Shop</a>
                     {% else %}
                     EDIT 
@@ -46,7 +46,7 @@
                 </td>
                 <td class="text-center">
                     {% if current_user.user_level.id == 0 and shop.id != current_user.shop.id and shop.id > 0 %}
-                    <a href="#" onclick="deleteItem({{ shop.id }})" data-toggle="modal" data-target="#deleteModal">
+                    <a href="#" onclick="deleteItem({{ shop.id }}, '{{ shop.name }}', '{{ shop.location }}')" data-toggle="modal" data-target="#deleteModal">
                         <i class="mdi mdi-delete" style="color: red" title="Delete Shop"></i>
                     </a>
                     {% endif %}
@@ -67,7 +67,7 @@
             <form method="POST" class="form-horizontal">
                 <input type="hidden" id="shop_id" name="shop_id" />
                 <div class="modal-header text-center">
-                    <h5 class="text-center">Capture Shop Details</h5>
+                    <h5 class="text-center"><span id="shop_header"></span> Shop</h5>
                     <button type="button" class="close" data-dismiss="modal">&times;</button>
                 </div>
                 <div class="modal-body">
@@ -111,14 +111,14 @@
     <div class="modal-dialog" role="document">
         <div class="modal-content">
             <form method="POST">
-                <input type="hidden" id="item_id" name="shop_id" />
+                <input type="hidden" id="delete_shop_id" name="shop_id" />
                 <div class="modal-header">
-                    <h5 class="modal-title" id="deleteModalLabel">Are you Sure You want to Delete this Shop?</h5>
+                    <h5 class="modal-title text-center" id="deleteModalLabel">Are you Sure You want to Delete <code class="text-xs" style="color: black;" id="delete_shop_name"></code> Shop?</h5>
                     <button class="close" type="button" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">×</span>
                     </button>
                 </div>
-                <div style="color: black" class="modal-body">Select "Confirm Delete" below if you want to delete this
+                <div style="color: black" class="modal-body">"Confirm Delete" below if you want to delete <code class="text-xs" style="color: black;" id="delete_shop_name_2"></code>
                     Shop from the System.
                     <p style="color: red">This action is not reversible!!</p>
                 </div>
@@ -137,21 +137,27 @@
     toastr.success('{{ toastr_message }}');
     {% endif %}
 
-    function editShop(id) {
+    
+
+    function addNewShop(){
+        $("#shop_header").html('Add New');
+        $("#name").val('');
+        $("#location").val('');
+        $("#submit_shop_details").val('add');
+    }
+    
+    function editShop(id) {        
+        $("#shop_header").html('Edit');
         $('#shop_id').val(id);
         $('#name').val($('#name_' + id).val());
         $('#location').val($('#location_' + id).html());
-        $('#shop_type_id').val($('#shop_type_' + id).val());
-        $('#phone_1').val($('#phone_1_' + id).html());
-        $('#phone_2').val($('#phone_2_' + id).html());
-        $('#paybill').val($('#paybill_' + id).html());
-        $('#account_no').val($('#account_no_' + id).html());
-        $('#till_no').val($('#till_no_' + id).html());
         $('#submit_shop_details').val('update');
     }
 
-    function deleteItem(id) {
-        document.getElementById("item_id").value = id;
+    function deleteItem(id, name, location) {
+        $('#delete_shop_id').val(id);
+        $('#delete_shop_name').html(name+' - '+location);
+        $('#delete_shop_name_2').html(name+' - '+location);
     }
 
 </script>
