@@ -11,6 +11,4 @@ RUN apt-get update \
 COPY requirements.txt .
 
 #update pip & install dependencies
-RUN pip install --upgrade pip \
-    && pip install -r requirements.txt
-    
+RUN --mount=type=cache,target=/root/.cache/pip pip install --upgrade -r requirements.txt 

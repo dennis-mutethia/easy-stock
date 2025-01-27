@@ -1,7 +1,7 @@
 import os
+from dotenv import load_dotenv
 from flask import Flask, redirect, render_template, url_for
 from flask_login import LoginManager, logout_user, login_required
-from dotenv import load_dotenv
 from flask_session import Session
 from redis import Redis
 

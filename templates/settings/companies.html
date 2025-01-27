@@ -12,7 +12,7 @@
                 <th class="text-center" style="font-size: x-small;">CREATED ON</th>
                 <th class="text-center" style="font-size: x-small;">PACKAGE</th>
                 <th class="text-center" style="font-size: x-small;">VALIDITY</th>
-                <th class="text-center" colspan="3" style="font-size: x-small;">ACTION</th>
+                <th class="text-center" colspan="4" style="font-size: x-small;">ACTION</th>
             </tr>
         </thead>
         <tbody>
@@ -36,6 +36,13 @@
                     <a href="#" data-toggle="modal" data-target="#shopsModal" onclick="fetchShops({{ company.id }});">
                         <i class="mdi mdi-eye" style="color: orange;" title="View Shops">shops</i>
                     </a>
+                </td>
+                <td class="text-center">
+                    {% if current_user.user_level.id == 0 and company.id != current_user.shop.company_id and company_id.id > 0 %}
+                    <a href="#" onclick="deleteItem({{ company.id }}, '{{ company.name }}')" data-toggle="modal" data-target="#deleteModal">
+                        <i class="mdi mdi-delete" style="color: red" title="Delete Company">delete</i>
+                    </a>
+                    {% endif %}
                 </td>
             </tr>
             {% endfor %}
@@ -122,6 +129,33 @@
     </div>
 </div>
 
+
+<div class="modal fade" id="deleteModal" tabindex="-1" role="dialog" aria-labelledby="deleteModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <form method="POST">
+                <input type="hidden" id="delete_company_id" name="company_id" />
+                <div class="modal-header">
+                    <h5 class="modal-title text-center" id="deleteModalLabel">Are you Sure You want to Delete <code class="text-xs" style="color: black;" id="delete_company_name"></code> Company?</h5>
+                    <button class="close" type="button" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">×</span>
+                    </button>
+                </div>
+                <div style="color: black" class="modal-body">"Confirm Delete" below if you want to delete <code class="text-xs" style="color: black;" id="delete_company_name_2"></code>
+                    Shop from the System.
+                    <p style="color: red">This action is not reversible!!</p>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-primary" type="button" data-dismiss="modal">Cancel</button>
+                    <button id="submit_delete_item" name="action" value="delete"
+                        class="btn btn-danger float-end">Confirm Delete</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
 <script>
     {% if toastr_message %}
     toastr.success('{{ toastr_message }}');
@@ -147,6 +181,12 @@
                 $('#shops_table').html(data);
             }
         });
+    }
+
+    function deleteItem(id, name, location) {
+        $('#delete_company_id').val(id);
+        $('#delete_company_name').html(name);
+        $('#delete_company_name_2').html(name);
     }
 
 </script>

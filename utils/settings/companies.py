@@ -1,9 +1,10 @@
 from flask import redirect, render_template, request, url_for
 from flask_login import current_user
 
-from utils.entities import Package
 from utils.helper import Helper
 from utils.our_packages import OurPackages
+from utils.settings.company_shops import CompanyShops
+from utils.settings.my_shops import MyShops
 
 class Company():
     def __init__(self, id, name, phone, created_at, license_id, license_key, expires_at, package, validity):
@@ -75,7 +76,22 @@ class Companies():
             """
             cursor.execute(query, (shop_id,current_user.id))
             self.db.conn.commit()
-        
+                
+    def delete(self, id):
+        self.db.ensure_connection()
+        with self.db.conn.cursor() as cursor:
+            query = "DELETE FROM companies WHERE id = %s"
+            cursor.execute(query, (id,))
+            self.db.conn.commit()
+            
+            query = "DELETE FROM licenses WHERE id = (SELECT license_id FROM companies WHERE id = %s)"
+            cursor.execute(query, (id,))
+            self.db.conn.commit()
+            
+            shops = CompanyShops(self.db).fetch_shops(id)
+            for shop in shops:
+                MyShops(self.db).delete(shop.id)
+                    
     def __call__(self):   
         toastr_message = None             
         if request.method == 'POST':       
@@ -95,8 +111,12 @@ class Companies():
             elif request.form['action'] == 'access':
                 shop_id = request.form['id']
                 self.access_shop(shop_id)
-                toastr_message = 'Successfully Switched Shop'
                 return redirect(url_for('logout'))
+                    
+            elif request.form['action'] == 'delete':
+                company_id = request.form['company_id']
+                self.delete(company_id)
+                toastr_message = 'Company Deleted Successfully'
         
         companies = self.fetch() 
         packages = OurPackages(self.db).fetch_packages()

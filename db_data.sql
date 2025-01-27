@@ -35,7 +35,7 @@ INSERT INTO user_levels (name, description) VALUES
 ON CONFLICT (name) DO NOTHING;
 
 -- Dumping data for table payment_modes
-INSERT INTO payment_modes (name, account, shop_id) VALUES
-('CASH', NULL, 1),
-('MPESA', NULL, 1)
+INSERT INTO payment_modes (name) VALUES
+('CASH'),
+('MPESA')
 ON CONFLICT (name) DO NOTHING;

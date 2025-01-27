@@ -3,10 +3,10 @@ from datetime import datetime, timedelta
 from flask import render_template, request
 from flask_login import current_user
 
+from utils.customers.customer_bills import CustomerBills
 from utils.expenses import Expenses
 from utils.helper import Helper
 from utils.stock.stock_take import StockTake
-from utils.customers.bills import Bills
 
 class Dashboard():
     def __init__(self, db): 
@@ -211,7 +211,7 @@ class Dashboard():
         total_sales, total_cost, total_purchases = self.get_total_sales(report_date)
         total_expenses = Expenses(self.db).get_total(report_date)
         total_capital, total_stock = StockTake(self.db).get_total(report_date)
-        total_unpaid_bills = Bills(self.db).get_total_unpaid_bills(report_date)
+        total_unpaid_bills = CustomerBills(self.db).get_total_unpaid_bills(report_date)
         items, qtys, bgcolors = self.get_sales_per_item(report_date)
         debts, amounts, bgcolors_2 = self.get_debts(report_date)
         dates, purchases, stocks, sales, expenses = self.get_sales_purchases_and_expenses(report_date)

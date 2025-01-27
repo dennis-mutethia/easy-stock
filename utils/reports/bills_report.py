@@ -2,9 +2,9 @@ import pytz
 from datetime import datetime, timedelta
 from flask import render_template, request
 
+from utils.customers.customer_bills import CustomerBills
 from utils.customers.customers import Customers
 from utils.helper import Helper
-from utils.customers.bills import Bills
 
 class BillsReport():
     def __init__(self, db): 
@@ -29,7 +29,7 @@ class BillsReport():
                 print(f"An error occurred: {e}")               
         
         customers = Customers(self.db).fetch()
-        bills = Bills(self.db).fetch(from_date, to_date, bill_status, customer_id) 
+        bills = CustomerBills(self.db).fetch(from_date, to_date, bill_status, customer_id) 
         grand_total = grand_paid = cash_total = mpesa_total =  0
         for bill in bills:
             grand_total = grand_total + bill.total

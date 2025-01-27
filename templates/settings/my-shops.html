@@ -41,13 +41,13 @@
                 <input id="shop_type_{{ shop.id }}" type="hidden" value="{{ shop.shop_type.id }}" />
                 <td class="text-center">
                     <a href="#" onclick="editShop({{ shop.id }})" data-toggle="modal" data-target="#newModal">
-                        <i class="mdi mdi-border-color" title="Edit Shop"></i>
+                        <i class="mdi mdi-border-color" title="Edit Shop">edit</i>
                     </a>
                 </td>
                 <td class="text-center">
                     {% if current_user.user_level.id == 0 and shop.id != current_user.shop.id and shop.id > 0 %}
                     <a href="#" onclick="deleteItem({{ shop.id }}, '{{ shop.name }}', '{{ shop.location }}')" data-toggle="modal" data-target="#deleteModal">
-                        <i class="mdi mdi-delete" style="color: red" title="Delete Shop"></i>
+                        <i class="mdi mdi-delete" style="color: red" title="Delete Shop">delete</i>
                     </a>
                     {% endif %}
                 </td>

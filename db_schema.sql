@@ -144,6 +144,18 @@ CREATE TABLE IF NOT EXISTS stock (
   PRIMARY KEY (stock_date, product_id, shop_id) -- Includes the partitioning column
 ) PARTITION BY RANGE (stock_date);
 
+-- Table structure for table customers
+CREATE TABLE IF NOT EXISTS customers (
+  id SERIAL PRIMARY KEY,
+  name TEXT,
+  phone TEXT,
+  shop_id INT,
+  created_at TIMESTAMP,
+  created_by INT,
+  updated_at TIMESTAMP,
+  updated_by INT,
+  UNIQUE (phone, shop_id)
+);
 
 -- Table structure for table bills
 CREATE TABLE IF NOT EXISTS bills (
@@ -156,19 +168,6 @@ CREATE TABLE IF NOT EXISTS bills (
   created_by INT,
   updated_at TIMESTAMP,
   updated_by INT
-);
-
--- Table structure for table customers
-CREATE TABLE IF NOT EXISTS customers (
-  id SERIAL PRIMARY KEY,
-  name TEXT,
-  phone TEXT,
-  shop_id INT,
-  created_at TIMESTAMP,
-  created_by INT,
-  updated_at TIMESTAMP,
-  updated_by INT,
-  UNIQUE (phone, shop_id)
 );
 
 -- Table structure for table expenses
@@ -188,8 +187,6 @@ CREATE TABLE IF NOT EXISTS expenses (
 CREATE TABLE IF NOT EXISTS payment_modes (
   id SERIAL PRIMARY KEY,
   name TEXT,
-  account TEXT,
-  shop_id INT,
   created_at TIMESTAMP,
   created_by INT,
   updated_at TIMESTAMP,

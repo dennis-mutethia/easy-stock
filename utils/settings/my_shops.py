@@ -84,11 +84,15 @@ class MyShops():
     def delete(self, id):
         self.db.ensure_connection()
         with self.db.conn.cursor() as cursor:
-            tables = ['shops', 'product_categories', 'products', 'stock', 'customers', 'bills', 'expenses', 'payments', 'cashbox' ]
+            tables = ['users', 'product_categories', 'products', 'stock', 'customers', 'bills', 'expenses', 'payments', 'cashbox']
             for table in tables:
-                query = f"DELETE FROM {table} WHERE id = %s"
+                query = f"DELETE FROM {table} WHERE shop_id = %s"
                 cursor.execute(query, (id,))
                 self.db.conn.commit()
+            
+            query = "DELETE FROM shops WHERE id = %s"
+            cursor.execute(query, (id,))
+            self.db.conn.commit()
             
     def fetch_shop_types(self):
         self.db.ensure_connection() 
@@ -136,15 +140,13 @@ class MyShops():
             
             elif request.form['action'] == 'switch':
                 shop_id = request.form['shop_id']
-                name = request.form['name']
                 self.switch(shop_id)
-                toastr_message = f'Successfully Switched Shop to {name}'
                 return redirect(url_for('logout'))
                     
             elif request.form['action'] == 'delete':
                 shop_id = request.form['shop_id']
                 self.delete(shop_id)
-                toastr_message = f'Shop Deleted Successfully'
+                toastr_message = 'Shop Deleted Successfully'
         
         shops = self.fetch() 
         shop_types = self.fetch_shop_types()
