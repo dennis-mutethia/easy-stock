@@ -1,4 +1,5 @@
 -- Table structure for table packages
+DROP TABLE IF EXISTS packages;
 CREATE TABLE IF NOT EXISTS packages (
   id SERIAL PRIMARY KEY,
   name TEXT,
@@ -16,6 +17,7 @@ CREATE TABLE IF NOT EXISTS packages (
 );
 
 -- Table structure for table licenses
+DROP TABLE IF EXISTS licenses;
 CREATE TABLE IF NOT EXISTS licenses (
   id SERIAL PRIMARY KEY,
   key TEXT,
@@ -30,6 +32,7 @@ CREATE TABLE IF NOT EXISTS licenses (
 );
 
 -- Table structure for table companies
+DROP TABLE IF EXISTS companies;
 CREATE TABLE IF NOT EXISTS companies (
   id SERIAL PRIMARY KEY,
   name TEXT,
@@ -41,6 +44,7 @@ CREATE TABLE IF NOT EXISTS companies (
 );
 
 -- Table structure for table shop_types
+DROP TABLE IF EXISTS shop_types;
 CREATE TABLE IF NOT EXISTS shop_types (
   id SERIAL PRIMARY KEY,
   name TEXT,
@@ -53,6 +57,7 @@ CREATE TABLE IF NOT EXISTS shop_types (
 );
 
 -- Table structure for table shops
+DROP TABLE IF EXISTS shops;
 CREATE TABLE IF NOT EXISTS shops (
   id SERIAL PRIMARY KEY,
   name TEXT,
@@ -71,6 +76,7 @@ CREATE TABLE IF NOT EXISTS shops (
 );
 
 -- Table structure for table user_levels
+DROP TABLE IF EXISTS user_levels;
 CREATE TABLE IF NOT EXISTS user_levels (
   id SERIAL PRIMARY KEY,
   name TEXT,
@@ -84,6 +90,7 @@ CREATE TABLE IF NOT EXISTS user_levels (
 );
 
 -- Table structure for table users
+DROP TABLE IF EXISTS users;
 CREATE TABLE IF NOT EXISTS users (
   id SERIAL PRIMARY KEY,
   name TEXT,
@@ -99,6 +106,7 @@ CREATE TABLE IF NOT EXISTS users (
 );
 
 -- Table structure for table product_categories
+DROP TABLE IF EXISTS product_categories;
 CREATE TABLE IF NOT EXISTS product_categories (
   id SERIAL PRIMARY KEY,
   name TEXT,
@@ -111,6 +119,7 @@ CREATE TABLE IF NOT EXISTS product_categories (
 );
 
 -- Table structure for table products
+DROP TABLE IF EXISTS products;
 CREATE TABLE IF NOT EXISTS products (
   id SERIAL PRIMARY KEY,
   name TEXT,
@@ -126,6 +135,7 @@ CREATE TABLE IF NOT EXISTS products (
 );
 
 -- Table structure for table stock
+DROP TABLE IF EXISTS stock;
 CREATE TABLE IF NOT EXISTS stock (
   id SERIAL NOT NULL,
   stock_date DATE NOT NULL,
@@ -145,6 +155,7 @@ CREATE TABLE IF NOT EXISTS stock (
 ) PARTITION BY RANGE (stock_date);
 
 -- Table structure for table customers
+DROP TABLE IF EXISTS customers;
 CREATE TABLE IF NOT EXISTS customers (
   id SERIAL PRIMARY KEY,
   name TEXT,
@@ -158,6 +169,7 @@ CREATE TABLE IF NOT EXISTS customers (
 );
 
 -- Table structure for table bills
+DROP TABLE IF EXISTS bills;
 CREATE TABLE IF NOT EXISTS bills (
   id SERIAL PRIMARY KEY,
   customer_id INT,
@@ -171,6 +183,7 @@ CREATE TABLE IF NOT EXISTS bills (
 );
 
 -- Table structure for table expenses
+DROP TABLE IF EXISTS expenses;
 CREATE TABLE IF NOT EXISTS expenses (
   id SERIAL PRIMARY KEY,
   date date,
@@ -184,6 +197,7 @@ CREATE TABLE IF NOT EXISTS expenses (
 );
 
 -- Table structure for table payment_modes
+DROP TABLE IF EXISTS payment_modes;
 CREATE TABLE IF NOT EXISTS payment_modes (
   id SERIAL PRIMARY KEY,
   name TEXT,
@@ -195,6 +209,7 @@ CREATE TABLE IF NOT EXISTS payment_modes (
 );
 
 -- Table structure for table payments
+DROP TABLE IF EXISTS payments;
 CREATE TABLE IF NOT EXISTS payments (
   id SERIAL PRIMARY KEY,
   bill_id INT,
@@ -208,6 +223,7 @@ CREATE TABLE IF NOT EXISTS payments (
 );
 
 -- Table structure for table cashbox
+DROP TABLE IF EXISTS cashbox;
 CREATE TABLE IF NOT EXISTS cashbox (
   id SERIAL PRIMARY KEY,
   date date,
