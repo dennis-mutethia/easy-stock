@@ -1,6 +1,6 @@
 import os
 from dotenv import load_dotenv
-from flask import Flask, redirect, render_template, url_for
+from flask import Flask, redirect, render_template, url_for, send_from_directory
 from flask_login import LoginManager, logout_user, login_required
 from flask_session import Session
 from redis import Redis
@@ -240,7 +240,7 @@ def download():
 
 @app.route('/android', methods=['GET'])
 def android():
-    return url_for('static', filename='bundles/easy-stock.apk')
+    return send_from_directory('static/bundles', 'easy-stock.apk', as_attachment=True)
 
 if __name__ == '__main__':
     debug_mode = os.getenv('IS_DEBUG', 'False') in ['True', '1', 't']
