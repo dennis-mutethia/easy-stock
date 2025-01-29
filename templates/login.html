@@ -68,10 +68,27 @@
                         Forgot Passord
                     </a>
                 </div>
-
             </div>
         </div>
     </div>
+
+    <div class="auth-wrapper d-flex no-block justify-content-center align-items-center bg-dark">
+        <div class="auth-box bg-dark">
+            <br /><br />
+            <h5 class="text-center text-white"><i class="mdi mdi-share">Share Andoid App</i></h5>
+            <div class="text-center pt-3 pb-3 text-white border-top border-bottom border-secondary" id="qr_code">
+            </div>
+        </div>
+    </div>
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <script type="text/javascript">
+        var qrcode = new QRCode(document.getElementById("qr_code"), {
+            text: "{{ url_for('android') }}"
+            // width: 100,
+            // height: 100
+        });
+    </script>
     <!-- ============================================================== -->
     <!-- Login box.scss -->
     <!-- ============================================================== -->
