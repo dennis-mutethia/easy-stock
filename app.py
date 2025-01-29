@@ -238,6 +238,10 @@ def ourPackages():
 def download():
     return render_template('download.html', page_title='Download > Android App')
 
+@app.route('/android', methods=['GET'])
+def android():
+    return url_for('static', filename='bundles/easy-stock.apk')
+
 if __name__ == '__main__':
     debug_mode = os.getenv('IS_DEBUG', 'False') in ['True', '1', 't']
     app.run(debug=debug_mode)
