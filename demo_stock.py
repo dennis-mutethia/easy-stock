@@ -93,13 +93,13 @@ class DemoSTock():
             old_opening = opening = stock.yesterday_opening + stock.yesterday_additions
             new_opening = random.randint(math.ceil(opening * 0.7), opening)
             additions = 0            
-            if (new_opening > 5 and new_opening % 5 == 0) or (new_opening > 3 and new_opening % 3 == 0) or new_opening <= 3:
-                sold = opening - new_opening
-                additions = random.randint(0, sold)
-                opening = new_opening  
-                
-                if old_opening != new_opening or additions > 0:
-                    print(f'Updating {stock.name} opening={opening} additions={additions}')               
+            #if (new_opening > 5 and new_opening % 5 == 0) or (new_opening > 3 and new_opening % 3 == 0) or new_opening <= 3:
+            sold = 24 #opening - new_opening
+            additions = random.randint(0, sold)
+            opening = new_opening  
+            
+            #if old_opening != new_opening or additions > 0:
+            print(f'Updating {stock.name} opening={opening} additions={additions}')               
                 
             query = """
             UPDATE stock
