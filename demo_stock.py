@@ -115,7 +115,7 @@ class DemoSTock():
     def __call__(self):
         current_date = datetime.now(pytz.timezone("Africa/Nairobi")).strftime('%Y-%m-%d')
         stock_date = current_date 
-        for shop_id in [17, 20]:  
+        for shop_id in [1, 2]:  
             self.load(stock_date, shop_id)
             self.update(stock_date, shop_id)
 
