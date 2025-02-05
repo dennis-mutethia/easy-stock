@@ -90,11 +90,11 @@ class DemoSTock():
         stocks = self.fetch(stock_date, shop_id)
         self.db.ensure_connection()
         for stock in stocks:
-            old_opening = opening = stock.yesterday_opening + stock.yesterday_additions
+            opening = stock.yesterday_opening + stock.yesterday_additions
             new_opening = random.randint(math.ceil(opening * 0.7), opening)
             additions = 0            
             #if (new_opening > 5 and new_opening % 5 == 0) or (new_opening > 3 and new_opening % 3 == 0) or new_opening <= 3:
-            sold = 24 #opening - new_opening
+            sold = 15 #opening - new_opening
             additions = random.randint(0, sold)
             opening = new_opening  
             
