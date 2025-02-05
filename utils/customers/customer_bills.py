@@ -153,10 +153,10 @@ class CustomerBills():
                 
         if request.method == 'POST':       
             if request.form['action'] == 'assign_customer_bill':
-                bill_id = int(request.form['bill_id'], 0)
+                bill_id = request.form['bill_id', 0]
                 bill_amount = int(request.form['bill_amount'])     
                 customer_id = int(request.form['customer_id'])  
-                if bill_id > 0:         
+                if int(bill_id) > 0:         
                     self.add(customer_id, bill_amount)
                 else:
                     self.update(bill_id, customer_id, bill_amount)
