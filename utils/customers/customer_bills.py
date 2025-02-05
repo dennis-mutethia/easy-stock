@@ -99,6 +99,7 @@ class CustomerBills():
         """
 
         params = (customer_id, bill_amount, current_user.shop.id, current_user.id)
+        
         try:
             with self.db.conn.cursor() as cursor:
                 cursor.execute(query, tuple(params))
@@ -111,27 +112,35 @@ class CustomerBills():
             
     def update(self, id, customer_id, bill_amount):
         self.db.ensure_connection()
-        with self.db.conn.cursor() as cursor:
-            query = """
-            UPDATE bills
-            SET customer_id=%s, total=%s, updated_at=CURRENT_TIMESTAMP AT TIME ZONE 'Africa/Nairobi', updated_by=%s
-            WHERE id=%s
-            """
-            params = [customer_id, bill_amount, current_user.shop.id, id]
-            cursor.execute(query, tuple(params))
-            self.db.conn.commit()    
+        try:
+            with self.db.conn.cursor() as cursor:
+                query = """
+                UPDATE bills
+                SET customer_id=%s, total=%s, updated_at=CURRENT_TIMESTAMP AT TIME ZONE 'Africa/Nairobi', updated_by=%s
+                WHERE id=%s
+                """
+                params = [customer_id, bill_amount, current_user.shop.id, id]
+                cursor.execute(query, tuple(params))
+                self.db.conn.commit()   
+        except Exception as e:
+            self.db.conn.rollback()
+            raise e         
             
     def pay(self, id, paid):
         self.db.ensure_connection()
-        with self.db.conn.cursor() as cursor:
-            query = """
-            UPDATE bills
-            SET paid=paid+%s, updated_at=CURRENT_TIMESTAMP AT TIME ZONE 'Africa/Nairobi', updated_by=%s
-            WHERE id=%s
-            """
-            params = [paid, current_user.shop.id, id]
-            cursor.execute(query, tuple(params))
-            self.db.conn.commit()
+        try:
+            with self.db.conn.cursor() as cursor:
+                query = """
+                UPDATE bills
+                SET paid=paid+%s, updated_at=CURRENT_TIMESTAMP AT TIME ZONE 'Africa/Nairobi', updated_by=%s
+                WHERE id=%s
+                """
+                params = [paid, current_user.shop.id, id]
+                cursor.execute(query, tuple(params))
+                self.db.conn.commit() 
+        except Exception as e:
+            self.db.conn.rollback()
+            raise e         
                
     def __call__(self):
         current_date = datetime.now(pytz.timezone("Africa/Nairobi")).strftime('%Y-%m-%d')
@@ -153,10 +162,10 @@ class CustomerBills():
                 
         if request.method == 'POST':       
             if request.form['action'] == 'assign_customer_bill':
-                bill_id = request.form['bill_id', 0]
+                bill_id = int(request.form['bill_id'])
                 bill_amount = int(request.form['bill_amount'])     
                 customer_id = int(request.form['customer_id'])  
-                if int(bill_id) > 0:         
+                if bill_id == 0:         
                     self.add(customer_id, bill_amount)
                 else:
                     self.update(bill_id, customer_id, bill_amount)
