@@ -106,10 +106,9 @@ class BillEntry():
         self.qty = qty 
           
 class PaymentMode():
-    def __init__(self, id, name, account):
+    def __init__(self, id, name):
         self.id = id    
         self.name = name     
-        self.account = account
           
 class Payment():
     def __init__(self, id, bill_id, amount, created_at, user, payment_mode ):

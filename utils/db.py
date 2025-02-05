@@ -160,11 +160,11 @@ class Db():
     def fetch_payment_modes(self):
         self.ensure_connection() 
         with self.conn.cursor() as cursor:
-            cursor.execute("SELECT id, name, account FROM payment_modes")
+            cursor.execute("SELECT id, name FROM payment_modes")
             data = cursor.fetchall()
             payment_modes = []
             for payment_mode in data:
-                payment_modes.append(PaymentMode(payment_mode[0], payment_mode[1], payment_mode[2]))
+                payment_modes.append(PaymentMode(payment_mode[0], payment_mode[1]))
                 
             return payment_modes
           
@@ -172,14 +172,14 @@ class Db():
         self.ensure_connection()
         with self.conn.cursor() as cursor:
             query = """
-            SELECT id, name, account
+            SELECT id, name
             FROM payment_modes 
             WHERE id = %s 
             """
             cursor.execute(query, (id,))
             data = cursor.fetchone()
             if data:
-                return PaymentMode(data[0], data[1], data[2])
+                return PaymentMode(data[0], data[1])
             else:
                 return None       
     
