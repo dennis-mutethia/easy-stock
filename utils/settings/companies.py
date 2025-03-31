@@ -26,7 +26,16 @@ class Companies():
         self.db.ensure_connection()
         with self.db.conn.cursor() as cursor:
             query = """
-            SELECT c.id, c.name, u.phone, DATE(c.created_at), l.id, l.key, DATE(l.expires_at), p.name, EXTRACT(DAY FROM (l.expires_at - CURRENT_TIMESTAMP AT TIME ZONE 'Africa/Nairobi'))
+            SELECT 
+               c.id as company_id, 
+               c.name as company, 
+               u.phone, 
+               DATE(c.created_at),
+               l.id as license_id, 
+               l.key, 
+               DATE(l.expires_at), 
+               p.name as package,
+              EXTRACT(DAY FROM (l.expires_at - CURRENT_TIMESTAMP AT TIME ZONE 'Africa/Nairobi'))
             FROM companies c
             LEFT JOIN users u ON u.id = c.created_by
             JOIN licenses l ON l.id = c.license_id
