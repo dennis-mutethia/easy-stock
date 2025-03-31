@@ -35,7 +35,7 @@ class Companies():
                l.key, 
                DATE(l.expires_at), 
                p.name as package,
-              EXTRACT(DAY FROM (l.expires_at - CURRENT_TIMESTAMP AT TIME ZONE 'Africa/Nairobi'))
+              EXTRACT(DAY FROM (l.expires_at - CURRENT_TIMESTAMP AT TIME ZONE 'Africa/Nairobi')) as validity
             FROM companies c
             LEFT JOIN users u ON u.id = c.created_by
             JOIN licenses l ON l.id = c.license_id
