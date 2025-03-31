@@ -94,7 +94,7 @@ class DemoSTock():
             new_opening = random.randint(math.ceil(opening * 0.7), opening)
             additions = 0            
             #if (new_opening > 5 and new_opening % 5 == 0) or (new_opening > 3 and new_opening % 3 == 0) or new_opening <= 3:
-            sold = 15 #opening - new_opening
+            sold = 5 #opening - new_opening
             additions = random.randint(0, sold)
             opening = new_opening  
             
