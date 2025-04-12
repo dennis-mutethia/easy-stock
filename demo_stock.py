@@ -88,6 +88,7 @@ class DemoSTock():
     
     def update(self, stock_date, shop_id):
         stocks = self.fetch(stock_date, shop_id)
+        stocks = random.sample(stocks, min(15, len(stocks)))
         stocks = random.sample(stocks, 15)
         self.db.ensure_connection()
         for stock in stocks:
