@@ -44,7 +44,7 @@
                 <td id="name_{{ stock.id }}">{{ stock.name }}</td> 
                 <td id="category_{{ stock.id }}">{{ stock.category_name }}</td> 
                 <td class="text-center" id="yesterday_{{ stock.id }}">{{ helper.format_number_with_commas(stock.yesterday_opening+stock.yesterday_additions) }}</td> 
-                <td class="text-center">{{ helper.format_number_with_commas(sold) if sold>=0 else '' }}</td> 
+                <td class="text-center" id="sold_{{ stock.id }}">{{ helper.format_number_with_commas(sold) if sold>=0 else '' }}</td> 
                 <td class="text-center">
                     <input 
                         type="hidden" 
@@ -128,6 +128,7 @@
                 toastr.success("Updated " + name);
                 $("#opening_old_" + id).html(opening);
                 $("#total_" + id).html(total);
+                $("#sold_" + id).html(yesterday-opening);
             }
         });
     }
