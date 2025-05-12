@@ -13,7 +13,9 @@ class ProductsCategories():
         with self.db.conn.cursor() as cursor:
             query = """
             WITH p AS(
-                SELECT shop_id, category_id, COUNT(*) counts FROM products GROUP BY shop_id, category_id
+                SELECT shop_id, category_id, COUNT(*) counts 
+                FROM products 
+                GROUP BY shop_id, category_id
             )
             SELECT id, name, COALESCE(counts, 0)
             FROM product_categories 

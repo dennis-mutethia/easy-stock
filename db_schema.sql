@@ -141,8 +141,6 @@ CREATE TABLE IF NOT EXISTS stock (
   stock_date DATE NOT NULL,
   product_id INT NOT NULL,
   shop_id INT NOT NULL,
-  name TEXT,
-  category_id INT,
   purchase_price DOUBLE PRECISION,
   selling_price DOUBLE PRECISION,
   opening DOUBLE PRECISION,

@@ -18,20 +18,18 @@ class StockTake():
         with self.db.conn.cursor() as cursor:     
             query = """         
             WITH products AS (
-                SELECT id, name, category_id, purchase_price, selling_price
+                SELECT id, purchase_price, selling_price
                 FROM products 
                 WHERE shop_id = %s
             ),
             yesterday AS (
-                SELECT product_id, name, category_id, purchase_price, selling_price, opening, additions
+                SELECT product_id, purchase_price, selling_price, opening, additions
                 FROM stock
                 WHERE DATE(stock_date) = DATE(%s) - 1
             ),
             today AS (
                 SELECT DATE(%s) AS stock_date, 
                     COALESCE(yesterday.product_id, products.id) AS product_id, 
-                    COALESCE(yesterday.name, products.name) AS name, 
-                    COALESCE(yesterday.category_id, products.category_id) AS category_id,
                     COALESCE(yesterday.purchase_price, products.purchase_price) AS purchase_price,
                     COALESCE(yesterday.selling_price, products.selling_price) AS selling_price,
                     COALESCE((yesterday.opening+yesterday.additions), 0) AS opening,
@@ -40,7 +38,7 @@ class StockTake():
                 FROM products
                 LEFT JOIN yesterday ON yesterday.product_id = products.id
             )
-            INSERT INTO stock (stock_date, product_id, name, category_id, purchase_price, selling_price, opening, additions, shop_id, created_at, created_by) 
+            INSERT INTO stock (stock_date, product_id, purchase_price, selling_price, opening, additions, shop_id, created_at, created_by) 
             SELECT * FROM today
             ON CONFLICT (stock_date, product_id, shop_id) DO NOTHING
             """
@@ -52,9 +50,14 @@ class StockTake():
     def fetch(self, stock_date, search, category_id, in_stock=0):
         self.db.ensure_connection()
     
-        query = """
-        WITH all_stock AS(
-            SELECT id, stock_date, product_id, name, category_id, opening, additions, selling_price, purchase_price
+        query = """       
+        WITH products AS (
+            SELECT id, name, category_id
+            FROM products 
+            WHERE shop_id = %s
+        ),
+        all_stock AS(
+            SELECT id, stock_date, product_id, opening, additions, selling_price, purchase_price
             FROM stock 
             WHERE shop_id = %s
         ),  
@@ -64,8 +67,9 @@ class StockTake():
             WHERE DATE(stock_date) = DATE(%s) - 1
         ), 
         today AS(
-            SELECT id, product_id, name, category_id, COALESCE(opening, 0) AS opening, COALESCE(additions,0) AS additions, selling_price, purchase_price
+            SELECT all_stock.id, product_id, name, category_id, COALESCE(opening, 0) AS opening, COALESCE(additions,0) AS additions, selling_price, purchase_price
             FROM all_stock
+            JOIN products ON products.id = all_stock.product_id
             WHERE DATE(stock_date) = DATE(%s)
         )
         SELECT today.id, today.product_id, today.name, product_categories.name, COALESCE(yesterday.opening,0), COALESCE(yesterday.additions,0),
@@ -75,7 +79,7 @@ class StockTake():
         LEFT JOIN yesterday ON yesterday.product_id = today.product_id            
         WHERE (today.opening + today.additions) >= %s        
         """
-        params = [current_user.shop.id, stock_date, stock_date, in_stock]
+        params = [current_user.shop.id, current_user.shop.id, stock_date, stock_date, in_stock]
 
         if search:
             query += " AND today.name LIKE %s"

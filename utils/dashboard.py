@@ -40,11 +40,15 @@ class Dashboard():
         self.db.ensure_connection()
         with self.db.conn.cursor() as cursor:
             query = """
-            WITH all_stock AS (
+            WITH products AS (
+                SELECT id, name
+                FROM products
+                WHERE shop_id = %s
+            ),
+            all_stock AS (
                 SELECT 
                     stock_date, 
                     product_id, 
-                    name, 
                     COALESCE(stock.opening, 0) AS opening, 
                     COALESCE(stock.additions, 0) AS additions 
                 FROM stock
@@ -53,6 +57,7 @@ class Dashboard():
             today AS (
                 SELECT product_id, name, opening, additions
                 FROM all_stock
+                INNER JOIN products ON products.id = all_stock.product_id
                 WHERE DATE(stock_date) = DATE(%s)
             ),
             tomorrow AS (
@@ -70,7 +75,7 @@ class Dashboard():
             FROM source 
             WHERE sold > 0         
             """
-            params = [current_user.shop.id, report_date, report_date]
+            params = [current_user.shop.id, current_user.shop.id, report_date, report_date]
             
             cursor.execute(query, tuple(params))
             data = cursor.fetchall()

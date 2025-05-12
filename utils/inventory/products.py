@@ -59,16 +59,16 @@ class Products():
                 print(f"Error loading stock: {e}")
                 return None
                 
-    def add_stock(self, product_id, name, category_id, purchase_price, selling_price,  in_stock):
+    def add_stock(self, product_id, purchase_price, selling_price,  in_stock):
         self.db.ensure_connection()
         with self.db.conn.cursor() as cursor:
             query = """
-            INSERT INTO stock (stock_date, product_id, name, category_id, purchase_price, selling_price, opening, additions, shop_id, created_at, created_by)               
-            VALUES(CURRENT_DATE, %s, %s, %s, %s, %s, %s, 0, %s, CURRENT_TIMESTAMP AT TIME ZONE 'Africa/Nairobi', %s) 
+            INSERT INTO stock (stock_date, product_id, purchase_price, selling_price, opening, additions, shop_id, created_at, created_by)               
+            VALUES(CURRENT_DATE, %s, %s, %s, %s, 0, %s, CURRENT_TIMESTAMP AT TIME ZONE 'Africa/Nairobi', %s) 
             ON CONFLICT (stock_date, product_id, shop_id) DO NOTHING
             RETURNING id
             """
-            params = [product_id, name.upper(), category_id, purchase_price, selling_price, in_stock, current_user.shop.id, current_user.id]
+            params = [product_id, purchase_price, selling_price, in_stock, current_user.shop.id, current_user.id]
             
             try:
                 cursor.execute(query, tuple(params))
@@ -92,16 +92,16 @@ class Products():
             cursor.execute(query, tuple(params))
             self.db.conn.commit()
     
-    def update_stock(self, id, name, category_id, purchase_price, selling_price, in_stock):
+    def update_stock(self, id, purchase_price, selling_price, in_stock):
         self.db.ensure_connection()
         with self.db.conn.cursor() as cursor:
             query = """
             UPDATE stock
-            SET name=%s, category_id=%s, purchase_price=%s, selling_price=%s, opening=%s-additions, updated_at=CURRENT_TIMESTAMP AT TIME ZONE 'Africa/Nairobi', updated_by=%s
+            SET purchase_price=%s, selling_price=%s, opening=%s-additions, updated_at=CURRENT_TIMESTAMP AT TIME ZONE 'Africa/Nairobi', updated_by=%s
             WHERE id=%s
             RETURNING product_id
             """
-            params = [name.upper(), category_id, purchase_price, selling_price, in_stock, current_user.id, id]
+            params = [purchase_price, selling_price, in_stock, current_user.id, id]
             cursor.execute(query, tuple(params))
             self.db.conn.commit()
             product_id = cursor.fetchone()[0]
@@ -139,7 +139,7 @@ class Products():
                 selling_price = request.form['selling_price']   
                 in_stock = request.form['in_stock'] 
                 product_id = self.add(name, purchase_price, selling_price, category_id_new)
-                self.add_stock(product_id, name, category_id_new, purchase_price, selling_price,  in_stock)
+                self.add_stock(product_id, purchase_price, selling_price,  in_stock)
             
             elif request.form['action'] == 'edit':
                 id = request.form['id']
@@ -149,7 +149,7 @@ class Products():
                 purchase_price = request.form['purchase_price']
                 selling_price = request.form['selling_price']
                 in_stock = request.form['in_stock']
-                self.update_stock(id, name, category_id_new, purchase_price, selling_price, in_stock) 
+                self.update_stock(id, purchase_price, selling_price, in_stock) 
                 self.update(product_id, name, category_id_new, purchase_price, selling_price)
                 
             elif request.form['action'] == 'delete':

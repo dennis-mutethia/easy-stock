@@ -11,7 +11,7 @@
                 required="required" value="{{ report_date }}" max="{{ max_date }}" />
         </div>
         <div class="col-6">
-            <select class="text-center" onchange="applyFilter()" name="category_id" id="category_id" style="width: 100%;">
+            <select class="text-center" onchange="applyFilter()" style="height: 25px" name="category_id" id="category_id" style="width: 100%;">
                 <option value="0">Filter by Category</option>
                 {% for product_category in product_categories %}
                 <option value="{{ product_category.id }}" {% if product_category.id == category_id %} selected {% endif %}>{{ product_category.name }}</option>
@@ -19,16 +19,21 @@
             </select>
         </div>
     </form><br />
-    <table class="table-bordered table-striped">
+    <table class="table-bordered table-striped"> 
+        <style>
+            th, td {
+                font-size: x-small;
+            }
+        </style>      
         <thead>
             <tr>
-                <th class="text-center" style="font-size: x-small;">PRODUCT</th>
-                <th class="text-center" style="font-size: x-small;">CATEGORY</th>
-                <th class="text-center" style="font-size: x-small;">OPENING STOCK</th>
-                <th class="text-center" style="font-size: x-small;">CLOSING STOCK</th>
-                <th class="text-center" style="font-size: x-small;">SOLD</th>
-                <th class="text-center" style="font-size: x-small;">SELLING PRICE</th>
-                <th class="text-center" style="font-size: x-small;">TOTAL</th>
+                <th class="text-center">PRODUCT</th>
+                <th class="text-center">CATEGORY</th>
+                <th class="text-center">OPENING STOCK</th>
+                <th class="text-center">CLOSING STOCK</th>
+                <th class="text-center">SOLD</th>
+                <th class="text-center">SELLING PRICE</th>
+                <th class="text-center">TOTAL</th>
             </tr>
         </thead>
         <tbody>

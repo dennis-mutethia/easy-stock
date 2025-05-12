@@ -14,19 +14,25 @@ class SalesReport():
     def fetch(self, report_date, category_id=0):
         self.db.ensure_connection()
         with self.db.conn.cursor() as cursor:
-            query = """            
-            WITH all_stock AS (
+            query = """         
+            WITH products AS (
+                SELECT id, name, category_id
+                FROM products 
+                WHERE shop_id = %s
+            ),        
+            all_stock AS (
                 SELECT 
                     stock.stock_date, 
                     stock.product_id, 
-                    stock.name AS item_name, 
-                    stock.category_id,
+                    products.name AS item_name, 
+                    products.category_id,
                     pc.name AS category_name, 
                     COALESCE(stock.opening, 0) AS opening, 
                     COALESCE(stock.additions, 0) AS additions, 
                     stock.selling_price
                 FROM stock
-                LEFT JOIN product_categories pc ON pc.id= stock.category_id   
+                INNER JOIN products ON products.id = stock.product_id
+                LEFT JOIN product_categories pc ON pc.id= products.category_id   
                 WHERE stock.shop_id = %s
             ),
             today AS (
@@ -59,7 +65,7 @@ class SalesReport():
             FROM source   
             WHERE sold > 0     
             """
-            params = [current_user.shop.id, report_date, report_date]
+            params = [current_user.shop.id, current_user.shop.id, report_date, report_date]
             
             if category_id > 0:
                 query = query + " AND category_id = %s "

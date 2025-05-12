@@ -13,8 +13,7 @@ class StatementOfAccount():
     def fetch(self, from_date, to_date):
         self.db.ensure_connection()
         with self.db.conn.cursor() as cursor:
-            query = """
-                                
+            query = """                                
             WITH all_stock AS (
                 SELECT 
                     stock_date, 

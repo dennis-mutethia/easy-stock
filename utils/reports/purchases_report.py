@@ -14,20 +14,27 @@ class PurchasesReport():
     def fetch(self, report_date, category_id=0):
         self.db.ensure_connection()
         with self.db.conn.cursor() as cursor:
-            query = """
-            SELECT s.stock_date, s.name, pc.name AS category_name, s.purchase_price, additions 
+            query = """      
+            WITH products AS (
+                SELECT id, name, category_id
+                FROM products 
+                WHERE shop_id = %s
+            )
+            
+            SELECT s.stock_date, p.name, pc.name AS category_name, s.purchase_price, additions 
             FROM stock s
+            INNER JOIN products p ON p.id = s.product_id
             LEFT JOIN product_categories pc ON pc.id= s.category_id   
             WHERE DATE(s.stock_date) = DATE(%s) AND s.shop_id = %s AND s.additions IS NOT NULL AND s.additions>0
             """
-            params = [report_date, current_user.shop.id]
+            params = [current_user.shop.id, report_date, current_user.shop.id]
             
             if category_id > 0:
-                query = query + " AND s.category_id = %s "
+                query = query + " AND p.category_id = %s "
                 params.append(category_id)
             
             query = query + """
-            ORDER BY pc.name, s.name
+            ORDER BY pc.name, p.name
             """
                         
             cursor.execute(query, tuple(params))
