@@ -114,9 +114,10 @@ class DemoSTock():
                 self.db.conn.commit()           
         
     def __call__(self):
+        shop_ids = [-1]
         current_date = datetime.now(pytz.timezone("Africa/Nairobi")).strftime('%Y-%m-%d')
         stock_date = current_date 
-        for shop_id in [1, 2]:  
+        for shop_id in shop_ids:  
             self.load(stock_date, shop_id)
             self.update(stock_date, shop_id)
 
