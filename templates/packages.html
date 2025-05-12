@@ -55,7 +55,7 @@
                         </tr>
                         <tr>
                             <th>VALIDITY:</th>
-                            <td style="color: {{ 'green' if current_user.license.validity > 7 else ('blue' if current_user.license.validity > 7 else 'red') }}">
+                            <td style="color: {{ package.color if current_user.license.validity > 3 else 'red' }}">
                                 {{ current_user.license.validity }} DAYS
                             </td>
                         </tr>

@@ -69,10 +69,17 @@ class Companies():
         with self.db.conn.cursor() as cursor:
             query = """
             UPDATE licenses 
-            SET package_id = %s, expires_at=CURRENT_TIMESTAMP AT TIME ZONE 'Africa/Nairobi' + INTERVAL %s, updated_at=CURRENT_TIMESTAMP AT TIME ZONE 'Africa/Nairobi', updated_by = %s 
-            WHERE id = %s         
+            SET 
+                package_id = %s, 
+                expires_at = CASE 
+                                WHEN expires_at > CURRENT_TIMESTAMP AT TIME ZONE 'Africa/Nairobi' THEN expires_at + INTERVAL %s 
+                                ELSE CURRENT_TIMESTAMP AT TIME ZONE 'Africa/Nairobi' + INTERVAL %s 
+                            END, 
+                updated_at = CURRENT_TIMESTAMP AT TIME ZONE 'Africa/Nairobi', 
+                updated_by = %s 
+            WHERE id = %s   
             """
-            cursor.execute(query, (package_id, f'+{package.validity} DAYS', current_user.id, id))
+            cursor.execute(query, (package_id, f'+{package.validity} DAYS', f'+{package.validity} DAYS', current_user.id, id))
             self.db.conn.commit()
             
     def access_shop(self, shop_id):

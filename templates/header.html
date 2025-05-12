@@ -12,7 +12,7 @@
 
                     <nav aria-label="breadcrumb">
                         <ol class="breadcrumb">
-                            {% if current_user.license.validity < 7 %}
+                            {% if current_user.license.validity < 4 %}
                             <li class="breadcrumb-item active text-center" aria-current="page" style="color: red; font-weight: bold;">
                                 Your License will Expire in {{ current_user.license.validity }} days - <a href="{{ url_for('ourPackages') }}">Click here to Renew</a> to avoid inconveniences. 
                                 Or Contact Support via <br />
