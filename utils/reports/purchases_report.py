@@ -24,7 +24,7 @@ class PurchasesReport():
             SELECT s.stock_date, p.name, pc.name AS category_name, s.purchase_price, additions 
             FROM stock s
             INNER JOIN products p ON p.id = s.product_id
-            LEFT JOIN product_categories pc ON pc.id= s.category_id   
+            LEFT JOIN product_categories pc ON pc.id= p.category_id   
             WHERE DATE(s.stock_date) = DATE(%s) AND s.shop_id = %s AND s.additions IS NOT NULL AND s.additions>0
             """
             params = [current_user.shop.id, report_date, current_user.shop.id]

@@ -41,7 +41,7 @@ class StockReport():
                     stock.selling_price
                 FROM stock
                 INNER JOIN products ON products.id = stock.product_id
-                LEFT JOIN product_categories pc ON pc.id= stock.category_id   
+                LEFT JOIN product_categories pc ON pc.id= products.category_id   
                 WHERE stock.shop_id = %s
             ),
             today AS (
