@@ -27,8 +27,6 @@ class DemoSTock():
             today AS (
                 SELECT DATE(%s) AS stock_date, 
                     COALESCE(yesterday.product_id, products.id) AS product_id, 
-                    products.name, 
-                    products.category_id,
                     COALESCE(yesterday.purchase_price, products.purchase_price) AS purchase_price,
                     COALESCE(yesterday.selling_price, products.selling_price) AS selling_price,
                     COALESCE((yesterday.opening+yesterday.additions), 0) AS opening,
@@ -37,7 +35,7 @@ class DemoSTock():
                 FROM products
                 LEFT JOIN yesterday ON yesterday.product_id = products.id
             )
-            INSERT INTO stock (stock_date, product_id, name, category_id, purchase_price, selling_price, opening, additions, shop_id, created_at, created_by) 
+            INSERT INTO stock (stock_date, product_id, purchase_price, selling_price, opening, additions, shop_id, created_at, created_by) 
             SELECT * FROM today
             ON CONFLICT (stock_date, product_id, shop_id) DO NOTHING
             """
@@ -49,9 +47,14 @@ class DemoSTock():
     def fetch(self, stock_date, shop_id):
         self.db.ensure_connection()
     
-        query = """
-        WITH all_stock AS(
-            SELECT id, stock_date, product_id, name, category_id, opening, additions, selling_price, purchase_price
+        query = """      
+        WITH products AS (
+            SELECT id, name, category_id
+            FROM products 
+            WHERE shop_id = %s
+        ),
+        all_stock AS(
+            SELECT id, stock_date, product_id, opening, additions, selling_price, purchase_price
             FROM stock 
             WHERE shop_id = %s
         ),  
@@ -61,22 +64,20 @@ class DemoSTock():
             WHERE DATE(stock_date) = DATE(%s) - 1
         ), 
         today AS(
-            SELECT id, product_id, name, category_id, COALESCE(opening, 0) AS opening, COALESCE(additions,0) AS additions, selling_price, purchase_price
+            SELECT id, product_id, COALESCE(opening, 0) AS opening, COALESCE(additions,0) AS additions, selling_price, purchase_price
             FROM all_stock
             WHERE DATE(stock_date) = DATE(%s)
         )
-        SELECT today.id, today.product_id, today.name, product_categories.name, COALESCE(yesterday.opening,0), COALESCE(yesterday.additions,0),
+        SELECT today.id, today.product_id, products.name, product_categories.name, COALESCE(yesterday.opening,0), COALESCE(yesterday.additions,0),
             today.opening, today.additions, today.selling_price, today.purchase_price
         FROM today
-        INNER JOIN product_categories ON product_categories.id = today.category_id
+        INNER JOIN products ON products.id = today.product_id
+        INNER JOIN product_categories ON product_categories.id = products.category_id
         LEFT JOIN yesterday ON yesterday.product_id = today.product_id   
+        ORDER BY products.category_id, products.name
         """
         params = [shop_id, stock_date, stock_date]
-        
-        query = query + """
-            ORDER BY today.category_id, today.name
-            """
-            
+                    
         with self.db.conn.cursor() as cursor:    
             cursor.execute(query, tuple(params))
             data = cursor.fetchall()
