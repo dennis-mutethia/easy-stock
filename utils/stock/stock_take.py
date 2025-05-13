@@ -149,6 +149,48 @@ class StockTake():
         with self.db.conn.cursor() as cursor:
             cursor.execute(query, (product_id,))
             self.db.conn.commit()
+    
+    def add(self, name, purchase_price, selling_price, category_id):
+        self.db.ensure_connection()
+        with self.db.conn.cursor() as cursor:
+            query = """
+            INSERT INTO products(name, purchase_price, selling_price, category_id, shop_id, created_at, created_by) 
+            VALUES(%s, %s, %s, %s, %s, CURRENT_TIMESTAMP AT TIME ZONE 'Africa/Nairobi', %s) 
+            ON CONFLICT (name, shop_id) DO NOTHING
+            RETURNING id
+            """
+            params = [name.upper(), purchase_price, selling_price, category_id, current_user.shop.id, current_user.id]
+            
+            try:
+                cursor.execute(query, tuple(params))
+                self.db.conn.commit()
+                id = cursor.fetchone()[0]
+                return id
+            except Exception as e:
+                self.db.conn.rollback()
+                print(f"Error loading stock: {e}")
+                return None
+                
+    def add_stock(self, product_id, purchase_price, selling_price,  in_stock):
+        self.db.ensure_connection()
+        with self.db.conn.cursor() as cursor:
+            query = """
+            INSERT INTO stock (stock_date, product_id, purchase_price, selling_price, opening, additions, shop_id, created_at, created_by)               
+            VALUES(CURRENT_DATE, %s, %s, %s, %s, 0, %s, CURRENT_TIMESTAMP AT TIME ZONE 'Africa/Nairobi', %s) 
+            ON CONFLICT (stock_date, product_id, shop_id) DO NOTHING
+            RETURNING id
+            """
+            params = [product_id, purchase_price, selling_price, in_stock, current_user.shop.id, current_user.id]
+            
+            try:
+                cursor.execute(query, tuple(params))
+                self.db.conn.commit()
+                id = cursor.fetchone()[0]
+                return id
+            except Exception as e:
+                self.db.conn.rollback()
+                print(f"Error loading stock: {e}")
+                return None
              
     def __call__(self):
         search = ''
@@ -167,7 +209,16 @@ class StockTake():
             except Exception as e:
                 print(f"An error occurred: {e}")
         
-        if request.method == 'POST':       
+        if request.method == 'POST':    
+            if request.form['action'] == 'add':
+                name = request.form['name']   
+                category_id_new = request.form['category_id_new']     
+                purchase_price = request.form['purchase_price']
+                selling_price = request.form['selling_price']   
+                in_stock = request.form['in_stock'] 
+                product_id = self.add(name, purchase_price, selling_price, category_id_new)
+                self.add_stock(product_id, purchase_price, selling_price,  in_stock)
+                    
             if request.form['action'] == 'update':
                 id = request.form['id']
                 opening = request.form['opening']
