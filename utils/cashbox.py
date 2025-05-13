@@ -31,7 +31,9 @@ class CashBox():
                     COALESCE(additions, 0) AS additions, 
                     selling_price
                 FROM stock
-                WHERE shop_id = %s AND DATE(stock_date) BETWEEN DATE(%s) - INTERVAL '30 days' AND DATE(%s) + 1
+                WHERE shop_id = %s 
+                AND EXTRACT(MONTH FROM stock_date) = EXTRACT(MONTH FROM %s::date)
+                AND EXTRACT(YEAR FROM stock_date) = EXTRACT(YEAR FROM %s::date)
             ),
             sales AS(
                 SELECT 
