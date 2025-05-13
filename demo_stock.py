@@ -76,7 +76,7 @@ class DemoSTock():
         LEFT JOIN yesterday ON yesterday.product_id = today.product_id   
         ORDER BY products.category_id, products.name
         """
-        params = [shop_id, stock_date, stock_date]
+        params = [shop_id, shop_id, stock_date, stock_date]
                     
         with self.db.conn.cursor() as cursor:    
             cursor.execute(query, tuple(params))
