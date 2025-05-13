@@ -20,15 +20,15 @@ class DemoSTock():
                 WHERE shop_id = %s
             ),
             yesterday AS (
-                SELECT product_id, name, category_id, purchase_price, selling_price, opening, additions
+                SELECT product_id, purchase_price, selling_price, opening, additions
                 FROM stock
                 WHERE DATE(stock_date) = DATE(%s) - 1
             ),
             today AS (
                 SELECT DATE(%s) AS stock_date, 
                     COALESCE(yesterday.product_id, products.id) AS product_id, 
-                    COALESCE(yesterday.name, products.name) AS name, 
-                    COALESCE(yesterday.category_id, products.category_id) AS category_id,
+                    products.name, 
+                    products.category_id,
                     COALESCE(yesterday.purchase_price, products.purchase_price) AS purchase_price,
                     COALESCE(yesterday.selling_price, products.selling_price) AS selling_price,
                     COALESCE((yesterday.opening+yesterday.additions), 0) AS opening,
