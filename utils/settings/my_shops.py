@@ -141,7 +141,7 @@ class MyShops():
             elif request.form['action'] == 'switch':
                 shop_id = request.form['shop_id']
                 self.switch(shop_id)
-                return redirect(url_for('logout'))
+                return redirect(url_for('dashboard'))
                     
             elif request.form['action'] == 'delete':
                 shop_id = request.form['shop_id']
