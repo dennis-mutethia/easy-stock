@@ -127,7 +127,7 @@ class Companies():
             elif request.form['action'] == 'access':
                 shop_id = request.form['id']
                 self.access_shop(shop_id)
-                return redirect(url_for('logout'))
+                return redirect(url_for('dashboard'))
                     
             elif request.form['action'] == 'delete':
                 company_id = request.form['company_id']
