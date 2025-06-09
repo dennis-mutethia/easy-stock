@@ -31,7 +31,7 @@
                     {% if total_diff < 0 %} 
                     SHORT
                     {% elif total_diff > 0 %} 
-                    TIPs
+                    EXCESS
                     {% endif %}
                 </th>
             </tr>
@@ -52,7 +52,7 @@
                 <th class="text-center">EXPECTED AMOUNT</th>
                 <th class="text-center">TOTAL RECEIVED</th>
                 <th class="text-center">DIFFERENCE</th>
-                <th class="text-center">TIPs / SHORTs</th>
+                <th class="text-center">EXCESS / SHORT</th>
             </tr>
         </thead>
         <tbody>
@@ -75,7 +75,7 @@
                     {% if diff < 0 %} 
                     SHORT
                     {% elif diff > 0 %} 
-                    TIPs
+                    EXCESS
                     {% endif %}
                 </td>
             </tr>
@@ -91,7 +91,7 @@
                     {% if ns.total_diff < 0 %} 
                     SHORT
                     {% elif ns.total_diff > 0 %} 
-                    TIPs
+                    EXCESS
                     {% endif %}
                 </th>
             </tr>
