@@ -57,7 +57,7 @@ class StockTake():
             WHERE shop_id = %s
         ),
         all_stock AS(
-            SELECT id, stock_date, product_id, opening, additions, selling_price, purchase_price
+            SELECT id, stock_date, product_id, COALESCE(opening,0) AS opening, COALESCE(additions,0) AS additions, selling_price, purchase_price
             FROM stock 
             WHERE shop_id = %s
         ),  
