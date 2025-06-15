@@ -57,10 +57,7 @@ class StockTake():
             WHERE shop_id = %s
         ),
         all_stock AS(
-            SELECT id, stock_date, product_id, 
-            CASE WHEN opening IS NAN THEN 0 ELSE opening END AS opening,
-            CASE WHEN additions IS NAN THEN 0 ELSE additions END AS additions,
-            selling_price, purchase_price
+            SELECT id, stock_date, product_id, opening, additions, selling_price, purchase_price
             FROM stock 
             WHERE shop_id = %s
         ),  
