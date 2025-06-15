@@ -23,7 +23,7 @@ class StockTake():
                 WHERE shop_id = %s
             ),
             yesterday AS (
-                SELECT product_id, purchase_price, selling_price, opening, additions
+                SELECT product_id, purchase_price, selling_price, COALESCE(opening,0) AS opening, COALESCE(additions,0) AS additions
                 FROM stock
                 WHERE DATE(stock_date) = DATE(%s) - 1
             ),
