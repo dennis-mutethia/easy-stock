@@ -25,7 +25,7 @@ class StockTake():
             yesterday AS (
                 SELECT product_id, purchase_price, selling_price, opening, additions
                 FROM stock
-                WHERE DATE(stock_date) = MAX(stock_date)
+                WHERE DATE(stock_date) = DATE(%s)-1
             ),
             today AS (
                 SELECT DATE(%s) AS stock_date, 
@@ -42,7 +42,7 @@ class StockTake():
             SELECT * FROM today
             ON CONFLICT (stock_date, product_id, shop_id) DO NOTHING
             """
-            params = [current_user.shop.id, stock_date, current_user.shop.id, current_user.id]
+            params = [current_user.shop.id, stock_date, stock_date, current_user.shop.id, current_user.id]
      
             cursor.execute(query, tuple(params))
             self.db.conn.commit()
