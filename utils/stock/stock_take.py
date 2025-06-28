@@ -42,7 +42,7 @@ class StockTake():
             SELECT * FROM today
             ON CONFLICT (stock_date, product_id, shop_id) DO NOTHING
             """
-            params = [current_user.shop.id, stock_date, stock_date, current_user.shop.id, current_user.id]
+            params = [current_user.shop.id, stock_date, current_user.shop.id, current_user.id]
      
             cursor.execute(query, tuple(params))
             self.db.conn.commit()
@@ -79,7 +79,7 @@ class StockTake():
         LEFT JOIN yesterday ON yesterday.product_id = today.product_id            
         WHERE (today.opening + today.additions) >= %s        
         """
-        params = [current_user.shop.id, current_user.shop.id, stock_date, in_stock]
+        params = [current_user.shop.id, current_user.shop.id,stock_date,stock_date, in_stock]
 
         if search:
             query += " AND today.name LIKE %s"
