@@ -17,7 +17,7 @@
                 <th class="text-center">LOCATION</th>
                 <th class="text-center">SHOP TYPE</th>
                 <th colspan="2" class="text-center">
-                    {% if current_user.user_level.id == 0 %}
+                    {% if current_user.user_level.id in [0, 1] %}
                     <a href="#" class="btn btn-xs btn-primary btn-flat" style="width: 100%" data-toggle="modal" onclick="addNewShop();"
                         data-target="#newModal">Add New Shop</a>
                     {% else %}
