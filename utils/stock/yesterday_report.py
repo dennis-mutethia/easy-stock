@@ -15,6 +15,7 @@ class YesterdayStockReport():
         search = ''
         category_id = 0   
         current_date = datetime.now(pytz.timezone("Africa/Nairobi")).strftime('%Y-%m-%d')
+        max_date = (datetime.now(pytz.timezone("Africa/Nairobi")) - timedelta(days=1)).strftime('%Y-%m-%d')
         stock_date = current_date   
         if request.method == 'GET':   
             try:    
@@ -29,5 +30,5 @@ class YesterdayStockReport():
         product_categories = ProductsCategories(self.db).fetch()
         stocks = self.stock_take.fetch(stock_date, search, category_id)
         return render_template('stock/yesterday-stock-report.html', helper=Helper(), menu='stock', sub_menu='stock_report',
-                               product_categories=product_categories, stocks=stocks, 
+                               product_categories=product_categories, stocks=stocks, max_date=max_date,
                                page_title='Stock Report', stock_date=stock_date, current_date=current_date, search=search, category_id=category_id)
