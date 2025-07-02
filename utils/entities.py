@@ -1,3 +1,4 @@
+import math
 from flask_login import UserMixin
 
 class User(UserMixin):
@@ -83,12 +84,13 @@ class Stock():
         self.product_id = product_id   
         self.name = name     
         self.category_name = category_name   
-        self.yesterday_opening = yesterday_opening 
-        self.yesterday_additions = yesterday_additions 
-        self.opening = opening   
-        self.additions = additions   
-        self.selling_price = selling_price
-        self.purchase_price = purchase_price
+         # Handle None or NaN for numeric fields
+        self.yesterday_opening = 0 if yesterday_opening is None or (isinstance(yesterday_opening, float) and math.isnan(yesterday_opening)) else yesterday_opening
+        self.yesterday_additions = 0 if yesterday_additions is None or (isinstance(yesterday_additions, float) and math.isnan(yesterday_additions)) else yesterday_additions
+        self.opening = 0 if opening is None or (isinstance(opening, float) and math.isnan(opening)) else opening
+        self.additions = 0 if additions is None or (isinstance(additions, float) and math.isnan(additions)) else additions
+        self.selling_price = 0 if selling_price is None or (isinstance(selling_price, float) and math.isnan(selling_price)) else selling_price
+        self.purchase_price = 0 if purchase_price is None or (isinstance(purchase_price, float) and math.isnan(purchase_price)) else purchase_price
 
 class Customer():
     def __init__(self, id, name, phone):
