@@ -82,8 +82,12 @@ class StockTake():
             JOIN products ON products.id = all_stock.product_id
             WHERE DATE(stock_date) = DATE(%s)
         )
-        SELECT today.id, today.product_id, today.name, product_categories.name, COALESCE(yesterday.opening,0), COALESCE(yesterday.additions,0),
-            today.opening, today.additions, today.selling_price, today.purchase_price
+        SELECT today.id, today.product_id, today.name, product_categories.name, 
+            CASE WHEN yesterday.opening = 'Nan' THEN 0 ELSE yesterday.opening END AS yesterday_opening,
+            CASE WHEN yesterday.additions = 'Nan' THEN 0 ELSE yesterday.additions END AS yesterday_additions,
+            CASE WHEN today.opening = 'Nan' THEN 0 ELSE today.opening END AS opening,
+            CASE WHEN today.additions = 'Nan' THEN 0 ELSE today.additions END AS additions,
+            today.selling_price, today.purchase_price
         FROM today
         INNER JOIN product_categories ON product_categories.id = today.category_id
         LEFT JOIN yesterday ON yesterday.product_id = today.product_id            
