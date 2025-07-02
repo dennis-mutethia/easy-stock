@@ -6,9 +6,14 @@
 <!-- ============================================================== -->
 <div class="container-fluid table-responsive bg-dark">
     <form id="filter-frm" method="GET" class="row">
-        <div class="col-6">
+        <!-- <div class="col-6">
             <a href="#" class="btn btn-xs btn-success btn-flat text-white" style="font-weight: bold;" onclick="addNewProduct()"
                     data-toggle="modal" data-target="#newModal">ADD NEW PRODUCT</a>
+        </div> -->
+        
+        <div class="col-6">
+            <input class="text-center" onchange="applyFilter()" style="height: 25px" type="date" id="stock_date" name="stock_date"
+                required="required" value="{{ stock_date }}" max="{{ max_date }}" />
         </div>
         <div class="col-6">
             <select onchange="applyFilter()" name="category_id" id="category_id" style="width: 100%;">
