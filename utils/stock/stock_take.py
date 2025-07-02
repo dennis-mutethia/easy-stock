@@ -66,11 +66,16 @@ class StockTake():
             FROM stock 
             WHERE shop_id = %s
         ),  
+        max_date AS(
+            SELECT MAX(stock_date) md
+            FROM stock 
+            WHERE shop_id =  %s AND DATE(stock_date) < DATE(%s)
+        ),
         yesterday AS (
             SELECT product_id, opening, additions
-            FROM all_stock
-            WHERE DATE(stock_date) = DATE(%s) - 1
-        ), 
+            FROM stock
+            INNER JOIN max_date ON max_date.md = DATE(stock.stock_date)
+        ),
         today AS(
             SELECT all_stock.id, product_id, name, category_id, COALESCE(opening, 0) AS opening, COALESCE(additions,0) AS additions, selling_price, purchase_price
             FROM all_stock
@@ -84,7 +89,7 @@ class StockTake():
         LEFT JOIN yesterday ON yesterday.product_id = today.product_id            
         WHERE (today.opening + today.additions) >= %s        
         """
-        params = [current_user.shop.id, current_user.shop.id,stock_date,stock_date, in_stock]
+        params = [current_user.shop.id, current_user.shop.id, current_user.shop.id,stock_date, stock_date, in_stock]
 
         if search:
             query += " AND today.name LIKE %s"
