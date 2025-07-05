@@ -47,15 +47,15 @@ class Expenses():
             else:
                 return None
         
-    def add(self, name, amount):
+    def add(self, expense_date, name, amount):
         self.db.ensure_connection()            
         query = """
-        INSERT INTO expenses(date, name, amount, shop_id, created_at, created_by) 
-        VALUES(DATE(CURRENT_TIMESTAMP AT TIME ZONE 'Africa/Nairobi'), %s, %s, %s, CURRENT_TIMESTAMP AT TIME ZONE 'Africa/Nairobi', %s)
+        INSERT INTO expenses(date, name, amount, shop_id, created_at, created_by)
+        VALUES(DATE(%s), %s, %s, %s, CURRENT_TIMESTAMP AT TIME ZONE 'Africa/Nairobi', %s)
         RETURNING id
         """
 
-        params = (name.upper(), amount, current_user.shop.id, current_user.id)
+        params = (expense_date, name.upper(), amount, current_user.shop.id, current_user.id)
         try:
             with self.db.conn.cursor() as cursor:
                 cursor.execute(query, tuple(params))
@@ -91,10 +91,11 @@ class Expenses():
                 
         if request.method == 'POST':       
             if request.form['action'] == 'add':
+                expense_date = request.form['expense_date']
                 name = request.form['name']
                 amount = request.form['amount']                
-                self.add(name, amount)                     
-                
+                self.add(expense_date, name, amount)                     
+
             elif request.form['action'] == 'delete':
                 expense_id = request.form['expense_id']
                 self.delete(expense_id)
