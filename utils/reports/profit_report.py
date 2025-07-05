@@ -36,7 +36,10 @@ class ProfitReport():
                     AND DATE(tomorrow.stock_date) = DATE(today.stock_date) + 1
             ),
             totals AS(
-                SELECT report_date, SUM(sold*selling_price) AS total_sales, SUM(sold*purchase_price) AS total_cost
+                SELECT 
+                    report_date, 
+                    SUM(sold*selling_price) AS total_sales, 
+                    SUM(sold*purchase_price) AS total_cost
                 FROM sales  
                 GROUP BY report_date
             ),
