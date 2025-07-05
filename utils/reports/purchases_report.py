@@ -47,7 +47,7 @@ class PurchasesReport():
          
     def __call__(self):
         current_date = datetime.now(pytz.timezone("Africa/Nairobi")).strftime('%Y-%m-%d')
-        from_date = to_date = current_date
+        from_date  = current_date
         category_id = 0
         
         if request.method == 'GET':   
@@ -66,5 +66,5 @@ class PurchasesReport():
         product_categories = ProductsCategories(self.db).fetch()
         return render_template('reports/purchases-report.html', page_title='Reports > Purchases', helper=Helper(), menu='reports', sub_menu='purchases_report',
                                purchases=purchases, grand_total=grand_total, product_categories=product_categories, category_id=category_id,
-                               current_date=current_date, from_date=from_date, to_date=to_date
+                               current_date=current_date, from_date=from_date
                             )
