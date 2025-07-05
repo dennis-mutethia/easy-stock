@@ -82,7 +82,7 @@ class StockTake():
             SELECT 
                 product_id, 
                 CASE WHEN opening = 'Nan' THEN 0 ELSE opening END AS opening,
-                CASE WHEN additions = 'Nan' THEN 0 ELSE additions END AS additions, 
+                CASE WHEN additions = 'Nan' THEN 0 ELSE additions END AS additions 
             FROM stock
             INNER JOIN max_date ON max_date.md = DATE(stock.stock_date)
         ),

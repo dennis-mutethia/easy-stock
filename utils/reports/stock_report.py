@@ -36,8 +36,8 @@ class StockReport():
                     products.name AS item_name, 
                     products.category_id,
                     pc.name AS category_name, 
-                    CASE WHEN opening = 'Nan' THEN 0 ELSE opening END AS opening,
-                    CASE WHEN additions = 'Nan' THEN 0 ELSE additions END AS additions,  
+                    CASE WHEN stock.opening = 'Nan' THEN 0 ELSE stock.opening END AS opening,
+                    CASE WHEN stock.additions = 'Nan' THEN 0 ELSE stock.additions END AS additions,  
                     stock.selling_price
                 FROM stock
                 INNER JOIN products ON products.id = stock.product_id
