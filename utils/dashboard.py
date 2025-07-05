@@ -49,19 +49,25 @@ class Dashboard():
                 SELECT 
                     stock_date, 
                     product_id, 
-                    COALESCE(stock.opening, 0) AS opening, 
-                    COALESCE(stock.additions, 0) AS additions 
+                    CASE WHEN opening = 'Nan' THEN 0 ELSE opening END AS opening,
+                    CASE WHEN additions = 'Nan' THEN 0 ELSE additions END AS additions
                 FROM stock
                 WHERE shop_id = %s
             ),
             today AS (
-                SELECT product_id, name, opening, additions
+                SELECT 
+                    product_id, 
+                    name, 
+                    CASE WHEN opening = 'Nan' THEN 0 ELSE opening END AS opening,
+                    CASE WHEN additions = 'Nan' THEN 0 ELSE additions END AS additions
                 FROM all_stock
                 INNER JOIN products ON products.id = all_stock.product_id
                 WHERE DATE(stock_date) = DATE(%s)
             ),
             tomorrow AS (
-                SELECT product_id, opening
+                SELECT 
+                    product_id, 
+                    CASE WHEN opening = 'Nan' THEN 0 ELSE opening END AS opening
                 FROM all_stock
                 WHERE DATE(stock_date) = DATE(%s) + 1
             ),

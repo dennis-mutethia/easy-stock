@@ -18,8 +18,8 @@ class StatementOfAccount():
                 SELECT 
                     stock_date, 
                     product_id, 
-                    COALESCE(opening, 0) AS opening, 
-                    COALESCE(additions, 0) AS additions, 
+                    CASE WHEN opening = 'Nan' THEN 0 ELSE opening END AS opening,
+                    CASE WHEN additions = 'Nan' THEN 0 ELSE additions END AS additions, 
                     purchase_price,
                     selling_price
                 FROM stock

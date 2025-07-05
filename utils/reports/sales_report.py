@@ -27,8 +27,8 @@ class SalesReport():
                     products.name AS item_name, 
                     products.category_id,
                     pc.name AS category_name, 
-                    COALESCE(stock.opening, 0) AS opening, 
-                    COALESCE(stock.additions, 0) AS additions, 
+                    CASE WHEN opening = 'Nan' THEN 0 ELSE opening END AS opening,
+                    CASE WHEN additions = 'Nan' THEN 0 ELSE additions END AS additions, 
                     stock.selling_price
                 FROM stock
                 INNER JOIN products ON products.id = stock.product_id
@@ -41,7 +41,9 @@ class SalesReport():
                 WHERE DATE(stock_date) = DATE(%s)
             ),
             tomorrow AS (
-                SELECT *
+                SELECT 
+                    product_id,
+                    CASE WHEN opening = 'Nan' THEN 0 ELSE opening END AS opening
                 FROM all_stock
                 WHERE DATE(stock_date) = DATE(%s) + 1
             ),

@@ -18,8 +18,8 @@ class ProfitReport():
                 SELECT 
                     stock_date, 
                     product_id, 
-                    COALESCE(opening, 0) AS opening, 
-                    COALESCE(additions, 0) AS additions, 
+                    CASE WHEN opening = 'Nan' THEN 0 ELSE opening END AS opening,
+                    CASE WHEN additions = 'Nan' THEN 0 ELSE additions END AS additions,
                     purchase_price,
                     selling_price
                 FROM stock
@@ -30,7 +30,7 @@ class ProfitReport():
                     today.stock_date AS report_date, 
                     today.purchase_price,
                     today.selling_price,
-                    (today.opening + today.additions -tomorrow.opening) AS sold
+                    (today.opening + today.additions - tomorrow.opening) AS sold
                 FROM all_stock AS today
                 INNER JOIN all_stock AS tomorrow ON tomorrow.product_id = today.product_id
                     AND DATE(tomorrow.stock_date) = DATE(today.stock_date) + 1

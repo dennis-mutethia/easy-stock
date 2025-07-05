@@ -62,7 +62,14 @@ class StockTake():
             WHERE shop_id = %s
         ),
         all_stock AS(
-            SELECT id, stock_date, product_id, COALESCE(opening,0) AS opening, COALESCE(additions,0) AS additions, selling_price, purchase_price
+            SELECT 
+                id, 
+                stock_date, 
+                product_id, 
+                CASE WHEN opening = 'Nan' THEN 0 ELSE opening END AS opening,
+                CASE WHEN additions = 'Nan' THEN 0 ELSE additions END AS additions, 
+                selling_price, 
+                purchase_price
             FROM stock 
             WHERE shop_id = %s
         ),  
@@ -72,12 +79,23 @@ class StockTake():
             WHERE shop_id =  %s AND DATE(stock_date) < DATE(%s)
         ),
         yesterday AS (
-            SELECT product_id, opening, additions
+            SELECT 
+                product_id, 
+                CASE WHEN opening = 'Nan' THEN 0 ELSE opening END AS opening,
+                CASE WHEN additions = 'Nan' THEN 0 ELSE additions END AS additions, 
             FROM stock
             INNER JOIN max_date ON max_date.md = DATE(stock.stock_date)
         ),
         today AS(
-            SELECT all_stock.id, product_id, name, category_id, COALESCE(opening, 0) AS opening, COALESCE(additions,0) AS additions, selling_price, purchase_price
+            SELECT 
+                all_stock.id, 
+                product_id, 
+                name, 
+                category_id, 
+                CASE WHEN opening = 'Nan' THEN 0 ELSE opening END AS opening,
+                CASE WHEN additions = 'Nan' THEN 0 ELSE additions END AS additions, 
+                selling_price, 
+                purchase_price
             FROM all_stock
             JOIN products ON products.id = all_stock.product_id
             WHERE DATE(stock_date) = DATE(%s)
