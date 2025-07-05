@@ -87,13 +87,13 @@ class SalesReport():
          
     def __call__(self):
         yesterday = datetime.now(pytz.timezone("Africa/Nairobi")) - timedelta(days=1)
+        report_date = yesterday.strftime('%Y-%m-%d')
         max_date = yesterday.strftime('%Y-%m-%d')
-        report_date = max_date
         category_id = 0
         
         if request.method == 'GET':   
             try:    
-                report_date = request.args.get('from_date', report_date)
+                report_date = request.args.get('report_date', report_date)
                 category_id = int(request.args.get('category_id', 0))
             except Exception as e:
                 print(f"An error occurred: {e}")               
