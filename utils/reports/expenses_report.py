@@ -15,7 +15,12 @@ class ExpensesReport():
         self.db.ensure_connection()
         with self.db.conn.cursor() as cursor:
             query = """
-            SELECT id, date, name, amount, created_by
+            SELECT 
+                id, 
+                date, 
+                name, 
+                amount, 
+                created_by
             FROM expenses
             WHERE (DATE(date) BETWEEN DATE(%s) AND DATE(%s)) AND shop_id = %s
             ORDER BY date
