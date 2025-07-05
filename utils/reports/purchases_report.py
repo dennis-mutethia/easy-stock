@@ -21,7 +21,12 @@ class PurchasesReport():
                 WHERE shop_id = %s
             )
             
-            SELECT s.stock_date, p.name, pc.name AS category_name, s.purchase_price, additions 
+            SELECT 
+                s.stock_date, 
+                p.name, 
+                pc.name AS category_name, 
+                s.purchase_price, 
+                CASE WHEN additions = 'Nan' THEN 0 ELSE additions END AS additions
             FROM stock s
             INNER JOIN products p ON p.id = s.product_id
             LEFT JOIN product_categories pc ON pc.id= p.category_id   
