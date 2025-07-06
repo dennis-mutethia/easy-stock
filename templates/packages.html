@@ -46,7 +46,7 @@
                         <tr>
                             <th>AMOUNT PAID:</th>
                             <td>
-                                {{ helper.format_number_with_commas(package.pay/2) }}
+                                {{ helper.format_number_with_commas(package.pay) }}
                             </td>
                         </tr>
                         <tr>
@@ -68,7 +68,7 @@
     <div class="row">
         {% for pkg in packages %}
         {% if pkg.amount > 0 %}
-        <a class="col-6" href="#" onclick="popup({{ pkg.pay/2 }}, '{{ helper.format_number_with_commas(pkg.pay/2) }}', '{{ pkg.description }}')" data-toggle="modal" data-target="#newModal">
+        <a class="col-6" href="#" onclick="popup({{ pkg.pay }}, '{{ helper.format_number_with_commas(pkg.pay/2) }}', '{{ pkg.description }}')" data-toggle="modal" data-target="#newModal">
             <div class="alert alert-{{ pkg.color }}" role="alert" >
                 <h4 class="alert-heading">{{ pkg.name }}</h4>
                 <p>{{ pkg.description }}</p>
@@ -76,9 +76,9 @@
                 <p class="mb-0">
                     Ksh.
                     {% if pkg.amount > pkg.pay %}
-                        <s>{{ helper.format_number_with_commas(pkg.amount/2) }}</s>
+                        <s>{{ helper.format_number_with_commas(pkg.amount) }}</s>
                     {% endif %}
-                    {{ helper.format_number_with_commas(pkg.pay/2) }}
+                    {{ helper.format_number_with_commas(pkg.pay) }}
                 </p>
                 <hr />
                 <p class="mb-0">{{ pkg.offer }}</p>
