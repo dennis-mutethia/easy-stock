@@ -3,7 +3,7 @@ from datetime import datetime
 from flask import redirect, render_template, request, url_for
 from flask_login import login_user
 
-from utils.stock.stock_take import StockTake
+from daily_stock_loader import DailyStockLoader
 from utils.settings.my_shops import MyShops
 from utils.settings.system_users import SystemUsers
 
@@ -18,7 +18,6 @@ class Login():
         
         if user:        
             login_user(user)
-            StockTake(self.db).load(datetime.now(pytz.timezone("Africa/Nairobi")).strftime('%Y-%m-%d'))
             if user.user_level.id in [0, 1]:               
                 return redirect(url_for('dashboard'))
             else:
@@ -53,7 +52,7 @@ class Login():
         login_user(user)
         self.db.import_product_categories_template_data(shop_id, shop_type_id)
         self.db.import_products_template_data(shop_id, shop_type_id)
-        StockTake(self.db).load(current_date) 
+        DailyStockLoader().load(current_date, register=True) 
         return redirect(url_for('dashboard'))         
     
     def reset_password(self):

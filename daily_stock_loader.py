@@ -1,3 +1,4 @@
+from flask_login import current_user
 import pytz
 from datetime import datetime
 
@@ -7,7 +8,7 @@ class DailyStockLoader():
     def __init__(self): 
         self.db = Db()
                     
-    def load(self, stock_date):
+    def load(self, stock_date, register=False):
         self.db.create_current_month_partition()
         
         self.db.ensure_connection()
@@ -37,10 +38,19 @@ class DailyStockLoader():
                 LEFT JOIN yesterday ON yesterday.product_id = products.id
             )
             INSERT INTO stock (stock_date, product_id, purchase_price, selling_price, opening, additions, shop_id, created_at, created_by) 
-            SELECT * FROM today
-            ON CONFLICT (stock_date, product_id, shop_id) DO NOTHING
+            SELECT * FROM today            
             """
+            
             params = [stock_date, stock_date]
+            if register:
+                query += """
+                WHERE shop_id = %s
+                """
+                params.append(current_user.shop.id)
+            
+            query += """  
+            ON CONFLICT (stock_date, product_id, shop_id) DO NOTHING
+            """          
      
             cursor.execute(query, tuple(params))
             self.db.conn.commit()

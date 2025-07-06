@@ -10,48 +10,7 @@ from utils.inventory.products_categories import ProductsCategories
 class StockTake():
     def __init__(self, db): 
         self.db = db
-                    
-    def load(self, stock_date):
-        self.db.create_current_month_partition()
-        
-        self.db.ensure_connection()
-        with self.db.conn.cursor() as cursor:     
-            query = """         
-            WITH products AS (
-                SELECT id, purchase_price, selling_price
-                FROM products 
-                WHERE shop_id = %s
-            ),
-            max_date AS(
-              SELECT MAX(stock_date) md
-              FROM stock 
-              WHERE shop_id =  %s AND DATE(stock_date) < DATE(%s)
-            ),
-            yesterday AS (
-                SELECT product_id, purchase_price, selling_price, opening, additions
-                FROM stock
-                INNER JOIN max_date ON max_date.md = DATE(stock.stock_date)
-            ),
-            today AS (
-                SELECT DATE(%s) AS stock_date, 
-                    COALESCE(yesterday.product_id, products.id) AS product_id, 
-                    COALESCE(yesterday.purchase_price, products.purchase_price) AS purchase_price,
-                    COALESCE(yesterday.selling_price, products.selling_price) AS selling_price,
-                    COALESCE((yesterday.opening+yesterday.additions), 0) AS opening,
-                    0 AS additions,
-                    %s AS shop_id, CURRENT_TIMESTAMP AT TIME ZONE 'Africa/Nairobi' AS created_at, %s AS created_by              
-                FROM products
-                LEFT JOIN yesterday ON yesterday.product_id = products.id
-            )
-            INSERT INTO stock (stock_date, product_id, purchase_price, selling_price, opening, additions, shop_id, created_at, created_by) 
-            SELECT * FROM today
-            ON CONFLICT (stock_date, product_id, shop_id) DO NOTHING
-            """
-            params = [current_user.shop.id, current_user.shop.id, stock_date, stock_date, current_user.shop.id, current_user.id]
-     
-            cursor.execute(query, tuple(params))
-            self.db.conn.commit()
-    
+   
     def fetch(self, stock_date, search, category_id, in_stock=0):
         self.db.ensure_connection()
     
@@ -229,7 +188,6 @@ class StockTake():
         category_id = 0   
         current_date = datetime.now(pytz.timezone("Africa/Nairobi")).strftime('%Y-%m-%d')
         stock_date = current_date   
-        self.load(stock_date)
         
         if request.method == 'GET':   
             try:    

@@ -3,9 +3,9 @@ from datetime import datetime
 from flask import redirect, render_template, request, url_for
 from flask_login import current_user
 
+from daily_stock_loader import DailyStockLoader
 from utils.entities import Shop, ShopType
 from utils.helper import Helper
-from utils.stock.stock_take import StockTake
 
 class MyShops():
     def __init__(self, db): 
@@ -131,7 +131,7 @@ class MyShops():
                     shop_id = self.add(name, shop_type_id, company_id, location, created_by)
                     self.db.import_product_categories_template_data(shop_id, shop_type_id)
                     self.db.import_products_template_data(shop_id, shop_type_id)
-                    StockTake(self.db).load(current_date)
+                    DailyStockLoader().load(current_date, register=True) 
                     toastr_message = f'{name} Added Successfully'
                 else:
                     shop_id = request.form['shop_id']
