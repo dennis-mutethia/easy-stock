@@ -1,4 +1,4 @@
-name: demo stock data
+name: daily stock loader
 
 on:
   schedule:
