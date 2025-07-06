@@ -4,31 +4,33 @@ from flask import render_template, request
 
 from utils.helper import Helper
 from utils.inventory.products_categories import ProductsCategories
-from utils.stock.stock_take import StockTake
+from utils.reports.stock_report import StockReport
 
 class YesterdayStockReport():
     def __init__(self, db): 
         self.db = db
-        self.stock_take = StockTake(db)
-      
+        self.stock_report = StockReport(db)    
+    
     def __call__(self):
-        search = ''
-        category_id = 0   
-        current_date = datetime.now(pytz.timezone("Africa/Nairobi")).strftime('%Y-%m-%d')
-        max_date = (datetime.now(pytz.timezone("Africa/Nairobi")) - timedelta(days=1)).strftime('%Y-%m-%d')
-        stock_date = current_date   
+        yesterday = datetime.now(pytz.timezone("Africa/Nairobi")) - timedelta(days=1)
+        max_date = yesterday.strftime('%Y-%m-%d')
+        report_date = max_date
+        category_id = 0
+        
         if request.method == 'GET':   
             try:    
-                search = request.args.get('search', '')
+                report_date = request.args.get('report_date', report_date)
                 category_id = int(request.args.get('category_id', 0))
-                stock_date = request.args.get('stock_date', default=current_date)
-            except ValueError as e:
-                print(f"Error converting category_id: {e}")
             except Exception as e:
-                print(f"An error occurred: {e}")
-             
+                print(f"An error occurred: {e}")               
+        
+        stocks = self.stock_report.fetch(report_date, category_id) 
+        grand_total =  0
+        for stock in stocks:
+            total = stock.selling_price * stock.sold
+            grand_total = grand_total + total
+        
         product_categories = ProductsCategories(self.db).fetch()
-        stocks = self.stock_take.fetch(stock_date, search, category_id)
-        return render_template('stock/yesterday-stock-report.html', helper=Helper(), menu='stock', sub_menu='stock_report',
-                               product_categories=product_categories, stocks=stocks, max_date=max_date,
-                               page_title='Stock Report', stock_date=stock_date, current_date=current_date, search=search, category_id=category_id)
+        return render_template('reports/stock-report.html', page_title='Reports > Stock', helper=Helper(), menu='stock', sub_menu='stock_report',
+                               stocks=stocks, grand_total=grand_total, product_categories=product_categories, category_id=category_id,
+                               max_date=max_date, report_date=report_date)

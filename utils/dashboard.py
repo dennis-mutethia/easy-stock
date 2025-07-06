@@ -29,10 +29,10 @@ class Dashboard():
             qtys = []
             bgcolors = []
             for datum in data:  
-                items.append(f"'UnPaid Debts', 'Paid Debts'")
+                items.append("'UnPaid Debts', 'Paid Debts'")
                 qtys.append(datum[0] if datum[0] is not None else 0)
                 qtys.append(datum[1] if datum[1] is not None else 0)
-                bgcolors.append(f"'red','lime'")
+                bgcolors.append("'red','lime'")
 
             return items, qtys, bgcolors
     
@@ -75,8 +75,7 @@ class Dashboard():
                 SELECT today.name AS item_name, (today.opening + today.additions - tomorrow.opening) AS sold
                 FROM today
                 INNER JOIN tomorrow ON tomorrow.product_id = today.product_id
-            )
-        
+            )        
             SELECT item_name, sold
             FROM source 
             WHERE sold > 0         
@@ -106,8 +105,8 @@ class Dashboard():
                 SELECT 
                     stock_date, 
                     product_id, 
-                    COALESCE(opening, 0) AS opening, 
-                    COALESCE(additions, 0) AS additions, 
+                    CASE WHEN opening = 'Nan' THEN 0 ELSE opening END AS opening,
+                    CASE WHEN additions = 'Nan' THEN 0 ELSE additions END AS additions,
                     purchase_price,
                     selling_price
                 FROM stock
@@ -150,8 +149,8 @@ class Dashboard():
                 SELECT 
                     stock_date, 
                     product_id, 
-                    COALESCE(opening, 0) AS opening, 
-                    COALESCE(additions, 0) AS additions, 
+                    CASE WHEN opening = 'Nan' THEN 0 ELSE opening END AS opening,
+                    CASE WHEN additions = 'Nan' THEN 0 ELSE additions END AS additions,
                     purchase_price,
                     selling_price
                 FROM stock
