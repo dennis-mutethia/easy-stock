@@ -4,27 +4,35 @@
 <!-- ============================================================== -->
 <!-- Container fluid  -->
 <!-- ============================================================== -->
+<style>
+    select {
+        width: 100%;
+        height: 100%;
+    }
+</style>
 <div class="container-fluid card table-responsive bg-dark">
     <form id="filter-frm" method="GET" class="row">
         <div class="col-6">
-            <input class="text-center" onchange="applyFilter()" style="height: 25px" type="date" id="report_date" name="report_date"
-                required="required" value="{{ report_date }}" max="{{ max_date }}" />
+            <input class="text-center" onchange="applyFilter()" type="date" id="report_date"
+                name="report_date" required="required" value="{{ report_date }}" max="{{ max_date }}" />
         </div>
         <div class="col-6">
-            <select class="text-center" onchange="applyFilter()" style="height: 25px" name="category_id" id="category_id" style="width: 100%;">
+            <select class="text-center" onchange="applyFilter()" name="category_id" id="category_id">
                 <option value="0">Filter by Category</option>
                 {% for product_category in product_categories %}
-                <option value="{{ product_category.id }}" {% if product_category.id == category_id %} selected {% endif %}>{{ product_category.name }}</option>
+                <option value="{{ product_category.id }}" {% if product_category.id==category_id %} selected {% endif
+                    %}>{{ product_category.name }}</option>
                 {% endfor %}
             </select>
         </div>
     </form><br />
-    <table class="table-bordered table-striped"> 
+    <table class="table-bordered table-striped">
         <style>
-            th, td {
+            th,
+            td {
                 font-size: x-small;
             }
-        </style>      
+        </style>
         <thead>
             <tr>
                 <th class="text-center">PRODUCT</th>
@@ -42,10 +50,13 @@
             <tr>
                 <td>{{ stock.name }}</td>
                 <td>{{ stock.category_name }}</td>
-                <td class="text-center">{{ helper.format_number_with_commas(stock.opening) }} {{ '+' ~ helper.format_number_with_commas(stock.additions) if stock.additions>0 }}</td> 
-                <td class="text-center">{{ helper.format_number_with_commas(helper.format_number(stock.opening + stock.additions - stock.sold)) }}</td>
+                <td class="text-center">{{ helper.format_number_with_commas(stock.opening) }} {{ '+' ~
+                    helper.format_number_with_commas(stock.additions) if stock.additions>0 }}</td>
+                <td class="text-center">{{ helper.format_number_with_commas(helper.format_number(stock.opening +
+                    stock.additions - stock.sold)) }}</td>
                 <td class="text-center">{{ helper.format_number_with_commas(helper.format_number(stock.sold)) }}</td>
-                <td class="text-center">{{ helper.format_number_with_commas(helper.format_number(stock.selling_price)) }}</td>
+                <td class="text-center">{{ helper.format_number_with_commas(helper.format_number(stock.selling_price))
+                    }}</td>
                 <td class="text-center">{{ helper.format_number_with_commas(helper.format_number(total))}}</td>
             </tr>
             {% endfor %}
@@ -53,7 +64,8 @@
         <tfoot>
             <tr>
                 <th class="text-center" colspan="6"><b><u>TOTAL SALES</u></b></th>
-                <th class="text-center"><b><u>{{ helper.format_number_with_commas(helper.format_number(grand_total))}}</u></b></th>
+                <th class="text-center"><b><u>{{
+                            helper.format_number_with_commas(helper.format_number(grand_total))}}</u></b></th>
             </tr>
         </tfoot>
     </table>

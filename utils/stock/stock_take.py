@@ -1,7 +1,7 @@
-import pytz
-from datetime import datetime, timedelta
+from datetime import datetime
 from flask import render_template, request
 from flask_login import current_user
+import pytz
 
 from utils.entities import Stock
 from utils.helper import Helper

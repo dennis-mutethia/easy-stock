@@ -1,6 +1,6 @@
+from datetime import datetime
 from flask_login import current_user
 import pytz
-from datetime import datetime
 
 from utils.db import Db
 
