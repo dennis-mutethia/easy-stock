@@ -151,7 +151,7 @@ class CashBox():
         for datum in data:
             if str(datum.date) == report_date:
                 today = datum 
-                total_expected = today.total_sales + today.paid_bills - today.new_bills + today.total_expenses
+                total_expected = today.total_sales + today.paid_bills - today.new_bills - today.total_expenses
                 total_received = today.cash + today.mpesa   
                 total_diff = total_received - total_expected          
         

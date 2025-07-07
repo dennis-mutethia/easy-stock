@@ -59,7 +59,7 @@
             {% set ns = namespace(total_expected=0, total_received=0, total_diff=0) %}
             {% for datum in data %}
 
-            {% set total_expected = datum.total_sales + datum.paid_bills - datum.new_bills + datum.total_expenses %}
+            {% set total_expected = datum.total_sales + datum.paid_bills - datum.new_bills - datum.total_expenses %}
             {% set total_received =datum.cash + datum.mpesa %}
             {% set ns.total_expected = ns.total_expected + total_expected %}    
             {% set ns.total_received = ns.total_received + total_received %}   
