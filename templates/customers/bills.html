@@ -4,9 +4,10 @@
 <!-- ============================================================== -->
 <!-- Container fluid  -->
 <!-- ============================================================== -->
+ 
 <div class="container-fluid card table-responsive bg-dark">
     <form id="filter-frm" method="GET" class="row">
-        <div class="col-4">
+        <div class="col-3">
             <select onchange="applyFilter()" name="bill_status" id="bill_status" style="width: 100%;">
                 <option value="0">All Bills</option>
                 <option {% if bill_status==1 %} selected {% endif %} value="1">Paid Bills
@@ -15,9 +16,8 @@
                 </option>
             </select>
         </div>
-        <div class="col-5">
-            <select class="text-center" onchange="applyFilter()" name="customer_id" id="customer_id"
-                style="width: 100%;">
+        <div class="col-3">
+            <select class="text-center" onchange="applyFilter()" name="customer_id" id="customer_id" style="width: 100%;">
                 <option value="0">All Customers</option>
                 {% for customer in customers %}
                 <option value="{{ customer.id }}" {{ 'selected' if customer_id==customer.id else '' }}>{{ customer.name
@@ -26,7 +26,11 @@
             </select>
         </div>
         <div class="col-3">
-            <a href="#" class="btn btn-xs btn-primary btn-flat" style="width: 100%" data-toggle="modal"
+            <a href="#" class="btn btn-xs btn-primary btn-flat text-center" style="width: 100%" data-toggle="modal"
+                data-target="#newCustomerModal" onclick="addNewCustomer()">New Customer</a>
+        </div>
+        <div class="col-3">
+            <a href="#" class="btn btn-xs btn-warning btn-flat text-center" style="width: 100%" data-toggle="modal"
                 data-target="#newBillModal">New Bill</a>
         </div>
     </form><br />
@@ -156,6 +160,13 @@
                 </div>
                 <div class="modal-body">  
                     <div class="form-group row">
+                        <label class="col-5 text-end control-label col-form-label">Bill Date:</label>
+                        <div class="col-7">
+                            <input required="required" type="date" name="bill_date" id="bill_date" class="form-control input-sm"
+                                value="{{ current_date }}" max="{{ current_date }}">
+                        </div>
+                    </div>
+                    <div class="form-group row">
                         <label class="col-5 text-end control-label col-form-label">Amount:</label>
                         <div class="col-7">
                             <input type="number" name="bill_amount" id="assign_bill_amount" min="0" required
@@ -183,6 +194,40 @@
     </div>
 </div>
 
+<div class="modal fade" id="newCustomerModal" tabindex="-1" role="dialog" aria-labelledby="newCustomerModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <form method="POST" class="form-horizontal">
+                <input type="hidden" id="edit_customer_id" name="id" />
+                <div class="modal-header text-center">
+                    <h5 class="text-center"><span id="customer_header"></span> Customer</h5>
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group row">
+                        <label class="col-3 text-end control-label col-form-label">Name:</label>
+                        <div class="col-9">
+                            <input required="required" type="text" name="name" id="customer_name" class="form-control input-sm"
+                                placeholder="Enter Customer Name">
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <label class="col-3 text-end control-label col-form-label">Phone:</label>
+                        <div class="col-9">
+                            <input id="customer_phone" name="phone" type="number" class="form-control input-sm"
+                                placeholder="Enter Customer Phone" required min="100000000" max="799999999" />
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+                        <button type="submit" id="add_new_customer" name="action" value="add_new_customer" class="btn btn-success">Save
+                            Customer</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
 
 <script>
     function applyFilter() {
@@ -202,6 +247,14 @@
     function assignCustomerBill(id, amount) {
         $('#assign_customer_bill_id').val(id);
         $('#assign_bill_amount').val(amount);        
+    }
+
+    function addNewCustomer(){
+        $("#customer_header").html('Add New');
+        $("#edit_customer_id").val('');
+        $("#customer_name").val('');
+        $("#customer_phone").val('');
+        $("#action").val('add');
     }
 
 </script>

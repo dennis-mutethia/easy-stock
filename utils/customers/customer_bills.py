@@ -12,6 +12,7 @@ from utils.settings.system_users import SystemUsers
 class CustomerBills():
     def __init__(self, db): 
         self.db = db  
+        self.customers = Customers(self.db)
           
     def fetch(self, from_date, to_date, bill_status, customer_id=0):
         self.db.ensure_connection()
@@ -90,15 +91,15 @@ class CustomerBills():
             else:
                 return None
             
-    def add(self, customer_id, bill_amount):
+    def add(self, customer_id, bill_amount, bill_date):
         self.db.ensure_connection()            
         query = """
         INSERT INTO bills(customer_id, total, paid, shop_id, created_at, created_by) 
-        VALUES(%s, %s, 0, %s, CURRENT_TIMESTAMP AT TIME ZONE 'Africa/Nairobi', %s)
+        VALUES(%s, %s, 0, %s, %s, %s)
         RETURNING id
         """
 
-        params = (customer_id, bill_amount, current_user.shop.id, current_user.id)
+        params = (customer_id, bill_amount, current_user.shop.id, bill_date, current_user.id)
         
         try:
             with self.db.conn.cursor() as cursor:
@@ -164,9 +165,10 @@ class CustomerBills():
             if request.form['action'] == 'assign_customer_bill':
                 bill_id = int(request.form['bill_id'])
                 bill_amount = int(request.form['bill_amount'])     
-                customer_id = int(request.form['customer_id'])  
+                customer_id = int(request.form['customer_id']) 
+                bill_date = request.form['bill_date'] 
                 if bill_id == 0:         
-                    self.add(customer_id, bill_amount)
+                    self.add(customer_id, bill_amount, bill_date)
                 else:
                     self.update(bill_id, customer_id, bill_amount)
                 
@@ -183,9 +185,14 @@ class CustomerBills():
                     customer_id = int(request.args.get('customer_id', customer_id))
                     for bill in self.get_bills_to_pay(customer_id, amount_paid):   
                         Payments(self.db).add(bill['id'], bill['pay_amount'], payment_mode_id)                    
-                        self.pay(bill['id'], bill['pay_amount'])                     
+                        self.pay(bill['id'], bill['pay_amount'])    
+                            
+            elif request.form['action'] == 'add_new_customer':
+                name = request.form['name']
+                phone = request.form['phone']
+                self.customers.add(name, phone)                     
         
-        customers = Customers(self.db).fetch()
+        customers = self.customers.fetch()
         payment_modes = self.db.fetch_payment_modes()
         bills = self.fetch(from_date, to_date, bill_status, customer_id) 
         grand_total = grand_paid = cash_total = mpesa_total =  0

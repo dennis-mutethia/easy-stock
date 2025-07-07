@@ -80,10 +80,16 @@ class Customers():
             """
             cursor.execute(query, (id,))
             self.db.conn.commit()
-        
             
-    def __call__(self):        
-        if request.method == 'POST':       
+            query = """
+            DELETE FROM bills
+            WHERE customer_id=%s
+            """
+            cursor.execute(query, (id,))
+            self.db.conn.commit()
+
+    def __call__(self):
+        if request.method == 'POST':
             if request.form['action'] == 'add':
                 name = request.form['name']
                 phone = request.form['phone']
