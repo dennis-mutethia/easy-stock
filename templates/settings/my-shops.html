@@ -42,8 +42,8 @@
                     </form>
                 </td>
                 <td id="location_{{ shop.id }}">{{ shop.location }}</td>
-                <td>{{ shop.shop_type.name }}</td>
-                <input id="shop_type_{{ shop.id }}" type="hidden" value="{{ shop.shop_type.id }}" />
+                <td id="shop_type_{{ shop.id }}">{{ shop.shop_type.name }}</td>
+                <input id="shop_type_id_{{ shop.id }}" type="hidden" value="{{ shop.shop_type.id }}" />
                 <td class="text-center">
                     <a href="#" onclick="editShop({{ shop.id }})" data-toggle="modal" data-target="#newModal">
                         <i class="mdi mdi-border-color" title="Edit Shop">edit</i>
@@ -156,6 +156,7 @@
         $('#shop_id').val(id);
         $('#name').val($('#name_' + id).val());
         $('#location').val($('#location_' + id).html());
+        $('#shop_type_id').val($('#shop_type_id_' + id).val());
         $('#submit_shop_details').val('update');
     }
 
