@@ -55,7 +55,7 @@
                     helper.format_number_with_commas(stock.additions) if stock.additions>0 }}</td>
                 <td class="text-center">{{ helper.format_number_with_commas(helper.format_number(stock.opening +
                     stock.additions - stock.sold)) }}</td>
-                <td class="text-center">{{ helper.format_number_with_commas(helper.format_number(stock.sold)) }}</td>
+                <td class="text-center">{{ helper.format_number(stock.sold) }}</td>
                 <td class="text-center">{{ helper.format_number_with_commas(helper.format_number(stock.selling_price))
                     }}</td>
                 <td class="text-center">{{ helper.format_number_with_commas(helper.format_number(total))}}</td>
