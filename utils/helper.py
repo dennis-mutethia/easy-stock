@@ -11,8 +11,7 @@ class Helper():
         if isinstance(number, float):
             if number.is_integer():
                 return int(number)
-            else:
-                return f"{number:.0f}"
+            return number
         return number
 
     # Custom filter function
