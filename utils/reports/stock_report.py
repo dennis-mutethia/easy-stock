@@ -87,7 +87,7 @@ class StockReport():
                 params.append(category_id)
             
             query = query + """
-            ORDER BY category_name, item_name
+            ORDER BY category_id, category_name, item_name
             """
             
             cursor.execute(query, tuple(params))
