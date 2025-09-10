@@ -29,15 +29,15 @@ class Payments():
 
             return payments 
             
-    def add(self, bill_id, amount, payment_mode_id):
+    def add(self, bill_id, amount, payment_mode_id, date_paid):
         self.db.ensure_connection()
         with self.db.conn.cursor() as cursor:              
             query = """
-            INSERT INTO payments(bill_id, amount, payment_mode_id, shop_id, created_at, created_by) 
-            VALUES(%s, %s, %s, %s, CURRENT_TIMESTAMP AT TIME ZONE 'Africa/Nairobi', %s) 
+            INSERT INTO payments(bill_id, amount, payment_mode_id, created_at, shop_id, created_by) 
+            VALUES(%s, %s, %s, %s, %s, %s) 
             RETURNING id
             """
-            params = (bill_id, amount, payment_mode_id, current_user.shop.id, current_user.id)
+            params = (bill_id, amount, payment_mode_id, date_paid, current_user.shop.id, current_user.id)
             try:
                 with self.db.conn.cursor() as cursor:
                     cursor.execute(query, params)
