@@ -1,20 +1,16 @@
+from dotenv import load_dotenv
 import pytz, os, uuid, psycopg2
 from datetime import datetime, timedelta
 from flask_login import current_user
+
 
 from utils.entities import Company, License, Package, PaymentMode, Shop
 
 class Db():
     def __init__(self):
-        # Access the environment variables
-        self.conn_params = {
-            'host': os.getenv('DB_HOST'),
-            'port': os.getenv('DB_PORT'),
-            'database': os.getenv('DB_NAME'),
-            'user': os.getenv('DB_USER'),
-            'password': os.getenv('DB_PASSWORD')
-        }
-        
+        load_dotenv()
+        self.database_url = os.getenv('DATABASE_URL')
+        print(self.database_url)
         self.conn = None
         self.ensure_connection()
     
@@ -22,15 +18,16 @@ class Db():
         try:
             # Check if the connection is open
             if self.conn is None or self.conn.closed:
-                self.conn = psycopg2.connect(**self.conn_params)
+                self.conn = psycopg2.connect(self.database_url)
             else:
                 # Test the connection
                 with self.conn.cursor() as cursor:
                     cursor.execute("SELECT 1")
         except Exception as e:
+            print(e)
             # Reconnect if the connection is invalid
-            self.conn = psycopg2.connect(**self.conn_params)
-                   
+            self.conn = psycopg2.connect(self.database_url)
+                        
     def migration(self):
         try:
             self.ensure_connection()  # Ensure your connection to PostgreSQL is established
