@@ -244,4 +244,5 @@ def android():
 
 if __name__ == '__main__':
     debug_mode = os.getenv('IS_DEBUG', 'False') in ['True', '1', 't']
-    app.run(debug=debug_mode)
+    app_port = os.getenv('APP_PORT', 5000)
+    app.run(debug=debug_mode, port=app_port)
