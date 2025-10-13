@@ -10,7 +10,6 @@ class Db():
     def __init__(self):
         load_dotenv()
         self.database_url = os.getenv('DATABASE_URL')
-        print(self.database_url)
         self.conn = None
         self.ensure_connection()
     

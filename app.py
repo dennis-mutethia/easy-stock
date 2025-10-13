@@ -243,8 +243,8 @@ def android():
     return send_from_directory('static/bundles', 'easy-stock.apk', as_attachment=True)
 
 if __name__ == '__main__':
-    debug_mode = os.getenv('IS_DEBUG', 'False') in ['True', '1', 't']
-    app_port = os.getenv('APP_PORT', 5000)
+    debug_mode = os.getenv('IS_DEBUG', False) in ['True', '1', 't']
+    app_port = int(os.getenv('APP_PORT', 5000))
     if debug_mode:
         app.run(debug=debug_mode, port=app_port)
     else:
