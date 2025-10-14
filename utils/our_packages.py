@@ -1,8 +1,10 @@
-from flask import render_template, request
+import time
+from flask import jsonify, render_template, request
 from flask_login import current_user
 
 from utils.entities import Package
 from utils.helper import Helper
+from utils.paystack import Charge, Transactions
 
 class OurPackages():
     def __init__(self, db): 
@@ -25,21 +27,32 @@ class OurPackages():
 
             return packages 
         
-    def pay(self, phone, amount):
-        tx_id = Helper().send_stk_push(phone, amount)
-        print(tx_id)
-        
-        #insert to db         
-        print(phone)
-        print(amount)
-        print(current_user.license.id)
+    def pay(self, phone, amount, license_id, package_id):
+        charge_details = Charge().stk_push(phone, amount)
+        if charge_details.get('status'):
+            reference = charge_details.get('data').get('reference')
+            time.sleep(15)
+            
+            transaction_details = Transactions().verify(reference=reference)
+            if transaction_details and transaction_details.get('status'):
+                status = transaction_details.get('data').get('status')
+                
+                if status == 'success':
+                    Helper(self.db).update_license(license_id, package_id)
+                    return True
+        return False            
           
     def __call__(self):    
-        if request.method == 'POST':       
+        if request.method == 'POST':  
             if request.form['action'] == 'pay':
                 phone = request.form['phone']
                 amount = request.form['amount']
-                self.pay(phone, amount)                   
+                license_id = request.form['license_id']
+                package_id = request.form['package_id']
+                is_paid = self.pay(phone, amount, license_id, package_id)   
+                return jsonify({
+                    "success": is_paid
+                }), 200                
                 
         toastr_message = None   
         package_id = current_user.license.package_id

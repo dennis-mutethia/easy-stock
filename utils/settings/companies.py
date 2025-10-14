@@ -62,25 +62,6 @@ class Companies():
             """
             cursor.execute(query, (name.upper(), current_user.id, id))
             self.db.conn.commit()
-       
-    def update_license(self, id, package_id):
-        package = self.db.get_package_by_id(package_id)
-        self.db.ensure_connection()
-        with self.db.conn.cursor() as cursor:
-            query = """
-            UPDATE licenses 
-            SET 
-                package_id = %s, 
-                expires_at = CASE 
-                                WHEN expires_at > CURRENT_TIMESTAMP AT TIME ZONE 'Africa/Nairobi' THEN expires_at + INTERVAL %s 
-                                ELSE CURRENT_TIMESTAMP AT TIME ZONE 'Africa/Nairobi' + INTERVAL %s 
-                            END, 
-                updated_at = CURRENT_TIMESTAMP AT TIME ZONE 'Africa/Nairobi', 
-                updated_by = %s 
-            WHERE id = %s   
-            """
-            cursor.execute(query, (package_id, f'+{package.validity} DAYS', f'+{package.validity} DAYS', current_user.id, id))
-            self.db.conn.commit()
             
     def access_shop(self, shop_id):
         self.db.ensure_connection()
@@ -121,7 +102,7 @@ class Companies():
             elif request.form['action'] == 'renew':
                 id = request.form['id']
                 package_id = request.form['package_id']
-                self.update_license(id, package_id)
+                Helper(self.db).update_license(id, package_id)
                 toastr_message = 'License Renewed Successfully'
                                 
             elif request.form['action'] == 'access':

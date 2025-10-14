@@ -29,7 +29,8 @@
                         </tr>
                         <tr>
                             <th>LICENSE KEY:</th>
-                            <td>{{ (current_user.license.key[:4] ~ '************' ~ current_user.license.key[-4:]).upper() }}</td>
+                            <td>{{ (current_user.license.key[:4] ~ '************' ~
+                                current_user.license.key[-4:]).upper() }}</td>
                         </tr>
                         <tr>
                             <th>PACKAGE:</th>
@@ -68,15 +69,17 @@
     <div class="row">
         {% for pkg in packages %}
         {% if pkg.amount > 0 %}
-        <a class="col-6" href="#" onclick="popup({{ pkg.pay }}, '{{ helper.format_number_with_commas(pkg.pay/2) }}', '{{ pkg.description }}')" data-toggle="modal" data-target="#newModal">
-            <div class="alert alert-{{ pkg.color }}" role="alert" >
+        <a class="col-6" href="#"
+            onclick="popup('{{ pkg.id }}', {{ pkg.pay }}, '{{ helper.format_number_with_commas(pkg.pay/2) }}', '{{ pkg.description }}')"
+            data-toggle="modal" data-target="#newModal">
+            <div class="alert alert-{{ pkg.color }}" role="alert">
                 <h4 class="alert-heading">{{ pkg.name }}</h4>
                 <p>{{ pkg.description }}</p>
                 <hr />
                 <p class="mb-0">
                     Ksh.
                     {% if pkg.amount > pkg.pay %}
-                        <s>{{ helper.format_number_with_commas(pkg.amount) }}</s>
+                    <s>{{ helper.format_number_with_commas(pkg.amount) }}</s>
                     {% endif %}
                     {{ helper.format_number_with_commas(pkg.pay) }}
                 </p>
@@ -88,48 +91,56 @@
         {% endfor %}
     </div>
 
-<div class="modal fade" id="newModal" tabindex="-1" role="dialog" aria-labelledby="newModalLabel" aria-hidden="true">
-    <div class="modal-dialog" role="document">
-        <div class="modal-content">
-            <form method="POST" class="form-horizontal">
-                <input type="hidden" id="amount" name="amount" />
-                <div class="modal-header text-center">
-                    <h5 class="text-center">To Get <code class="text-xs" style="color: black;" id="package_desc"></code> License</h5>
-                    <button type="button" class="close" data-dismiss="modal">&times;</button>
-                </div>
-                <div class="modal-body">                    
-                    <ol>
-                        <!-- <li>Enter your MPESA Phone below.</li>
-                        <li>Tap/Click Pay Button</li>
-                        <li>You will receive MPESA STK Push prompt.</li>
-                        <li>Enter your MPESA pin to Confirm Payment.</li>
-                        <li>Once you receive MPESA confirmation message, Your license will be automatically renewed.</li> -->
-                        <li>Go to MPESA</li>
+    <div class="modal fade" id="newModal" tabindex="-1" role="dialog" aria-labelledby="newModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <form method="POST" class="form-horizontal">
+                    <input type="hidden" id="amount" name="amount" />
+                    <input type="hidden" id="license_id" name="license_id" value="{{ current_user.license.id }}" />
+                    <input type="hidden" id="package_id" name="package_id" />
+                    <div class="modal-header text-center">
+                        <h5 class="text-center">To Get <code class="text-xs" style="color: black;"
+                                id="package_desc"></code> License</h5>
+                        <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    </div>
+                    <div class="modal-body">
+                        <ol>
+                            <li>Enter your MPESA Phone below.</li>
+                            <li>Tap/Click Pay Button</li>
+                            <li>You will receive MPESA STK Push prompt.</li>
+                            <li>Enter your MPESA pin to Confirm Payment.</li>
+                            <li>Once you receive MPESA confirmation message, Your license will be automatically renewed.
+                            </li>
+                            <!-- <li>Go to MPESA</li>
                         <li>Choose Lipa na MPESA</li>
                         <li>Enter Equity Paybill No: <code class="text-xs" style="color: black;" id="phone_number">247247</code></li>
                         <li>Enter Account No: <code class="text-xs" style="color: black;" id="account_number">1320270358236</code></li>
                         <li>Enter the Package Amount</li>
                         <li>Enter your MPESA pin to Confirm Payment.</li>
                         <li>Once you receive MPESA confirmation message, Your license will be automatically renewed.</li>
-                        <li>For any issues, please contact us via <a href="https://wa.me/254105565532" target="_blank">WhatsApp - 0105565532</a></li>
-                        <li>Thank you for choosing us!</li>
-                    </ol>
-                    <!-- <div class="form-group row">
-                        <div class="col-sm-12">
-                            <input name="phone" id="phone" type="number" class="form-control input-sm text-center success" style="font-weight: bolder; color: black; border-color: green; "
-                                placeholder="Enter MPESA Phone No. here" required min="100000000" max="799999999" />
+                        <li>For any issues, please contact us via <a class="text-success" href="https://wa.me/254105565532" target="_blank">WhatsApp - 0105565532</a></li>
+                        <li>Thank you for choosing us!</li> -->
+                        </ol>
+                        <div class="form-group row">
+                            <div class="col-sm-2"></div>
+                            <div class="col-sm-5">
+                                <input name="phone" id="phone" type="number"
+                                    class="form-control input-sm text-center success"
+                                    style="font-weight: bolder; color: black; " placeholder="Enter MPESA Phone No. here"
+                                    required min="100000000" max="799999999" />
+                            </div>
+                            <div class="col-sm-5">
+                                <button type="submit" id="action" name="action" value="pay" class="btn btn-success"
+                                    data-dismiss="modal" onclick="sendSTKPush()">Pay Ksh.<b
+                                        id="pay_amount_"></b></button>
+                            </div>
                         </div>
-                    </div> -->
-                </div>
-                <!-- <div class="modal-footer">
-                    <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
-                    <button type="button" id="action" name="action" value="pay" data-dismiss="modal"
-                        class="btn btn-success">Pay Ksh.<b id="pay_amount_"></b></button>
-                </div> -->
-            </form>
+                    </div>
+                </form>
+            </div>
         </div>
     </div>
-</div>
 </div>
 <!-- ============================================================== -->
 <!-- End Container fluid  -->
@@ -137,10 +148,36 @@
 
 
 <script>
-    function popup(amount, formatted_amount, package_desc) {
+    function popup(id, amount, formatted_amount, package_desc) {
+        $('#package_id').val(id);
         $('#amount').val(amount);
         $('#pay_amount').html(formatted_amount);
+        $('#pay_amount_').html(formatted_amount);
         $('#package_desc').html(package_desc);
+    }
+
+    function sendSTKPush() {
+        $.ajax({
+            type: 'post',
+            url: '{{ url_for('ourPackages') }}',
+            data: {
+                license_id: $('#license_id').val(),
+                package_id: $('#package_id').val(),
+                amount: $('#amount').val(),
+                phone: $('#phone').val(),
+                action: 'pay'
+            },
+            dataType: 'json',
+            success: function (data) {
+                console.log(data.success);
+                if (data.success) {
+                    location.reload();
+                }
+            },
+            error: function (xhr, status, error) {
+                console.error('Error:', error); 
+            }
+        });
     }
 </script>
 
