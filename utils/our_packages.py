@@ -49,7 +49,7 @@ class OurPackages():
         if request.method == 'POST':  
             if request.form['action'] == 'pay':
                 phone = request.form['phone']
-                amount = request.form['amount']
+                amount = int(request.form['amount'])
                 license_id = request.form['license_id']
                 package_id = request.form['package_id']
                 is_paid = self.pay(phone, amount, license_id, package_id)   
