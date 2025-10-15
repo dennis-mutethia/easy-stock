@@ -70,7 +70,7 @@
         {% for pkg in packages %}
         {% if pkg.amount > 0 %}
         <a class="col-6" href="#"
-            onclick="popup('{{ pkg.id }}', {{ pkg.pay }}, '{{ helper.format_number_with_commas(pkg.pay/2) }}', '{{ pkg.description }}')"
+            onclick="popup('{{ pkg.id }}', {{ pkg.pay }}, '{{ helper.format_number_with_commas(pkg.pay) }}', '{{ pkg.description }}')"
             data-toggle="modal" data-target="#newModal">
             <div class="alert alert-{{ pkg.color }}" role="alert">
                 <h4 class="alert-heading">{{ pkg.name }}</h4>

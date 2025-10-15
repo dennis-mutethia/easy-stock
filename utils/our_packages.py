@@ -31,15 +31,18 @@ class OurPackages():
         charge_details = Charge().stk_push(phone, amount)
         if charge_details.get('status'):
             reference = charge_details.get('data').get('reference')
-            time.sleep(15)
             
-            transaction_details = Transactions().verify(reference=reference)
-            if transaction_details and transaction_details.get('status'):
-                status = transaction_details.get('data').get('status')
+            while True:            
+                transaction_details = Transactions().verify(reference=reference)
+                if transaction_details and transaction_details.get('status'):
+                    status = transaction_details.get('data').get('status')
+                    
+                    if status == 'success':
+                        Helper(self.db).update_license(license_id, package_id)
+                        return True
+                    elif status == 'failed':
+                        return False 
                 
-                if status == 'success':
-                    Helper(self.db).update_license(license_id, package_id)
-                    return True
         return False            
           
     def __call__(self):    
