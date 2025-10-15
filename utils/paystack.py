@@ -59,7 +59,7 @@ class Charge(Paystack):
     
         data={ 
             "email": f"{phone}@safaricom.co.ke", 
-            "amount": amount,
+            "amount": amount*100,
             "currency": "KES",            
             "mobile_money": {
                 "phone" : f"+254{phone[-9:]}",
