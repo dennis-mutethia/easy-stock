@@ -14,15 +14,6 @@ jobs:
       - name: checkout repo content
         uses: actions/checkout@v2 
       
-      # pick .env variables from github secrets
-      - name: Set environment variables
-        run: |
-          echo "DB_HOST=${{ secrets.DB_HOST }}" >> $GITHUB_ENV
-          echo "DB_PORT=${{ secrets.DB_PORT }}" >> $GITHUB_ENV
-          echo "DB_NAME=${{ secrets.DB_NAME }}" >> $GITHUB_ENV
-          echo "DB_USER=${{ secrets.DB_USER }}" >> $GITHUB_ENV
-          echo "DB_PASSWORD=${{ secrets.DB_PASSWORD }}" >> $GITHUB_ENV
-      
       - name: setup python
         uses: actions/setup-python@v4
         with:
@@ -35,5 +26,7 @@ jobs:
       
       # execute demo stock script i.e run demo_stock.py
       - name: execute demo stock script 
+        env:
+            DATABASE_URL: ${{ secrets.DATABASE_URL }} 
         run: python demo_stock.py
       
