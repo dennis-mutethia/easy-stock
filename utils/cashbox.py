@@ -33,8 +33,6 @@ class CashBox():
                     selling_price
                 FROM stock
                 WHERE shop_id = %s                 
-                AND EXTRACT(MONTH FROM stock_date) >= EXTRACT(MONTH FROM %s::date)
-                AND EXTRACT(YEAR FROM stock_date) >= EXTRACT(YEAR FROM %s::date)
             ),
             sales AS(
                 SELECT 
@@ -97,7 +95,7 @@ class CashBox():
             WHERE EXTRACT(MONTH FROM stock_date) = EXTRACT(MONTH FROM %s::date)
             AND EXTRACT(YEAR FROM stock_date) = EXTRACT(YEAR FROM %s::date)
             """
-            params = [current_user.shop.id, report_date, report_date, current_user.shop.id, current_user.shop.id, current_user.shop.id, current_user.shop.id, report_date, report_date]
+            params = [current_user.shop.id, current_user.shop.id, current_user.shop.id, current_user.shop.id, current_user.shop.id, report_date, report_date]
             
             cursor.execute(query, tuple(params))
             data = cursor.fetchall()
