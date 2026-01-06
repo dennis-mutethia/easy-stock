@@ -31,9 +31,9 @@ class CashBox():
                     CASE WHEN additions = 'Nan' THEN 0 ELSE additions END AS additions, 
                     selling_price
                 FROM stock
-                WHERE shop_id = %s 
-                AND EXTRACT(MONTH FROM stock_date) = EXTRACT(MONTH FROM %s::date)
-                AND EXTRACT(YEAR FROM stock_date) = EXTRACT(YEAR FROM %s::date)
+                WHERE shop_id = %s                 
+                AND EXTRACT(MONTH FROM stock_date) >= EXTRACT(MONTH FROM %s::date)
+                AND EXTRACT(YEAR FROM stock_date) >= EXTRACT(YEAR FROM %s::date)
             ),
             sales AS(
                 SELECT 
@@ -41,8 +41,9 @@ class CashBox():
                     today.selling_price,
                     (today.opening + today.additions - tomorrow.opening) AS sold
                 FROM all_stock AS today
-                INNER JOIN all_stock AS tomorrow ON tomorrow.product_id = today.product_id
-                    AND DATE(tomorrow.stock_date) = DATE(today.stock_date) + 1
+                LEFT JOIN all_stock AS tomorrow 
+			        ON tomorrow.product_id = today.product_id
+			        AND tomorrow.stock_date = today.stock_date + INTERVAL '1 day'
             ),
             totals AS(
                 SELECT stock_date, SUM(sold*selling_price) AS total_sales
@@ -91,9 +92,11 @@ class CashBox():
                 total_expenses,
                 cash,
                 mpesa
-            FROM source
+            FROM source            
+            WHERE EXTRACT(MONTH FROM stock_date) = EXTRACT(MONTH FROM %s::date)
+            AND EXTRACT(YEAR FROM stock_date) = EXTRACT(YEAR FROM %s::date)
             """
-            params = [current_user.shop.id, report_date, report_date, current_user.shop.id, current_user.shop.id, current_user.shop.id, current_user.shop.id]
+            params = [current_user.shop.id, report_date, report_date, current_user.shop.id, current_user.shop.id, current_user.shop.id, current_user.shop.id, report_date, report_date]
             
             cursor.execute(query, tuple(params))
             data = cursor.fetchall()
