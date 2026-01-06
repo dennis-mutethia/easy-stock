@@ -15,6 +15,7 @@ class Cash():
         self.cash = cash
         self.mpesa = mpesa
         
+        
 class CashBox():
     def __init__(self, db): 
         self.db = db
