@@ -80,8 +80,7 @@ class CashBox():
                 LEFT JOIN exp ON exp.date=totals.stock_date 
                 LEFT JOIN payments ON payments.date=totals.stock_date 
                 LEFT JOIN bills ON bills.date=totals.stock_date    
-                LEFT JOIN received ON received.date=totals.stock_date    
-                ORDER BY stock_date  
+                LEFT JOIN received ON received.date=totals.stock_date  
             )
             SELECT 
                 stock_date, 
@@ -94,6 +93,8 @@ class CashBox():
             FROM source            
             WHERE EXTRACT(MONTH FROM stock_date) = EXTRACT(MONTH FROM %s::date)
             AND EXTRACT(YEAR FROM stock_date) = EXTRACT(YEAR FROM %s::date)
+            AND stock_date < CURRENT_DATE  
+            ORDER BY stock_date  
             """
             params = [current_user.shop.id, current_user.shop.id, current_user.shop.id, current_user.shop.id, current_user.shop.id, report_date, report_date]
             
