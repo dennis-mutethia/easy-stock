@@ -14,7 +14,7 @@ class CustomerBills():
         self.db = db  
         self.customers = Customers(self.db)
           
-    def fetch(self, from_date, to_date, bill_status, customer_id=0):
+    def fetch(self, from_date, to_date, bill_status, customer_id=0, customers=[],payment_modes=[]):
         self.db.ensure_connection()
         with self.db.conn.cursor() as cursor:
             query = """
@@ -24,29 +24,39 @@ class CustomerBills():
             """
             params = [from_date, to_date, current_user.shop.id]
             
-            if bill_status==1:
-                query = query + " AND paid>=total"
-            if bill_status==2:
-                query = query + " AND paid<total"
-                
-            if customer_id>0:
-                query = query + " AND customer_id=%s"
+            if bill_status == 1:
+                query += " AND paid>=total"
+            if bill_status == 2:
+                query += " AND paid<total"
+            if customer_id > 0:
+                query += " AND customer_id=%s"
                 params.append(customer_id)
             
-            query = query + """
-            ORDER BY id DESC
-            """
+            query += " ORDER BY id DESC"
             
             cursor.execute(query, tuple(params))
             data = cursor.fetchall()
+
+            if not data:
+                return []
+
+            # --- Fetch all once, build lookup dicts ---
+            users_map    = {u.id: u for u in SystemUsers(self.db).fetch()}            
+            customers_map = {c.id: c for c in customers}
+            payment_modes_map    = {p.id: p for p in payment_modes}
+            payments_map = {}
+            for p in Payments(self.db).fetch(payment_modes_map, users_map):
+                payments_map.setdefault(p.bill_id, []).append(p)
+
+            # --- Iterate with no further DB calls ---
             bills = []
-            for datum in data:                
-                customer = Customers(self.db).fetch_by_id(datum[4])
-                user = SystemUsers(self.db).get_by_id(datum[5])  
-                payments = Payments(self.db).fetch_by_bill_id(datum[0])         
+            for datum in data:
+                customer = customers_map.get(datum[4])
+                user     = users_map.get(datum[5])
+                payments = payments_map.get(datum[0], [])
                 bills.append(Bill(datum[0], datum[1], datum[2], datum[3], customer, user, payments))
 
-            return bills 
+            return bills
             
     def get_bills_to_pay(self, customer_id, paid):
         self.db.ensure_connection()
@@ -185,7 +195,7 @@ class CustomerBills():
                 else:
                     customer_id = int(request.args.get('customer_id', customer_id))
                     for bill in self.get_bills_to_pay(customer_id, amount_paid):   
-                        Payments(self.db).add(bill['id'], bill['pay_amount'], payment_mode_id)                    
+                        Payments(self.db).add(bill['id'], bill['pay_amount'], payment_mode_id, date_paid)                    
                         self.pay(bill['id'], bill['pay_amount'])    
                             
             elif request.form['action'] == 'add_new_customer':
@@ -195,7 +205,7 @@ class CustomerBills():
         
         customers = self.customers.fetch()
         payment_modes = self.db.fetch_payment_modes()
-        bills = self.fetch(from_date, to_date, bill_status, customer_id) 
+        bills = self.fetch(from_date, to_date, bill_status, customer_id, customers, payment_modes) 
         grand_total = grand_paid = cash_total = mpesa_total =  0
         for bill in bills:
             grand_total = grand_total + bill.total

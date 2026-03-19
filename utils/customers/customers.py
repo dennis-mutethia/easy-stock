@@ -8,23 +8,6 @@ class Customers():
     def __init__(self, db): 
         self.db = db
                
-    def fetch_by_id(self, id):
-        self.db.ensure_connection()
-        with self.db.conn.cursor() as cursor:
-            query = """
-            SELECT id, name, phone
-            FROM customers
-            WHERE id=%s 
-            """
-            params = [id]
-            
-            cursor.execute(query, tuple(params))
-            data = cursor.fetchone()
-            if data:
-                return Customer(data[0], data[1], data[2])
-            else:
-                return None    
-    
     def fetch(self):
         self.db.ensure_connection()
         with self.db.conn.cursor() as cursor:

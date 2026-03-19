@@ -9,26 +9,26 @@ class Payments():
     def __init__(self, db): 
         self.db = db
             
-    def fetch_by_bill_id(self, bill_id):
+    def fetch(self, payment_modes_map, users_map):
         self.db.ensure_connection()
         with self.db.conn.cursor() as cursor:
             query = """
             SELECT id, bill_id, amount, payment_mode_id, TO_CHAR(created_at + INTERVAL '3 HOURS', 'YYYY-MM-DD HH24:MI') AS created_at, created_by
             FROM payments
-            WHERE bill_id = %s
+            WHERE shop_id=%s 
             """
-            params = [bill_id]
+            params = [current_user.shop.id]
             
             cursor.execute(query, tuple(params))
             data = cursor.fetchall()
             payments = []
             for datum in data:
-                payment_mode = self.db.get_payment_mode_by_id(datum[3])
-                user = SystemUsers(self.db).get_by_id(datum[5])                
+                payment_mode = payment_modes_map.get(datum[3])
+                user     = users_map.get(datum[5])              
                 payments.append(Payment(datum[0], datum[1], datum[2], datum[4], user, payment_mode))
 
             return payments 
-            
+       
     def add(self, bill_id, amount, payment_mode_id, date_paid):
         self.db.ensure_connection()
         with self.db.conn.cursor() as cursor:              
