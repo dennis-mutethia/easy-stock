@@ -1,9 +1,9 @@
 import os
 from dotenv import load_dotenv
+from datetime import timedelta
 from flask import Flask, redirect, render_template, url_for, send_from_directory
 from flask_login import LoginManager, logout_user, login_required
-from flask_session import Session
-from redis import Redis
+from flask_jwt_extended import JWTManager
 
 from utils.account_profile import AccountProfile
 from utils.cashbox import CashBox
@@ -37,20 +37,17 @@ app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 31536000  # One year in seconds
 
 # Load environment variables from .env file
 load_dotenv()
+# JWT Configuration
 app.config['SECRET_KEY'] = os.getenv('SECRET_KEY')
-app.config['SESSION_TYPE'] = 'redis'
-app.config['SESSION_REDIS'] = Redis(
-    host=os.getenv('REDIS_HOSTNAME'),
-    port=os.getenv('REDIS_PORT'),
-    password=os.getenv('REDIS_PASSWORD') if os.getenv('REDIS_SSL') in ['True', '1'] else None,
-    ssl=False if os.getenv('REDIS_SSL') in ['False', '0'] else True
-)
+app.config['JWT_SECRET_KEY'] = os.getenv('JWT_SECRET_KEY', os.getenv('SECRET_KEY'))
+app.config['JWT_TOKEN_LOCATION'] = ['cookies']
+app.config['JWT_COOKIE_SECURE'] = True          # HTTPS only (Vercel uses HTTPS)
+app.config['JWT_COOKIE_HTTPONLY'] = True         # No JS access to cookie
+app.config['JWT_COOKIE_SAMESITE'] = 'Lax'
+app.config['JWT_ACCESS_TOKEN_EXPIRES'] = timedelta(days=365)   # Adjust as needed
+app.config['JWT_COOKIE_CSRF_PROTECT'] = True     # CSRF protection for cookie-based JWT
 
-app.config['SESSION_COOKIE_SECURE'] = True  # Set to True if using HTTPS on Vercel
-app.config['SESSION_COOKIE_HTTPONLY'] = True
-app.config['SESSION_COOKIE_SAMESITE'] = 'Lax'
-
-Session(app)
+jwt = JWTManager(app)
 login_manager = LoginManager()
 login_manager.init_app(app)
 login_manager.login_view = 'login'
