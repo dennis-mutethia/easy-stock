@@ -1,9 +1,10 @@
 import os
 from dotenv import load_dotenv
-from datetime import timedelta
-from flask import Flask, redirect, render_template, url_for, send_from_directory
+from datetime import datetime, timezone, timedelta
+from functools import wraps
+from flask import Flask, make_response, redirect, render_template, url_for, send_from_directory
 from flask_login import LoginManager, logout_user, login_required
-from flask_jwt_extended import JWTManager
+from flask_jwt_extended import JWTManager, create_access_token, get_jwt, get_jwt_identity, set_access_cookies, unset_jwt_cookies
 
 from utils.account_profile import AccountProfile
 from utils.cashbox import CashBox
@@ -44,13 +45,36 @@ app.config['JWT_TOKEN_LOCATION'] = ['cookies']
 app.config['JWT_COOKIE_SECURE'] = True          # HTTPS only (Vercel uses HTTPS)
 app.config['JWT_COOKIE_HTTPONLY'] = True         # No JS access to cookie
 app.config['JWT_COOKIE_SAMESITE'] = 'Lax'
-app.config['JWT_ACCESS_TOKEN_EXPIRES'] = timedelta(days=365)   # Adjust as needed
 app.config['JWT_COOKIE_CSRF_PROTECT'] = True     # CSRF protection for cookie-based JWT
+app.config['JWT_ACCESS_TOKEN_EXPIRES'] = timedelta(minutes=30)
+app.config['JWT_REFRESH_TOKEN_EXPIRES'] = timedelta(days=7)
 
 jwt = JWTManager(app)
 login_manager = LoginManager()
 login_manager.init_app(app)
 login_manager.login_view = 'login'
+
+@app.after_request
+def refresh_token_if_expiring_soon(response):
+    try:
+        jwt_data = get_jwt()
+        exp_timestamp = jwt_data.get("exp")
+        if not exp_timestamp:
+            return response
+
+        now = datetime.now(timezone.utc)
+        expire_time = datetime.fromtimestamp(exp_timestamp, timezone.utc)
+        time_remaining = expire_time - now
+
+        if time_remaining < timedelta(minutes=10):
+            identity = get_jwt_identity()
+            new_token = create_access_token(identity=identity)
+            set_access_cookies(response, new_token)
+
+    except (RuntimeError, KeyError):
+        pass
+
+    return response
 
 db = Db()
 #db.migration()
@@ -72,8 +96,10 @@ def login():
 @app.route('/logout')
 @login_required
 def logout():
+    response = make_response(redirect(url_for('login')))
+    unset_jwt_cookies(response)   # clears both access + refresh cookies
     logout_user()
-    return redirect(url_for('login'))
+    return response
 
 @app.route('/dashboard', methods=['GET', 'POST'])
 @login_required

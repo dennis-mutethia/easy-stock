@@ -1,7 +1,7 @@
 import pytz, random
 from datetime import datetime
 from flask import make_response, redirect, render_template, request, url_for
-from flask_jwt_extended import create_access_token, set_access_cookies
+from flask_jwt_extended import create_access_token, create_refresh_token, set_access_cookies, set_refresh_cookies
 from flask_login import login_user
 
 from daily_stock_loader import DailyStockLoader
@@ -13,11 +13,12 @@ class Login():
         self.db = db    
 
     def _redirect_with_jwt(self, user, endpoint):
-        """Helper: build a redirect response with JWT cookie attached."""
         access_token = create_access_token(identity=str(user.id))
+        refresh_token = create_refresh_token(identity=str(user.id))
         response = make_response(redirect(url_for(endpoint)))
         set_access_cookies(response, access_token)
-        return response    
+        set_refresh_cookies(response, refresh_token)  # adds refresh_token_cookie
+        return response
      
     def login(self):  
         phone = request.form['phone']
