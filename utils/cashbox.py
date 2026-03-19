@@ -41,8 +41,8 @@ class CashBox():
                     (today.opening + today.additions - tomorrow.opening) AS sold
                 FROM all_stock AS today
                 LEFT JOIN all_stock AS tomorrow 
-			        ON tomorrow.product_id = today.product_id
-			        AND tomorrow.stock_date = today.stock_date + INTERVAL '1 day'
+                    ON tomorrow.product_id = today.product_id
+                    AND tomorrow.stock_date = today.stock_date + INTERVAL '1 day'
             ),
             totals AS(
                 SELECT stock_date, SUM(sold*selling_price) AS total_sales
@@ -96,15 +96,14 @@ class CashBox():
             AND stock_date < CURRENT_DATE  
             ORDER BY stock_date  
             """
-            params = [current_user.shop.id, current_user.shop.id, current_user.shop.id, current_user.shop.id, current_user.shop.id, report_date, report_date]
+            shop_id = current_user.shop.id
+            params = (shop_id, shop_id, shop_id, shop_id, shop_id, report_date, report_date)
             
-            cursor.execute(query, tuple(params))
-            data = cursor.fetchall()
-            cashes = []
-            for datum in data:           
-                cashes.append(Cash(datum[0], datum[1], datum[2], datum[3], datum[4], datum[5], datum[6]))
-
-            return cashes 
+            cursor.execute(query, params)
+            return [
+                Cash(row[0], row[1], row[2], row[3], row[4], row[5], row[6])
+                for row in cursor.fetchall()
+            ]
     
     def update(self, report_date, cash, mpesa):
         self.db.ensure_connection()
@@ -113,51 +112,56 @@ class CashBox():
             INSERT INTO cashbox (date, cash, mpesa, shop_id, created_at, created_by)               
             VALUES(%s, %s, %s, %s, CURRENT_TIMESTAMP AT TIME ZONE 'Africa/Nairobi', %s) 
             ON CONFLICT (date, shop_id) DO UPDATE 
-            SET cash = EXCLUDED.cash, mpesa = EXCLUDED.mpesa, updated_at = CURRENT_TIMESTAMP AT TIME ZONE 'Africa/Nairobi', updated_by = %s
+            SET cash = EXCLUDED.cash, mpesa = EXCLUDED.mpesa, 
+                updated_at = CURRENT_TIMESTAMP AT TIME ZONE 'Africa/Nairobi', 
+                updated_by = %s
             RETURNING id
             """
-            params = [report_date, cash, mpesa, current_user.shop.id, current_user.id, current_user.id]
+            params = (report_date, cash, mpesa, current_user.shop.id, current_user.id, current_user.id)
             
             try:
-                cursor.execute(query, tuple(params))
+                cursor.execute(query, params)
                 self.db.conn.commit()
-                id = cursor.fetchone()[0]
-                return id
+                return cursor.fetchone()[0]
             except Exception as e:
                 self.db.conn.rollback()
                 print(f"Error updating cashbox: {e}")
                 return None
                  
     def __call__(self):
-        yesterday = datetime.now(pytz.timezone("Africa/Nairobi")) - timedelta(days=1)
+        nairobi = pytz.timezone("Africa/Nairobi")
+        yesterday = datetime.now(nairobi) - timedelta(days=1)
         max_date = yesterday.strftime('%Y-%m-%d')
         report_date = max_date
         
-        if request.method == 'GET':   
-            try:    
-                report_date = request.args.get('report_date', report_date)
-                
-            except Exception as e:
-                print(f"An error occurred: {e}")    
+        if request.method == 'POST' and request.form['action'] == 'update':
+            report_date = request.form['report_date']
+            self.update(report_date, request.form['cash'], request.form['mpesa'])
+        elif request.method == 'GET':
+            report_date = request.args.get('report_date', max_date)
+
+        data = self.fetch(report_date)
+
+        # Build a date-keyed dict for O(1) lookup instead of looping
+        data_by_date = {str(c.date): c for c in data}
+        today = data_by_date.get(report_date)
+
+        total_expected = total_received = total_diff = 0
+        if today:
+            total_expected = today.total_sales + today.paid_bills - today.new_bills - today.total_expenses
+            total_received = today.cash + today.mpesa
+            total_diff     = total_received - total_expected
         
-        if request.method == 'POST':       
-            if request.form['action'] == 'update':
-                report_date = request.form['report_date']
-                cash = request.form['cash']
-                mpesa = request.form['mpesa']     
-                self.update(report_date, cash, mpesa)              
-        
-        data = self.fetch(report_date) 
-        today = {}
-        total_received = total_expected = total_diff = 0
-        
-        for datum in data:
-            if str(datum.date) == report_date:
-                today = datum 
-                total_expected = today.total_sales + today.paid_bills - today.new_bills - today.total_expenses
-                total_received = today.cash + today.mpesa   
-                total_diff = total_received - total_expected          
-        
-        return render_template('cashbox.html', page_title='Cashbox', helper=Helper(), menu = 'cashbox',
-                               data=data, today=today, total_expected=total_expected, total_received=total_received, total_diff=total_diff,
-                               report_date=report_date, max_date=max_date)
+        return render_template(
+            'cashbox.html',
+            page_title='Cashbox',
+            helper=Helper(),
+            menu='cashbox',
+            data=data,
+            today=today,
+            total_expected=total_expected,
+            total_received=total_received,
+            total_diff=total_diff,
+            report_date=report_date,
+            max_date=max_date
+        )

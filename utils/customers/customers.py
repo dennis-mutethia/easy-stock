@@ -11,83 +11,98 @@ class Customers():
     def fetch(self):
         self.db.ensure_connection()
         with self.db.conn.cursor() as cursor:
-            #$id, $name, $selling_price, remaining, $temp_qty
-            query = """
-            SELECT id, name, phone
-            FROM customers
-            WHERE shop_id=%s 
-            ORDER BY name
-            """
-            params = [current_user.shop.id]
-            
-            cursor.execute(query, tuple(params))
-            data = cursor.fetchall()
-            customers = []
-            for datum in data:
-                customers.append(Customer(datum[0], datum[1], datum[2]))
-
-            return customers
+            cursor.execute(
+                """
+                SELECT id, name, phone
+                FROM customers
+                WHERE shop_id = %s
+                ORDER BY name
+                """,
+                (current_user.shop.id,)
+            )
+            return [Customer(*row) for row in cursor.fetchall()]
     
-    def add(self, name, phone):
+    def fetch_by_id(self, id):
         self.db.ensure_connection()
         with self.db.conn.cursor() as cursor:
-            query = """
-            INSERT INTO customers(name, phone, shop_id, created_at, created_by) 
-            VALUES(%s, %s, %s, CURRENT_TIMESTAMP AT TIME ZONE 'Africa/Nairobi', %s) 
-            ON CONFLICT (phone, shop_id) DO NOTHING
-            RETURNING id
-            """
-            cursor.execute(query, (name.upper(), phone, current_user.shop.id, current_user.id))
-            self.db.conn.commit()
-            id = cursor.fetchone()[0]
-            return id   
+            cursor.execute(
+                """
+                SELECT id, name, phone
+                FROM customers
+                WHERE id = %s AND shop_id = %s
+                """,
+                (id, current_user.shop.id)
+            )
+            row = cursor.fetchone()
+            return Customer(*row) if row else None
+
+    def add(self, name, phone):
+        self.db.ensure_connection()
+        try:
+            with self.db.conn.cursor() as cursor:
+                cursor.execute(
+                    """
+                    INSERT INTO customers(name, phone, shop_id, created_at, created_by) 
+                    VALUES(%s, %s, %s, CURRENT_TIMESTAMP AT TIME ZONE 'Africa/Nairobi', %s) 
+                    ON CONFLICT (phone, shop_id) DO UPDATE
+                        SET name = EXCLUDED.name,
+                            updated_at = CURRENT_TIMESTAMP AT TIME ZONE 'Africa/Nairobi',
+                            updated_by = EXCLUDED.created_by
+                    RETURNING id
+                    """,
+                    (name.upper(), phone, current_user.shop.id, current_user.id)
+                )
+                self.db.conn.commit()
+                return cursor.fetchone()[0]
+        except Exception as e:
+            self.db.conn.rollback()
+            raise
             
     def update(self, id, name, phone):
         self.db.ensure_connection()
-        with self.db.conn.cursor() as cursor:
-            query = """
-            UPDATE customers
-            SET name=%s, phone=%s, updated_at=CURRENT_TIMESTAMP AT TIME ZONE 'Africa/Nairobi', updated_by=%s
-            WHERE id=%s
-            """
-            params = [name.upper(), phone, current_user.shop.id, id]
-            cursor.execute(query, tuple(params))
-            self.db.conn.commit()
+        try:
+            with self.db.conn.cursor() as cursor:
+                cursor.execute(
+                    """
+                    UPDATE customers
+                    SET name = %s, phone = %s,
+                        updated_at = CURRENT_TIMESTAMP AT TIME ZONE 'Africa/Nairobi',
+                        updated_by = %s
+                    WHERE id = %s
+                    """,
+                    # BUG FIX: was using current_user.shop.id as updated_by
+                    (name.upper(), phone, current_user.id, id)
+                )
+                self.db.conn.commit()
+        except Exception as e:
+            self.db.conn.rollback()
+            raise
             
     def delete(self, id):
+        """Delete customer and their bills atomically — both succeed or neither does."""
         self.db.ensure_connection()
-        with self.db.conn.cursor() as cursor:
-            query = """
-            DELETE FROM customers
-            WHERE id=%s
-            """
-            cursor.execute(query, (id,))
+        try:
+            with self.db.conn.cursor() as cursor:
+                cursor.execute("DELETE FROM bills WHERE customer_id = %s", (id,))
+                cursor.execute("DELETE FROM customers WHERE id = %s", (id,))
             self.db.conn.commit()
-            
-            query = """
-            DELETE FROM bills
-            WHERE customer_id=%s
-            """
-            cursor.execute(query, (id,))
-            self.db.conn.commit()
+        except Exception as e:
+            self.db.conn.rollback()
+            raise
 
     def __call__(self):
         if request.method == 'POST':
-            if request.form['action'] == 'add':
-                name = request.form['name']
-                phone = request.form['phone']
-                self.add(name, phone)   
-                
-            elif request.form['action'] == 'edit':
-                id = request.form['id']
-                name = request.form['name']
-                phone = request.form['phone'] 
-                self.update(id, name, phone)
-                   
-            elif request.form['action'] == 'delete':
-                id = request.form['customer_id']
-                self.delete(id) 
+            action = request.form.get('action')
+            if action == 'add':
+                self.add(request.form['name'], request.form['phone'])
+            elif action == 'edit':
+                self.update(request.form['id'], request.form['name'], request.form['phone'])
+            elif action == 'delete':
+                self.delete(request.form['customer_id'])
         
-        customers = self.fetch()
-        return render_template('customers/index.html', helper=Helper(), 
-                               customers=customers, page_title='Customers')
+        return render_template(
+            'customers/index.html',
+            helper=Helper(),
+            customers=self.fetch(),
+            page_title='Customers'
+        )

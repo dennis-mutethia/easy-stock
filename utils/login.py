@@ -1,4 +1,4 @@
-import pytz, random
+import random, pytz
 from datetime import datetime
 from flask import make_response, redirect, render_template, request, url_for
 from flask_jwt_extended import create_access_token, create_refresh_token, set_access_cookies, set_refresh_cookies
@@ -13,73 +13,78 @@ class Login():
         self.db = db    
 
     def _redirect_with_jwt(self, user, endpoint):
-        access_token = create_access_token(identity=str(user.id))
+        access_token  = create_access_token(identity=str(user.id))
         refresh_token = create_refresh_token(identity=str(user.id))
         response = make_response(redirect(url_for(endpoint)))
         set_access_cookies(response, access_token)
-        set_refresh_cookies(response, refresh_token)  # adds refresh_token_cookie
+        set_refresh_cookies(response, refresh_token)
         return response
      
     def login(self):  
-        phone = request.form['phone']
-        password = request.form['password']   
-        user = SystemUsers(self.db).authenticate(phone, password)
+        phone    = request.form['phone']
+        password = request.form['password']
+        user     = SystemUsers(self.db).authenticate(phone, password)
         
         if user:        
             login_user(user)
-            if user.user_level.id in [0, 1]:  
-                return self._redirect_with_jwt(user, 'dashboard')   
-            else:
-                return self._redirect_with_jwt(user, 'stockTake')
-        else: 
-            error = 'Login failed! Phone & Password do not match or Phone does not exist.'
-            shop_types = MyShops(self.db).fetch_shop_types()
-            return render_template('login.html', shop_types=shop_types, error=error)
+            endpoint = 'dashboard' if user.user_level.id in [0, 1] else 'stockTake'
+            return self._redirect_with_jwt(user, endpoint)
+
+        shop_types = MyShops(self.db).fetch_shop_types()
+        return render_template('login.html', shop_types=shop_types,
+                               error='Login failed! Phone & Password do not match or Phone does not exist.')
     
-    def register(self):           
-        company_name = request.form['company_name']
-        shop_name = request.form['shop_name']  
-        shop_type_id = request.form['shop_type_id']
-        shop_location = request.form['shop_location'] 
-        user_name = request.form['user_name']    
-        user_phone = request.form['user_phone']
-        user_password = request.form['user_password'] 
+    def register(self):
+        form         = request.form
         current_date = datetime.now(pytz.timezone("Africa/Nairobi")).strftime('%Y-%m-%d')
-        
-        package = self.db.get_package_by_id(1)
+
+        # ── Create company structure ──────────────────────────────────────────
+        package    = self.db.get_package_by_id(1)
         payment_id = self.db.save_payment(0, 0, 4)
         license_id = self.db.save_license(package, payment_id)
-        company_id = self.db.save_company(company_name, license_id)
-        shop_id = MyShops(self.db).add(shop_name, shop_type_id, company_id, shop_location, created_by=0)
-        user = SystemUsers(self.db).get_by_phone(user_phone)
+        company_id = self.db.save_company(form['company_name'], license_id)
+        shop_id    = MyShops(self.db).add(
+                        form['shop_name'], form['shop_type_id'],
+                        company_id, form['shop_location'], created_by=0
+                     )
+
+        # ── Create or update user ─────────────────────────────────────────────
+        system_users = SystemUsers(self.db)
+        user = system_users.get_by_phone(form['user_phone'])
+
         if user is None:
-            user_id = SystemUsers(self.db).add(user_name, user_phone, 1, shop_id, user_password)
-            user = SystemUsers(self.db).get_by_id(user_id)
+            user_id = system_users.add(form['user_name'], form['user_phone'], 1, shop_id, form['user_password'])
+            user    = system_users.get_by_id(user_id)
         else:
-            SystemUsers(self.db).update(user_id, user_name, user_phone, 1, shop_id, password=user_password)
-                    
+            # BUG FIX: was referencing user_id before assignment when user already existed
+            system_users.update(user.id, form['user_name'], form['user_phone'], 1, shop_id, password=form['user_password'])
+            user = system_users.get_by_id(user.id)
+
+        # ── Seed shop data and load stock ─────────────────────────────────────
         login_user(user)
-        self.db.import_product_categories_template_data(shop_id, shop_type_id)
-        self.db.import_products_template_data(shop_id, shop_type_id)
-        DailyStockLoader().load(current_date, register=True) 
+        self.db.import_product_categories_template_data(shop_id, form['shop_type_id'])
+        self.db.import_products_template_data(shop_id, form['shop_type_id'])
+        DailyStockLoader().load(current_date, register=True)
+
         return self._redirect_with_jwt(user, 'dashboard')
     
     def reset_password(self):
-        phone = request.form['phone']
+        phone    = request.form['phone']
         password = str(random.randint(1000, 9999))
-        print(password)
-        ## send SMS
+        # TODO: replace print with SMS dispatch
+        print(f"Reset password for {phone}: {password}")
         SystemUsers(self.db).reset_password(phone, password, 0)
         shop_types = MyShops(self.db).fetch_shop_types()
         return render_template('login.html', shop=None, shop_types=shop_types, error=None)
      
     def __call__(self):
         if request.method == 'POST':
-            if request.form['action'] == 'register':
+            action = request.form.get('action')
+            if action == 'register':
                 return self.register()
-            elif request.form['action'] == 'login':
+            elif action == 'login':
                 return self.login()
-            elif request.form['action'] == 'reset_password':
+            elif action == 'reset_password':
                 return self.reset_password()
 
         shop_types = MyShops(self.db).fetch_shop_types()

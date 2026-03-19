@@ -1,43 +1,38 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<!-- ============================================================== -->
-<!-- Container fluid  -->
-<!-- ============================================================== -->
-<style>
-    select {
-        width: 100%;
-        height: 100%;
-    }
-</style>
-<div class="container-fluid table-responsive bg-dark">
-    <form id="filter-frm" method="GET" class="row">
-        <!-- <div class="col-6">
-            <a href="#" class="btn btn-xs btn-success btn-flat text-white" style="font-weight: bold;" onclick="addNewProduct()"
-                    data-toggle="modal" data-target="#newModal">ADD NEW PRODUCT</a>
-        </div> -->
 
+<style>
+    th, td  { font-size: x-small; }
+    select  { width: 100%; height: 100%; }
+    input   { width: 100%; }
+    .sold-negative { color: #aaa; font-style: italic; }
+</style>
+
+<div class="container-fluid table-responsive bg-dark">
+
+    <!-- Filter Form -->
+    <form id="filter-frm" method="GET" class="row mb-2">
         <div class="col-6">
-            <input class="text-center" onchange="applyFilter()" type="date" id="stock_date"
-                name="stock_date" required="required" value="{{ stock_date }}" max="{{ current_date }}" />
+            <input class="text-center" type="date"
+                   id="stock_date" name="stock_date"
+                   value="{{ stock_date }}" max="{{ current_date }}"
+                   required onchange="applyFilter()" />
         </div>
         <div class="col-6">
-            <select class="text-center" onchange="applyFilter()" name="category_id" id="category_id">
+            <select class="text-center" name="category_id" id="category_id" onchange="applyFilter()">
                 <option value="0">Filter by Category</option>
-                {% for product_category in product_categories %}
-                <option value="{{ product_category.id }}" {% if product_category.id==category_id %} selected {% endif
-                    %}>{{ product_category.name }}</option>
+                {% for cat in product_categories %}
+                <option value="{{ cat.id }}" {% if cat.id == category_id %}selected{% endif %}>
+                    {{ cat.name }}
+                </option>
                 {% endfor %}
             </select>
         </div>
-    </form><br />
+    </form>
+
+    <!-- Stock Table -->
     <table class="table-bordered table-striped">
-        <style>
-            th,
-            td {
-                font-size: x-small;
-            }
-        </style>
         <thead>
             <tr>
                 <th rowspan="2" class="text-center">PRODUCT</th>
@@ -55,117 +50,131 @@
         </thead>
         <tbody>
             {% for stock in stocks %}
-            {% set sold = stock.yesterday_opening+stock.yesterday_additions-stock.opening %}
-            <style>
-                input {
-                    width: 100%;
-                }
-            </style>
+            {% set sold = stock.yesterday_opening + stock.yesterday_additions - stock.opening %}
             <tr>
                 <td id="name_{{ stock.id }}">{{ stock.name }}</td>
-                <td id="category_{{ stock.id }}">{{ stock.category_name }}</td>
-                <td class="text-center" id="yesterday_{{ stock.id }}">{{
-                    helper.format_number(stock.yesterday_opening+stock.yesterday_additions) }}</td>
-                <td class="text-center" id="sold_{{ stock.id }}">{{ helper.format_number(sold) if sold>=0
-                    else '' }}</td>
-                <td class="text-center">
-                    <input type="hidden" id="opening_old_{{ stock.id }}" name="opening_old_{{ stock.id }}"
-                        value="{{ helper.format_number(stock.opening) }}" />
-                    <input type="number" id="opening_{{ stock.id }}" name="opening_{{ stock.id }}"
-                        value="{{ helper.format_number(stock.opening) }}" onchange="updateTotal({{ stock.id }});"
-                        min="0" />
+                <td>{{ stock.category_name }}</td>
+
+                <!-- Yesterday total — store raw value in data attr to avoid comma parsing issues -->
+                <td class="text-center"
+                    id="yesterday_{{ stock.id }}"
+                    data-value="{{ stock.yesterday_opening + stock.yesterday_additions }}">
+                    {{ helper.format_number(stock.yesterday_opening + stock.yesterday_additions) }}
                 </td>
-                <td class="text-center">
-                    <input type="number" id="additions_{{ stock.id }}" name="additions_{{ stock.id }}"
-                        value="{{ helper.format_number(stock.additions) }}" onchange="updateTotal({{ stock.id }});"
-                        min="0" {% if current_user.user_level.id==3 %} disabled {% endif %} />
+
+                <!-- Sold — empty if negative (product was restocked mid-day) -->
+                <td class="text-center {% if sold < 0 %}sold-negative{% endif %}"
+                    id="sold_{{ stock.id }}">
+                    {{ helper.format_number(sold) if sold >= 0 else '' }}
                 </td>
-                <td class="text-center" id="total_{{ stock.id }}">{{ helper.format_number(stock.opening +
-                    stock.additions) }}</td>
+
+                <!-- Opening -->
+                <td class="text-center">
+                    <input type="hidden"
+                           id="opening_old_{{ stock.id }}"
+                           value="{{ helper.format_number(stock.opening) }}" />
+                    <input type="number"
+                           id="opening_{{ stock.id }}"
+                           value="{{ helper.format_number(stock.opening) }}"
+                           data-id="{{ stock.id }}"
+                           class="stock-input"
+                           min="0" />
+                </td>
+
+                <!-- Additions -->
+                <td class="text-center">
+                    <input type="number"
+                           id="additions_{{ stock.id }}"
+                           value="{{ helper.format_number(stock.additions) }}"
+                           data-id="{{ stock.id }}"
+                           class="stock-input"
+                           min="0"
+                           {% if current_user.user_level.id == 3 %}disabled{% endif %} />
+                </td>
+
+                <td class="text-center" id="total_{{ stock.id }}">
+                    {{ helper.format_number(stock.opening + stock.additions) }}
+                </td>
             </tr>
             {% endfor %}
         </tbody>
     </table>
 </div>
 
+<!-- Add New Product Modal -->
 <div class="modal fade" id="newModal" tabindex="-1" role="dialog" aria-labelledby="newModalLabel" aria-hidden="true">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
             <form method="POST" class="form-horizontal">
+                <!-- CSRF token required for JWT cookie CSRF protection -->
                 <input type="hidden" id="edit_id" name="id" />
                 <input type="hidden" id="edit_product_id" name="product_id" />
-                <div class="modal-header text-center">
-                    <h5 class="text-center"><span id="product_header"></span> Product</h5>
+
+                <div class="modal-header">
+                    <h5><span id="product_header"></span> Product</h5>
                     <button type="button" class="close" data-dismiss="modal">&times;</button>
                 </div>
+
                 <div class="modal-body">
                     <div class="form-group row">
-                        <label class="col-5 text-end control-label col-form-label">Product Name:</label>
+                        <label class="col-5 text-end col-form-label">Product Name:</label>
                         <div class="col-7">
-                            <input required="required" type="text" name="name" id="edit_product_name"
-                                class="form-control input-sm" placeholder="Enter Product Name">
+                            <input required type="text" name="name" id="edit_product_name"
+                                   class="form-control input-sm" placeholder="Enter Product Name">
                         </div>
                     </div>
                     <div class="form-group row">
-                        <label class="col-5 text-end control-label col-form-label">Select Category:</label>
+                        <label class="col-5 text-end col-form-label">Select Category:</label>
                         <div class="col-7">
-                            <select class="form-control input-sm" name="category_id_new" id="edit_category_name"
-                                required>
-                                {% for product_category in product_categories %}
-                                <option value="{{ product_category.id }}" {{ 'selected' if
-                                    product_category.id==category_id }}>{{ product_category.name }}</option>
+                            <select class="form-control input-sm" name="category_id_new" id="edit_category_name" required>
+                                {% for cat in product_categories %}
+                                <option value="{{ cat.id }}" {{ 'selected' if cat.id == category_id }}>
+                                    {{ cat.name }}
+                                </option>
                                 {% endfor %}
                             </select>
                         </div>
                     </div>
                     <div class="form-group row">
-                        <label class="col-5 text-end control-label col-form-label">Buying Price:</label>
+                        <label class="col-5 text-end col-form-label">Buying Price:</label>
                         <div class="col-7">
-                            <input required="required" type="number" name="purchase_price" id="edit_purchase_price"
-                                class="form-control input-sm" placeholder="Enter Buying Price">
+                            <input required type="number" name="purchase_price" id="edit_purchase_price"
+                                   class="form-control input-sm" placeholder="Enter Buying Price">
                         </div>
                     </div>
                     <div class="form-group row">
-                        <label class="col-5 text-end control-label col-form-label">Selling Price:</label>
+                        <label class="col-5 text-end col-form-label">Selling Price:</label>
                         <div class="col-7">
-                            <input required="required" type="number" name="selling_price" id="edit_selling_price"
-                                class="form-control input-sm" placeholder="Enter Selling Price">
+                            <input required type="number" name="selling_price" id="edit_selling_price"
+                                   class="form-control input-sm" placeholder="Enter Selling Price">
                         </div>
                     </div>
                     <div class="form-group row">
-                        <label class="col-5 text-end control-label col-form-label">Items in Stock:</label>
+                        <label class="col-5 text-end col-form-label">Items in Stock:</label>
                         <div class="col-7">
-                            <input required="required" type="number" name="in_stock" id="edit_in_stock"
-                                class="form-control input-sm" placeholder="Enter Items in Stock">
+                            <input required type="number" name="in_stock" id="edit_in_stock"
+                                   class="form-control input-sm" placeholder="Enter Items in Stock">
                         </div>
                     </div>
                 </div>
+
                 <div class="modal-footer">
                     <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
-                    <button type="submit" id="action" name="action" value="add" class="btn btn-success">Save
-                        Product</button>
+                    <button type="submit" id="action" name="action" value="add" class="btn btn-success">
+                        Save Product
+                    </button>
                 </div>
             </form>
         </div>
     </div>
 </div>
-<!-- ============================================================== -->
-<!-- End Container fluid  -->
-<!-- ============================================================== -->
 
 <script>
-    $(document).ready(function () {
-        $("#search").focus(function () {
-            if (this.setSelectionRange) {
-                var len = $(this).val().length;
-                this.setSelectionRange(len, len);
-            } else {
-                $(this).val($(this).val());
-            }
-
-        });
-        $("#search").focus();
+    // Event delegation — one listener instead of inline onchange per row
+    $(document).on('change', '.stock-input', function () {
+        updateTotal($(this).data('id'));
     });
+
     function applyFilter() {
         $("#filter-frm").submit();
     }
@@ -180,33 +189,38 @@
     }
 
     function updateTotal(id) {
-        let name = $("#name_" + id).html();
-        let yesterday = parseFloat($("#yesterday_" + id).html());
-        let opening_old = parseFloat($("#opening_old_" + id).val());
-        let opening = parseFloat($("#opening_" + id).val());
-        let additions = parseFloat($("#additions_" + id).val());
+        const name       = $("#name_" + id).text();
+        // Read from data-value attr — avoids comma-parsing bug with formatted numbers
+        const yesterday  = parseFloat($("#yesterday_" + id).data('value')) || 0;
+        const openingOld = parseFloat($("#opening_old_" + id).val()) || 0;
+        let   opening    = parseFloat($("#opening_" + id).val()) || 0;
+        let   additions  = parseFloat($("#additions_" + id).val()) || 0;
+
         if (opening > yesterday) {
-            toastr.error("Opening stock cannot be more than yesterday's closing stock.\nAdded Stock has been set as purchases");
-            additions = opening - opening_old + additions;
+            toastr.error(
+                "Opening stock cannot exceed yesterday's closing stock.<br>Excess has been moved to additions.",
+                "Stock Warning",
+                { escapeHtml: false }   // allows <br> in message
+            );
+            additions = (opening - openingOld) + additions;
+            opening   = openingOld;
             $("#additions_" + id).val(additions);
-            opening = opening_old;
-            $("#opening_" + id).val(opening_old);
+            $("#opening_"   + id).val(opening);
         }
-        let total = opening + additions;
+
         $.ajax({
-            type: 'post',
-            url: '{{ url_for('stockTakeUpdate') }}',
-            data: {
-                id: id,
-                opening: opening,
-                additions: additions,
-                action: 'update'
-            },
-            success: function (data) {
+            type: 'POST',
+            url: '{{ url_for("stockTakeUpdate") }}',
+            data: { id, opening, additions, action: 'update' },
+            success: function () {
                 toastr.success("Updated " + name);
-                $("#opening_old_" + id).html(opening);
-                $("#total_" + id).html(total);
-                $("#sold_" + id).html(yesterday - opening);
+                $("#opening_old_" + id).val(opening);
+                $("#total_"       + id).text(opening + additions);
+                const sold = yesterday - opening;
+                $("#sold_" + id).text(sold >= 0 ? sold : '');
+            },
+            error: function () {
+                toastr.error("Failed to update " + name + ". Please try again.");
             }
         });
     }

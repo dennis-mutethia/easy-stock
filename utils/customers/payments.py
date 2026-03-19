@@ -1,9 +1,6 @@
-from flask import render_template, request
 from flask_login import current_user
 
-from utils.entities import Bill, BillEntry, Payment
-from utils.helper import Helper
-from utils.settings.system_users import SystemUsers
+from utils.entities import Payment
 
 class Payments():
     def __init__(self, db): 
@@ -12,73 +9,53 @@ class Payments():
     def fetch(self, payment_modes_map, users_map):
         self.db.ensure_connection()
         with self.db.conn.cursor() as cursor:
-            query = """
-            SELECT id, bill_id, amount, payment_mode_id, TO_CHAR(created_at + INTERVAL '3 HOURS', 'YYYY-MM-DD HH24:MI') AS created_at, created_by
-            FROM payments
-            WHERE shop_id=%s 
-            """
-            params = [current_user.shop.id]
-            
-            cursor.execute(query, tuple(params))
-            data = cursor.fetchall()
-            payments = []
-            for datum in data:
-                payment_mode = payment_modes_map.get(datum[3])
-                user     = users_map.get(datum[5])              
-                payments.append(Payment(datum[0], datum[1], datum[2], datum[4], user, payment_mode))
-
-            return payments 
+            cursor.execute(
+                """
+                SELECT id, bill_id, amount, payment_mode_id,
+                       TO_CHAR(created_at + INTERVAL '3 HOURS', 'YYYY-MM-DD HH24:MI') AS created_at,
+                       created_by
+                FROM payments
+                WHERE shop_id = %s
+                """,
+                (current_user.shop.id,)
+            )
+            return [
+                Payment(
+                    row[0], row[1], row[2], row[4],
+                    users_map.get(row[5]),
+                    payment_modes_map.get(row[3])
+                )
+                for row in cursor.fetchall()
+            ]
        
     def add(self, bill_id, amount, payment_mode_id, date_paid):
         self.db.ensure_connection()
-        with self.db.conn.cursor() as cursor:              
-            query = """
-            INSERT INTO payments(bill_id, amount, payment_mode_id, created_at, shop_id, created_by) 
-            VALUES(%s, %s, %s, %s, %s, %s) 
-            RETURNING id
-            """
-            params = (bill_id, amount, payment_mode_id, date_paid, current_user.shop.id, current_user.id)
-            try:
-                with self.db.conn.cursor() as cursor:
-                    cursor.execute(query, params)
-                    self.db.conn.commit()
-                    row_id = cursor.fetchone()[0]
-                    return row_id
-            except Exception as e:
-                self.db.conn.rollback()
-                raise e
-    
+        # BUG FIX: was opening two nested cursors — outer one was wasted
+        try:
+            with self.db.conn.cursor() as cursor:
+                cursor.execute(
+                    """
+                    INSERT INTO payments(bill_id, amount, payment_mode_id, created_at, shop_id, created_by) 
+                    VALUES(%s, %s, %s, %s, %s, %s) 
+                    RETURNING id
+                    """,
+                    (bill_id, amount, payment_mode_id, date_paid, current_user.shop.id, current_user.id)
+                )
+                self.db.conn.commit()
+                return cursor.fetchone()[0]
+        except Exception as e:
+            self.db.conn.rollback()
+            raise
     
     def delete(self, id):
         self.db.ensure_connection()
-        with self.db.conn.cursor() as cursor:
-            query = """
-            DELETE FROM payments
-            WHERE id=%s
-            """
-            params = [id]
-            cursor.execute(query, tuple(params))
-            self.db.conn.commit()    
-                       
-    def __call__(self):
-        if request.method == 'POST':       
-            if request.form['action'] == 'add':
-                stock_id = request.form['stock_id']    
-                bill_id = request.form['bill_id']
-                item_name = request.form['item_name']    
-                price = request.form['price']       
-                qty = request.form['qty']    
-                self.add(bill_id, stock_id, item_name, price, qty)
-                return 'success'                
-                
-            elif request.form['action'] == 'delete':
-                id = request.form['item_id']
-                self.delete(id) 
-                
-        bill_entries = self.fetch(0)
-        grandtotal = 0
-        for bill_entry in bill_entries:
-            grandtotal = grandtotal + (bill_entry.price * bill_entry.qty) 
-            
-        return render_template('pos/bill-entries.html', helper=Helper(), 
-                               bill_entries=bill_entries, grandtotal=grandtotal )
+        try:
+            with self.db.conn.cursor() as cursor:
+                cursor.execute(
+                    "DELETE FROM payments WHERE id = %s",
+                    (id,)
+                )
+            self.db.conn.commit()
+        except Exception as e:
+            self.db.conn.rollback()
+            raise

@@ -102,7 +102,7 @@ class Companies():
             elif request.form['action'] == 'renew':
                 id = request.form['id']
                 package_id = request.form['package_id']
-                Helper(self.db).update_license(id, package_id)
+                self.db.update_license(id, package_id)
                 toastr_message = 'License Renewed Successfully'
                                 
             elif request.form['action'] == 'access':

@@ -1,235 +1,278 @@
-import random, pytz
+import hashlib, pytz
 from datetime import datetime, timedelta
 from flask import render_template, request
 from flask_login import current_user
 
-from utils.customers.customer_bills import CustomerBills
-from utils.expenses import Expenses
 from utils.helper import Helper
-from utils.stock.stock_take import StockTake
 
 class Dashboard():
     def __init__(self, db): 
         self.db = db
-    
-    
-    def get_debts(self, report_date):
-        self.db.ensure_connection()
-        with self.db.conn.cursor() as cursor:
-            query = """
-            SELECT SUM(total - paid) AS unpaid_debts, SUM(paid) AS paid_debts
-            FROM bills
-            WHERE shop_id = %s AND total != 'Nan' AND DATE(created_at) <= %s
-            """
-            params = [current_user.shop.id, report_date]
-            
-            cursor.execute(query, tuple(params))
-            data = cursor.fetchall()
-            items = []
-            qtys = []
-            bgcolors = []
-            for datum in data:  
-                items.append("'UnPaid Debts', 'Paid Debts'")
-                qtys.append(datum[0] if datum[0] is not None else 0)
-                qtys.append(datum[1] if datum[1] is not None else 0)
-                bgcolors.append("'red','lime'")
 
-            return items, qtys, bgcolors
-    
-    def get_sales_per_item(self, report_date):
+    def _stable_color(self, text):
+        """Generate a stable RGB color from a string — no flicker on refresh."""
+        h = hashlib.md5(text.encode()).hexdigest()
+        r, g, b = int(h[0:2], 16), int(h[2:4], 16), int(h[4:6], 16)
+        # Brighten dark colors so they're visible on charts
+        r, g, b = max(r, 80), max(g, 80), max(b, 80)
+        return f"'rgb({r},{g},{b})'"
+
+    def fetch_all(self, report_date):
+        """Single query replacing get_total_sales, get_sales_per_item,
+           get_sales_purchases_and_expenses, and get_debts."""
         self.db.ensure_connection()
         with self.db.conn.cursor() as cursor:
             query = """
-            WITH products AS (
-                SELECT id, name
-                FROM products
-                WHERE shop_id = %s
-            ),
-            all_stock AS (
+            WITH all_stock AS (
                 SELECT 
-                    stock_date, 
-                    product_id, 
-                    CASE WHEN opening = 'Nan' THEN 0 ELSE opening END AS opening,
-                    CASE WHEN additions = 'Nan' THEN 0 ELSE additions END AS additions
+                    stock_date,
+                    product_id,
+                    CASE WHEN opening  = 'Nan' THEN 0 ELSE opening  END AS opening,
+                    CASE WHEN additions = 'Nan' THEN 0 ELSE additions END AS additions,
+                    purchase_price,
+                    selling_price
                 FROM stock
                 WHERE shop_id = %s
             ),
-            today AS (
-                SELECT 
-                    product_id, 
-                    name, 
-                    CASE WHEN opening = 'Nan' THEN 0 ELSE opening END AS opening,
-                    CASE WHEN additions = 'Nan' THEN 0 ELSE additions END AS additions
-                FROM all_stock
-                INNER JOIN products ON products.id = all_stock.product_id
+
+            -- ── Per-product daily sales ──────────────────────────────────────
+            sales AS (
+                SELECT
+                    t.stock_date,
+                    t.product_id,
+                    t.purchase_price,
+                    t.selling_price,
+                    t.additions,
+                    t.opening,
+                    (t.opening + t.additions - n.opening) AS sold
+                FROM all_stock t
+                INNER JOIN all_stock n
+                    ON  n.product_id  = t.product_id
+                    AND n.stock_date  = t.stock_date + INTERVAL '1 day'
+            ),
+
+            -- ── Today totals (sales / cost / purchases) ───────────────────────
+            today_totals AS (
+                SELECT
+                    SUM(sold * selling_price)   AS total_sales,
+                    SUM(sold * purchase_price)  AS total_cost,
+                    SUM(additions * purchase_price) AS total_purchases
+                FROM sales
                 WHERE DATE(stock_date) = DATE(%s)
             ),
-            tomorrow AS (
-                SELECT 
-                    product_id, 
-                    CASE WHEN opening = 'Nan' THEN 0 ELSE opening END AS opening
-                FROM all_stock
-                WHERE DATE(stock_date) = DATE(%s) + 1
-            ),
-            source AS(
-                SELECT today.name AS item_name, (today.opening + today.additions - tomorrow.opening) AS sold
-                FROM today
-                INNER JOIN tomorrow ON tomorrow.product_id = today.product_id
-            )        
-            SELECT item_name, sold
-            FROM source 
-            WHERE sold > 0         
-            """
-            params = [current_user.shop.id, current_user.shop.id, report_date, report_date]
-            
-            cursor.execute(query, tuple(params))
-            data = cursor.fetchall()
-            items = []
-            qtys = []
-            bgcolors = []
-            for datum in data:  
-                items.append(f"'{datum[0] if datum[0] is not None else 0}'")
-                qtys.append(datum[1] if datum[1] is not None else 0)
-                bgcolors.append(f"'rgb({random.randint(1, 255)},{random.randint(1, 255)},{random.randint(1, 255)})'")
 
-            return items, qtys, bgcolors
-    
-    def get_total_sales(self, report_date):
-        self.db.ensure_connection()
-        total_sales = 0 
-        total_cost = 0
-        total_purchases = 0
-        with self.db.conn.cursor() as cursor:
-            query = """                       
-            WITH all_stock AS (
-                SELECT 
-                    stock_date, 
-                    product_id, 
-                    CASE WHEN opening = 'Nan' THEN 0 ELSE opening END AS opening,
-                    CASE WHEN additions = 'Nan' THEN 0 ELSE additions END AS additions,
-                    purchase_price,
-                    selling_price
-                FROM stock
-                WHERE shop_id = %s
+            -- ── Per-item sales for today (for bar/pie chart) ──────────────────
+            item_sales AS (
+                SELECT
+                    p.name  AS item_name,
+                    s.sold
+                FROM sales s
+                INNER JOIN products p ON p.id = s.product_id
+                WHERE DATE(s.stock_date) = DATE(%s)
+                  AND s.sold > 0
             ),
-            sales AS(
-                SELECT 
-                    today.purchase_price,
-                    today.selling_price,
-                    today.additions,
-                    (today.opening + today.additions - tomorrow.opening) AS sold
-                FROM all_stock AS today
-                INNER JOIN all_stock AS tomorrow ON tomorrow.product_id = today.product_id
-                    AND DATE(tomorrow.stock_date) = DATE(today.stock_date) + 1
-                WHERE DATE(today.stock_date) = DATE(%s)
-            ),
-            totals AS(
-                SELECT SUM(sold*selling_price) AS total_sales, SUM(sold*purchase_price) AS total_cost, SUM(additions*purchase_price) AS total_purchases
-                FROM sales  
-            )
-            SELECT total_sales, total_cost, total_purchases
-            FROM totals
-            """
-            params = [current_user.shop.id, report_date]
-            
-            cursor.execute(query, tuple(params))
-            data = cursor.fetchall()
-            for datum in data:   
-                total_sales = datum[0]   
-                total_cost = datum[1]  
-                total_purchases = datum[2]        
 
-            return total_sales, total_cost, total_purchases 
-        
-    def get_sales_purchases_and_expenses(self, report_date):
-        self.db.ensure_connection()
-        with self.db.conn.cursor() as cursor:
-            query = """                                  
-            WITH all_stock AS (
-                SELECT 
-                    stock_date, 
-                    product_id, 
-                    CASE WHEN opening = 'Nan' THEN 0 ELSE opening END AS opening,
-                    CASE WHEN additions = 'Nan' THEN 0 ELSE additions END AS additions,
-                    purchase_price,
-                    selling_price
-                FROM stock
-                WHERE shop_id = %s
-            ),
-            sales AS(
-                SELECT 
-                    today.stock_date,
-                    today.opening,
-                    today.additions,
-                    today.purchase_price,
-                    today.selling_price,
-                    (today.opening + today.additions - tomorrow.opening) AS sold
-                FROM all_stock AS today
-                INNER JOIN all_stock AS tomorrow ON tomorrow.product_id = today.product_id
-                    AND DATE(tomorrow.stock_date) = DATE(today.stock_date) + 1
-            ),
-            totals AS(
-                SELECT 
-                    stock_date AS report_date,
-                    SUM(additions*purchase_price) AS purchases,
-                    SUM((opening+additions)*selling_price) AS stocks,
-                    SUM(sold*selling_price) AS sales
-                FROM sales  
+            -- ── 7-day trend (sales, purchases, stock, expenses) ───────────────
+            weekly_totals AS (
+                SELECT
+                    stock_date                          AS report_date,
+                    SUM(additions * purchase_price)     AS purchases,
+                    SUM((opening + additions) * selling_price) AS stocks,
+                    SUM(sold * selling_price)           AS sales
+                FROM sales
                 WHERE DATE(stock_date) BETWEEN DATE(%s) - INTERVAL '7 days' AND DATE(%s)
                 GROUP BY stock_date
             ),
-            exp AS(
-                SELECT date, SUM(amount) expenses
+            weekly_exp AS (
+                SELECT date, SUM(amount) AS expenses
                 FROM expenses
                 WHERE shop_id = %s
                 GROUP BY date
-            )
-            SELECT report_date, COALESCE(purchases,0) AS purchases, stocks, COALESCE(sales,0) AS sales, COALESCE(expenses,0) AS expenses
-            FROM totals
-            LEFT JOIN exp ON exp.date=totals.report_date         
-            """
-            params = [current_user.shop.id, report_date, report_date, current_user.shop.id]
-            
-            cursor.execute(query, tuple(params))
-            data = cursor.fetchall()
-            dates = []
-            purchases_all = []
-            stocks_all = []
-            sales_all = []
-            expenses_all = []
-            for datum in data:  
-                dates.append(f"'{datum[0]}'")
-                purchases_all.append(datum[1] if datum[1] is not None else 0)
-                stocks_all.append(datum[2] if datum[2] is not None else 0)
-                sales_all.append(datum[3] if datum[3] is not None else 0)
-                expenses_all.append(datum[4] if datum[4] is not None else 0)
+            ),
+            weekly AS (
+                SELECT
+                    w.report_date,
+                    COALESCE(w.purchases, 0) AS purchases,
+                    w.stocks,
+                    COALESCE(w.sales, 0)     AS sales,
+                    COALESCE(e.expenses, 0)  AS expenses
+                FROM weekly_totals w
+                LEFT JOIN weekly_exp e ON e.date = w.report_date
+            ),
 
-            return dates, purchases_all, stocks_all, sales_all, expenses_all
-                
+            -- ── Debt summary ─────────────────────────────────────────────────
+            debts AS (
+                SELECT
+                    SUM(total - paid) AS unpaid_debts,
+                    SUM(paid)         AS paid_debts
+                FROM bills
+                WHERE shop_id = %s
+                  AND total != 'Nan'
+                  AND DATE(created_at) <= DATE(%s)
+            )
+
+            -- Return all result sets tagged by type
+            SELECT 
+                'today'::text   AS result_type, 
+                total_sales::float, 
+                total_cost::float, 
+                total_purchases::float, 
+                NULL::text      AS label, 
+                NULL::text      AS report_date, 
+                NULL::float     AS expenses,
+                NULL::float, 
+                NULL::float, 
+                NULL::float 
+            FROM today_totals
+
+            UNION ALL
+
+            SELECT 
+                'item'::text, 
+                sold::float, 
+                NULL::float, 
+                NULL::float, 
+                item_name::text, 
+                NULL::text, 
+                NULL::float, 
+                NULL::float, 
+                NULL::float, 
+                NULL::float 
+            FROM item_sales
+
+            UNION ALL
+
+            SELECT 
+                'weekly'::text, 
+                purchases::float, 
+                stocks::float, 
+                sales::float, 
+                NULL::text, 
+                report_date::text, 
+                expenses::float, 
+                NULL::float, 
+                NULL::float, 
+                NULL::float 
+            FROM weekly
+
+            UNION ALL
+
+            SELECT 
+                'debt'::text, 
+                unpaid_debts::float, 
+                paid_debts::float, 
+                NULL::float, 
+                NULL::text, 
+                NULL::text, 
+                NULL::float, 
+                NULL::float, 
+                NULL::float, 
+                NULL::float 
+            FROM debts
+            """
+            shop_id = current_user.shop.id
+            params = (
+                shop_id,        # all_stock
+                report_date,    # today_totals
+                report_date,    # item_sales
+                report_date,    # weekly start
+                report_date,    # weekly end
+                shop_id,        # weekly_exp
+                shop_id,        # debts
+                report_date,    # debts date
+            )
+
+            cursor.execute(query, params)
+            rows = cursor.fetchall()
+
+        # ── Parse results by type tag ─────────────────────────────────────────
+        total_sales = total_cost = total_purchases = 0
+        items, qtys, bgcolors = [], [], []
+        dates, purchases_all, stocks_all, sales_all, expenses_all = [], [], [], [], []
+        unpaid_debts = paid_debts = 0
+
+        for row in rows:
+            rtype = row[0]
+
+            if rtype == 'today':
+                total_sales     = row[1] or 0
+                total_cost      = row[2] or 0
+                total_purchases = row[3] or 0
+
+            elif rtype == 'item':
+                name = row[4] or 'Unknown'
+                items.append(f"'{name}'")
+                qtys.append(row[1] or 0)
+                bgcolors.append(self._stable_color(name))
+
+            elif rtype == 'weekly':
+                dates.append(f"'{row[5]}'")
+                purchases_all.append(row[1] or 0)
+                stocks_all.append(row[2] or 0)
+                sales_all.append(row[3] or 0)
+                expenses_all.append(row[6] or 0)
+
+            elif rtype == 'debt':
+                unpaid_debts = row[1] or 0
+                paid_debts   = row[2] or 0
+
+        debts    = ["'UnPaid Debts', 'Paid Debts'"]
+        amounts  = [unpaid_debts, paid_debts]
+        bgcolors_2 = ["'red','lime'"]
+
+        return (
+            total_sales, total_cost, total_purchases,
+            items, qtys, bgcolors,
+            dates, purchases_all, stocks_all, sales_all, expenses_all,
+            debts, amounts, bgcolors_2
+        )
+
     def __call__(self):
-        yesterday = datetime.now(pytz.timezone("Africa/Nairobi")) - timedelta(days=1)
-        report_date = yesterday.strftime('%Y-%m-%d')
-        max_date = datetime.now(pytz.timezone("Africa/Nairobi")).strftime('%Y-%m-%d')
-        
-        if request.method == 'GET':   
-            try:    
-                report_date = request.args.get('report_date', report_date)
-                
-            except Exception as e:
-                print(f"An error occurred: {e}")
-        
-        total_sales, total_cost, total_purchases = self.get_total_sales(report_date)
-        total_expenses = Expenses(self.db).get_total(report_date)
-        total_capital, total_stock = StockTake(self.db).get_total(report_date)
-        total_unpaid_bills = CustomerBills(self.db).get_total_unpaid_bills(report_date)
-        items, qtys, bgcolors = self.get_sales_per_item(report_date)
-        debts, amounts, bgcolors_2 = self.get_debts(report_date)
-        dates, purchases, stocks, sales, expenses = self.get_sales_purchases_and_expenses(report_date)
-         
-        return render_template('dashboard/index.html', page_title='Dashboard', helper=Helper(), menu = 'dashboard',
-                               report_date=report_date, max_date=max_date,
-                               total_purchases=total_purchases, total_sales=total_sales, total_expenses=total_expenses,
-                               total_capital=total_capital, total_stock=total_stock, total_cost=total_cost, total_unpaid_bills=total_unpaid_bills,
-                               items=items, qtys=qtys, bgcolors=bgcolors, debts=debts, amounts=amounts, bgcolors_2=bgcolors_2,
-                               dates=dates, sales=sales, expenses=expenses, stocks=stocks, purchases=purchases
-                               )
+        nairobi = pytz.timezone("Africa/Nairobi")
+        now = datetime.now(nairobi)
+        yesterday  = (now - timedelta(days=1)).strftime('%Y-%m-%d')
+        max_date   = now.strftime('%Y-%m-%d')
+        report_date = request.args.get('report_date', yesterday) if request.method == 'GET' else yesterday
+
+        (
+            total_sales, total_cost, total_purchases,
+            items, qtys, bgcolors,
+            dates, purchases_all, stocks_all, sales_all, expenses_all,
+            debts, amounts, bgcolors_2
+        ) = self.fetch_all(report_date)
+
+        # These three still need their own queries but are self-contained utils
+        from utils.expenses import Expenses
+        from utils.stock.stock_take import StockTake
+        from utils.customers.customer_bills import CustomerBills
+
+        total_expenses                  = Expenses(self.db).get_total(report_date)
+        total_capital, total_stock      = StockTake(self.db).get_total(report_date)
+        total_unpaid_bills              = CustomerBills(self.db).get_total_unpaid_bills(report_date)
+
+        return render_template(
+            'dashboard/index.html',
+            page_title='Dashboard',
+            helper=Helper(),
+            menu='dashboard',
+            report_date=report_date,
+            max_date=max_date,
+            total_purchases=total_purchases,
+            total_sales=total_sales,
+            total_expenses=total_expenses,
+            total_capital=total_capital,
+            total_stock=total_stock,
+            total_cost=total_cost,
+            total_unpaid_bills=total_unpaid_bills,
+            items=items,
+            qtys=qtys,
+            bgcolors=bgcolors,
+            debts=debts,
+            amounts=amounts,
+            bgcolors_2=bgcolors_2,
+            dates=dates,
+            sales=sales_all,
+            expenses=expenses_all,
+            stocks=stocks_all,
+            purchases=purchases_all,
+        )
