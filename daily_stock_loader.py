@@ -8,7 +8,7 @@ class DailyStockLoader():
     def __init__(self): 
         self.db = Db()
                     
-    def load(self, stock_date, register=False):
+    def load(self, stock_date, shop_id=None):
         self.db.create_current_month_partition()
         
         self.db.ensure_connection()
@@ -42,16 +42,16 @@ class DailyStockLoader():
             """
             
             params = [stock_date, stock_date]
-            if register:
+            if shop_id:
                 query += """
                 WHERE shop_id = %s
                 """
-                params.append(current_user.shop.id)
+                params.append(shop_id)
             
             query += """  
             ON CONFLICT (stock_date, product_id, shop_id) DO NOTHING
-            """          
-     
+            """    
+                 
             cursor.execute(query, tuple(params))
             self.db.conn.commit()
     

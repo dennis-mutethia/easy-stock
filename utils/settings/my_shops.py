@@ -131,7 +131,7 @@ class MyShops():
                     shop_id = self.add(name, shop_type_id, company_id, location, created_by)
                     self.db.import_product_categories_template_data(shop_id, shop_type_id)
                     self.db.import_products_template_data(shop_id, shop_type_id)
-                    DailyStockLoader().load(current_date, register=True) 
+                    DailyStockLoader().load(current_date, shop_id=shop_id) 
                     toastr_message = f'{name} Added Successfully'
                 else:
                     shop_id = request.form['shop_id']

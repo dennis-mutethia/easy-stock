@@ -64,7 +64,7 @@ class Login():
         login_user(user)
         self.db.import_product_categories_template_data(shop_id, form['shop_type_id'])
         self.db.import_products_template_data(shop_id, form['shop_type_id'])
-        DailyStockLoader().load(current_date, register=True)
+        DailyStockLoader().load(current_date, shop_id=shop_id)
 
         return self._redirect_with_jwt(user, 'dashboard')
     

@@ -165,22 +165,31 @@ class Db():
         )
         return PaymentMode(*row) if row else None
     
-    def import_product_categories_template_data(self, shop_id, shop_type_id):
-        self._execute_write(
-            """
+    def import_product_categories_template_data(self, shop_id, shop_type_id):        
+        self.ensure_connection()
+        with self.conn.cursor() as cursor:
+            query = """
             WITH source AS (
                 SELECT name FROM product_categories WHERE shop_id = %s
             )
             INSERT INTO product_categories(name, shop_id, created_at, created_by)
             SELECT name, %s, CURRENT_TIMESTAMP AT TIME ZONE 'Africa/Nairobi', %s
             FROM source
-            """,
-            (0 - int(shop_type_id), shop_id, current_user.id)
-        )
-    
-    def import_products_template_data(self, shop_id, shop_type_id):
-        self._execute_write(
             """
+            params = [0 - int(shop_type_id), shop_id, current_user.id]
+            
+            try:
+                cursor.execute(query, tuple(params))
+                self.conn.commit()
+            except Exception as e:
+                self.conn.rollback()
+                print(f"Error loading product categories: {e}")
+            
+    
+    def import_products_template_data(self, shop_id, shop_type_id):      
+        self.ensure_connection()
+        with self.conn.cursor() as cursor:
+            query = """
             WITH pc AS (
                 SELECT id, name, shop_id FROM product_categories
             ),
@@ -195,10 +204,17 @@ class Db():
             SELECT name, purchase_price, selling_price, category_id, %s, 
                    CURRENT_TIMESTAMP AT TIME ZONE 'Africa/Nairobi', %s
             FROM source
-            """,
-            (shop_id, 0 - int(shop_type_id), shop_id, current_user.id)
-        )
+            """
+            params = [shop_id, 0 - int(shop_type_id), shop_id, current_user.id]
             
+            try:
+                cursor.execute(query, tuple(params))
+                self.conn.commit()
+            except Exception as e:
+                self.conn.rollback()
+                print(f"Error loading products: {e}")
+            
+
     def create_current_month_partition(self):
         self.ensure_connection()
         nairobi = pytz.timezone("Africa/Nairobi")
