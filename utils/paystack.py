@@ -1,5 +1,6 @@
 
 import os
+from utils.helper import Helper
 from dotenv import load_dotenv
 import requests
 
@@ -58,12 +59,12 @@ class Charge(Paystack):
         url = f'{self.base_url}/charge'
     
         data={ 
-            "email": f"{phone}@safaricom.co.ke", 
+            "email": f"{phone}@easystock.co.ke", 
             "amount": amount*100,
             "currency": "KES",            
             "mobile_money": {
                 "phone" : f"+254{phone[-9:]}",
-                "provider" : "mpesa"
+                "provider" : Helper().get_provider(phone)
             }
         }
         
