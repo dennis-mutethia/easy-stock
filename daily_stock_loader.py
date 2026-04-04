@@ -1,5 +1,4 @@
 from datetime import datetime
-from flask_login import current_user
 import pytz
 
 from utils.db import Db
@@ -60,4 +59,6 @@ class DailyStockLoader():
         stock_date = current_date 
         self.load(stock_date)
 
-DailyStockLoader()()
+
+if __name__ == '__main__':
+    DailyStockLoader()()

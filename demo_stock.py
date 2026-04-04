@@ -85,4 +85,5 @@ class DemoSTock():
         for shop_id in shop_ids:  
             self.update(stock_date, shop_id)
 
-DemoSTock()()
+if __name__ == '__main__':
+    DemoSTock()()
