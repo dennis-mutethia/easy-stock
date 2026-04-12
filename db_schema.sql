@@ -234,3 +234,48 @@ CREATE TABLE IF NOT EXISTS cashbox (
   updated_by INT,
   UNIQUE (date, shop_id)
 );
+
+
+-- Table structure for table cards
+DROP TABLE IF EXISTS cards;
+CREATE TABLE IF NOT EXISTS cards (
+  id SERIAL PRIMARY KEY,
+  card_no TEXT,
+  name TEXT,
+  phone TEXT,
+  shop_id INT,
+  created_at TIMESTAMP,
+  created_by INT,
+  updated_at TIMESTAMP,
+  updated_by INT,
+  UNIQUE (card_no, shop_id),
+  UNIQUE (phone, shop_id)
+);
+
+-- Table structure for table points
+DROP TABLE IF EXISTS points;
+CREATE TABLE IF NOT EXISTS points (
+  id SERIAL PRIMARY KEY,
+  card_id INT,
+  amount_spent DOUBLE PRECISION,
+  points_earned DOUBLE PRECISION,
+  shop_id INT,
+  created_at TIMESTAMP,
+  created_by INT,
+  updated_at TIMESTAMP,
+  updated_by INT
+);
+
+-- Table structure for table redemptions
+DROP TABLE IF EXISTS redemptions;
+CREATE TABLE IF NOT EXISTS redemptions (
+  id SERIAL PRIMARY KEY,
+  card_id INT,
+  points_redeemed DOUBLE PRECISION,
+  amount_redeemed DOUBLE PRECISION,
+  shop_id INT,
+  created_at TIMESTAMP,
+  created_by INT,
+  updated_at TIMESTAMP,
+  updated_by INT
+);

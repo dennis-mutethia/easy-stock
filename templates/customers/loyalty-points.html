@@ -1,0 +1,268 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<!-- ============================================================== -->
+<!-- Container fluid  -->
+<!-- ============================================================== -->
+<div class="container-fluid table-responsive bg-dark">
+    <table class="table-bordered table-striped">
+        <thead>
+            <tr>
+                <th class="text-center">CARD NO</th>
+                <th>CUSTOMER NAME</th>
+                <th class="text-center">PHONE</th>
+                <th class="text-center">POINTS</th>
+                <th class="text-center" colspan="3">
+                    <a href="#" class="btn btn-xs btn-primary btn-flat" style="width: 100%" data-toggle="modal"
+                        data-target="#newModal" onclick="addNewCustomer()">Add New Card
+                    </a>
+                </th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for card in cards %}
+            <tr>
+                <td class="text-center">{{ card.card_no }}</td>
+                <td>{{ card.name }}</td>
+                <td>{{ card.phone }}</td>
+                <td class="text-center">{{ card.points }}</td>
+                <td class="text-center">
+                    <a href="#"
+                        onclick="addPoints({{ card.id }}, '{{ card.card_no }}', '{{ card.name }}', {{ card.points }})"
+                        data-toggle="modal" class="btn btn-xs btn-success btn-flat" style="height: 60%"
+                        data-target="#addPointsModal" title="Add Points"><i class="mdi mdi-plus-circle">Add</i></a>
+                </td>
+                <td class="text-center">
+                    <a href="#"
+                        onclick="redeemPoints({{ card.id }}, '{{ card.card_no }}', '{{ card.name }}', {{ card.points }})"
+                        data-toggle="modal" class="btn btn-xs btn-warning btn-flat" style="height: 60%"
+                        data-target="#redeemPointsModal" title="Redeem Points"><i
+                            class="mdi mdi-credit-card">Redeem</i></a>
+                </td>
+
+                <td class="text-center">
+                    <a href="#"
+                        onclick="editCustomer({{ card.id }}, '{{ card.name }}', '{{ card.phone }}', '{{ card.card_no }}')"
+                        data-toggle="modal" data-target="#newModal" title="Edit Item"><i
+                            class="mdi mdi-border-color">edit</i></a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+<!-- ============================================================== -->
+<!-- End Container fluid  -->
+<!-- ============================================================== -->
+
+
+<div class="modal fade" id="newModal" tabindex="-1" role="dialog" aria-labelledby="newModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <form method="POST" class="form-horizontal">
+                <input type="hidden" id="edit_card_id" name="id" />
+                <div class="modal-header text-center">
+                    <h5 class="text-center"><span id="customer_header"></span> Loyalty Points</h5>
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group row">
+                        <label class="col-3 text-end control-label col-form-label">Customer Name:</label>
+                        <div class="col-9">
+                            <input required="required" type="text" name="name" id="customer_name"
+                                class="form-control input-sm" placeholder="Enter Customer Name">
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <label class="col-3 text-end control-label col-form-label">Phone:</label>
+                        <div class="col-9">
+                            <input id="customer_phone" name="phone" type="number" class="form-control input-sm"
+                                placeholder="Enter Customer Phone" required min="100000000" max="799999999" />
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <label class="col-3 text-end control-label col-form-label">Card Number:</label>
+                        <div class="col-9">
+                            <input id="card_no" name="card_no" type="text" class="form-control input-sm"
+                                placeholder="Enter Card Number" required />
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+                    <button type="submit" id="action" name="action" value="add" class="btn btn-success">Save
+                        Card</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+
+<div class="modal fade" id="addPointsModal" tabindex="-1" role="dialog" aria-labelledby="addPointsModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <form method="POST">
+                <input type="hidden" id="add_points_id" name="id" />
+                <div class="modal-header">
+                    <h5 class="text-center">Add Points to Customer: <code class="text-xs" style="color: black;"
+                            id="add_points_card_no"> - </code> <code class="text-xs" style="color: black;"
+                            id="add_points_name"></code></h5>
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group row">
+                        <label class="col-3 text-end control-label col-form-label">Amount Spent:</label>
+                        <div class="col-9">
+                            <input id="amount_spent" name="amount_spent" type="number" class="form-control input-sm"
+                                onkeyup="updatePointsGained()" placeholder="Enter Amount Spent" min="1" required />
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <label class="col-3 text-end control-label col-form-label">Points Gained:</label>
+                        <div class="col-9">
+                            <input id="points_gained" name="points_gained" type="number" class="form-control input-sm"
+                                readonly placeholder="0.0" />
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <label class="col-3 text-end control-label col-form-label">Original Points:</label>
+                        <div class="col-9">
+                            <input id="original_points" type="number" class="form-control input-sm" readonly
+                                placeholder="0.0" />
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <label class="col-3 text-end control-label col-form-label">New Points Balance:</label>
+                        <div class="col-9">
+                            <input id="new_points" type="number" class="form-control input-sm" readonly
+                                placeholder="0.0" />
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-danger" type="button" data-dismiss="modal">Cancel</button>
+                    <button type="submit" id="action" name="action" value="add_points"
+                        class="btn btn-success float-end">Confirm Add Points</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+
+<div class="modal fade" id="redeemPointsModal" tabindex="-1" role="dialog" aria-labelledby="redeemPointsModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <form method="POST">
+                <input type="hidden" id="redeem_points_id" name="id" />
+                <div class="modal-header">
+                    <h5 class="text-center">Redeem Points for Customer: <code class="text-xs" style="color: black;"
+                            id="redeem_points_card_no"> - </code> <code class="text-xs" style="color: black;"
+                            id="redeem_points_name"></code></h5>
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group row">
+                        <label class="col-3 text-end control-label col-form-label">Points to Redeem:</label>
+                        <div class="col-9">
+                            <input id="points_redeemed" name="points_redeemed" type="number"
+                                class="form-control input-sm" onkeyup="updatePointsRedeemed()"
+                                placeholder="Enter Points to Redeem" min="1" required />
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <label class="col-3 text-end control-label col-form-label">Amount Redeemed:</label>
+                        <div class="col-9">
+                            <input id="amount_redeemed" name="amount_redeemed" type="number"
+                                class="form-control input-sm" readonly placeholder="0.0" />
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <label class="col-3 text-end control-label col-form-label">Original Points:</label>
+                        <div class="col-9">
+                            <input id="original_points_" type="number" class="form-control input-sm" readonly
+                                placeholder="0.0" />
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <label class="col-3 text-end control-label col-form-label">New Points Balance:</label>
+                        <div class="col-9">
+                            <input id="new_points_" type="number" class="form-control input-sm" readonly
+                                placeholder="0.0" />
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-danger" type="button" data-dismiss="modal">Cancel</button>
+                    <button type="submit" id="action" name="action" value="redeem_points"
+                        class="btn btn-success float-end">Confirm Redeem Points</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    if ({% if errors %}true{% else %} false{% endif %}) toastr.error('{{ errors }}');
+
+    function addNewCustomer() {
+        $("#customer_header").html('Add New');
+        $("#edit_card_id").val('');
+        $("#customer_name").val('');
+        $("#customer_phone").val('');
+        $("#card_no").val('');
+        $('#card_no').prop('readonly', false);
+        $("#action").val('add');
+    }
+
+    function editCustomer(id, name, phone, card_no) {
+        $("#customer_header").html('Edit');
+        $("#edit_card_id").val(id);
+        $("#customer_name").val(name);
+        $("#customer_phone").val(phone);
+        $("#card_no").val(card_no);
+        $('#card_no').prop('readonly', true);
+        $("#action").val('edit');
+    }
+
+    function addPoints(id, card_no, name, points) {
+        $("#add_points_id").val(id);
+        $("#add_points_card_no").html(card_no);
+        $("#add_points_name").html(name);
+        $("#points_gained").val('');
+        $("#original_points").val(points);
+        $("#new_points").val(points);
+    }
+
+    function updatePointsGained() {
+        let amountSpent = parseFloat($("#amount_spent").val()) || 0;
+        let pointsGained = amountSpent / 100;
+        let originalPoints = parseFloat($("#original_points").val()) || 0;
+        $("#points_gained").val(pointsGained);
+        $("#new_points").val(originalPoints + pointsGained);
+    }
+
+    function redeemPoints(id, card_no, name, points) {
+        $("#redeem_points_id").val(id);
+        $("#redeem_points_card_no").html(card_no);
+        $("#redeem_points_name").html(name);
+        $("#points_redeemed").val('');
+        $("#points_redeemed").attr('max', points);
+        $("#original_points_").val(points);
+        $("#new_points_").val(points);
+    }
+
+    function updatePointsRedeemed() {
+        let pointsToRedeem = parseFloat($("#points_redeemed").val()) || 0;
+        let amountRedeemed = pointsToRedeem * 1; 
+        let originalPoints = parseFloat($("#original_points_").val()) || 0;
+        $("#amount_redeemed").val(amountRedeemed);
+        $("#new_points_").val(originalPoints - pointsToRedeem);
+    }
+
+</script>
+
+{% endblock %}

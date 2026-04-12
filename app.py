@@ -11,6 +11,7 @@ from utils.cashbox import CashBox
 from utils.our_packages import OurPackages
 from utils.customers.customer_bills import CustomerBills
 from utils.customers.customers import Customers
+from utils.customers.loyalty_points import LoyaltyPoints
 from utils.dashboard import Dashboard
 from utils.db import Db
 from utils.expenses import Expenses
@@ -165,6 +166,11 @@ def inventoryStockAdjustmentUpdate():
 @login_required
 def customers():
     return Customers(db)()
+
+@app.route('/loyalty-points', methods=['GET', 'POST'])
+@login_required
+def loyaltyPoints():
+    return LoyaltyPoints(db)()
 
 @app.route('/customer-update', methods=['POST'])
 @login_required

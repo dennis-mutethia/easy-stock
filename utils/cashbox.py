@@ -6,12 +6,13 @@ from flask_login import current_user
 from utils.helper import Helper
 
 class Cash():
-    def __init__(self, date, total_sales, paid_bills, new_bills, total_expenses, cash, mpesa):
+    def __init__(self, date, total_sales, paid_bills, new_bills, total_expenses, total_points_redeemed, cash, mpesa):
         self.date = date        
         self.total_sales = total_sales
         self.paid_bills = paid_bills
         self.new_bills = new_bills
         self.total_expenses = total_expenses
+        self.total_points_redeemed = total_points_redeemed
         self.cash = cash
         self.mpesa = mpesa
         
@@ -55,6 +56,12 @@ class CashBox():
                 WHERE shop_id = %s
                 GROUP BY date
             ),
+            points_redeemed AS(
+                SELECT DATE(created_at) AS date, SUM(points_redeemed) total_points_redeemed
+                FROM redemptions
+                WHERE shop_id = %s
+                GROUP BY DATE(created_at)
+            ),
             payments AS(
                 SELECT DATE(created_at) AS date, SUM(amount) paid_bills
                 FROM payments
@@ -74,10 +81,11 @@ class CashBox():
                 GROUP BY date, cash, mpesa    
             ),
             source AS(
-                SELECT stock_date, COALESCE(total_sales,0) AS total_sales, COALESCE(total_expenses,0) AS total_expenses, 
+                SELECT stock_date, COALESCE(total_sales,0) AS total_sales, COALESCE(total_expenses,0) AS total_expenses, COALESCE(total_points_redeemed,0) AS total_points_redeemed,
                     COALESCE(paid_bills,0) AS paid_bills, COALESCE(new_bills,0) AS new_bills, COALESCE(cash,0) AS cash, COALESCE(mpesa,0) AS mpesa
                 FROM totals
                 LEFT JOIN exp ON exp.date=totals.stock_date 
+                LEFT JOIN points_redeemed ON points_redeemed.date=totals.stock_date
                 LEFT JOIN payments ON payments.date=totals.stock_date 
                 LEFT JOIN bills ON bills.date=totals.stock_date    
                 LEFT JOIN received ON received.date=totals.stock_date  
@@ -88,6 +96,7 @@ class CashBox():
                 paid_bills,
                 new_bills,
                 total_expenses,
+                total_points_redeemed,
                 cash,
                 mpesa
             FROM source            
@@ -97,11 +106,11 @@ class CashBox():
             ORDER BY stock_date  
             """
             shop_id = current_user.shop.id
-            params = (shop_id, shop_id, shop_id, shop_id, shop_id, report_date, report_date)
+            params = (shop_id, shop_id, shop_id, shop_id, shop_id, shop_id, report_date, report_date)
             
             cursor.execute(query, params)
             return [
-                Cash(row[0], row[1], row[2], row[3], row[4], row[5], row[6])
+                Cash(row[0], row[1], row[2], row[3], row[4], row[5], row[6], row[7])
                 for row in cursor.fetchall()
             ]
     
@@ -148,7 +157,7 @@ class CashBox():
 
         total_expected = total_received = total_diff = 0
         if today:
-            total_expected = today.total_sales + today.paid_bills - today.new_bills - today.total_expenses
+            total_expected = today.total_sales + today.paid_bills - today.new_bills - today.total_expenses - today.total_points_redeemed
             total_received = today.cash + today.mpesa
             total_diff     = total_received - total_expected
         

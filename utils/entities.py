@@ -178,6 +178,14 @@ class Statement():
         self.purchases = purchases    
         self.expenses = expenses   
         
+class Cards():
+    def __init__(self, id, card_no, name, phone, points=0):
+        self.id = id
+        self.card_no = card_no
+        self.name = name
+        self.phone = phone
+        self.points = points
+        
         
           
         
