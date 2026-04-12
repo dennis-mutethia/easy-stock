@@ -51,6 +51,11 @@
                         </li>
                     </ul>
                 </li>
+                <li class="sidebar-item {{'selected' if menu == 'loyalty_points' }}">
+                    <a class="sidebar-link waves-effect waves-dark sidebar-link" href="{{ url_for('loyaltyPoints') }}"
+                        aria-expanded="false"><i class="mdi mdi-tag-heart"></i><span
+                            class="hide-menu">Loyalty Points</span></a>
+                </li>
                 <li class="sidebar-item {{'selected' if menu == 'expenses' }}">
                     <a class="sidebar-link waves-effect waves-dark sidebar-link" href="{{ url_for('expenses') }}"
                         aria-expanded="false"><i class="mdi mdi-gas-station"></i><span
@@ -60,11 +65,6 @@
                     <a class="sidebar-link waves-effect waves-dark sidebar-link" href="{{ url_for('cashbox') }}"
                         aria-expanded="false"><i class="mdi mdi-cash-multiple"></i><span
                             class="hide-menu">Cashbox</span></a>
-                </li>
-                <li class="sidebar-item {{'selected' if menu == 'loyalty_points' }}">
-                    <a class="sidebar-link waves-effect waves-dark sidebar-link" href="{{ url_for('loyaltyPoints') }}"
-                        aria-expanded="false"><i class="mdi mdi-tag-heart"></i><span
-                            class="hide-menu">Loyalty Points</span></a>
                 </li>
                 {% endif %}
                 {% if current_user.user_level.id in [0, 1, 2] %}
