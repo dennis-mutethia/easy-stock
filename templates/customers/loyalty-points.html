@@ -206,6 +206,7 @@
 </div>
 
 <script>
+    if ({% if success %}true{% else %} false{% endif %}) toastr.success('{{ success }}');
     if ({% if errors %}true{% else %} false{% endif %}) toastr.error('{{ errors }}');
 
     function addNewCustomer() {

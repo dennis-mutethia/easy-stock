@@ -51,11 +51,11 @@ class LoyaltyPoints():
                     (card_no, name.upper(), phone, current_user.shop.id, current_user.id)
                 )
                 self.db.conn.commit()
-                return None
+                return f'Card {card_no} added successfully.', None
         except Exception as e:
             self.db.conn.rollback()
-            return 'Card number or phone already exists for another customer. Please use unique values.'
-            
+            return None, 'Card number or phone already exists for another customer. Please use unique values.'
+
     def update(self, id, name, phone):
         self.db.ensure_connection()
         try:
@@ -72,10 +72,10 @@ class LoyaltyPoints():
                     (name.upper(), phone, current_user.id, id)
                 )
                 self.db.conn.commit()
-                return None
+                return f'Customer details updated successfully.', None
         except Exception as e:
             self.db.conn.rollback()
-            return 'Phone number already exists for another customer. Please use a unique value.'
+            return None, 'Phone number already exists for another customer. Please use a unique value.'
         
     def add_points(self, card_id, amount_spent, points_earned):
         self.db.ensure_connection()
@@ -89,10 +89,10 @@ class LoyaltyPoints():
                     (card_id, amount_spent, points_earned, current_user.shop.id, current_user.id)
                 )
                 self.db.conn.commit()
-                return None
+                return f'Added {points_earned} points for amount spent of {amount_spent} successfully.', None
         except Exception as e:
             self.db.conn.rollback()
-            return 'An error occurred while adding points. Please try again later.'
+            return None, 'An error occurred while adding points. Please try again later.'
     
     def redeem_points(self, card_id, points_redeemed, amount_redeemed):
         self.db.ensure_connection()
@@ -106,28 +106,30 @@ class LoyaltyPoints():
                     (card_id, points_redeemed, amount_redeemed, current_user.shop.id, current_user.id)
                 )
                 self.db.conn.commit()
-                return None
+                return f'Redeemed {points_redeemed} points for amount of {amount_redeemed} successfully.', None
         except Exception as e:
             self.db.conn.rollback()
-            return 'An error occurred while redeeming points. Please try again later.'
-            
+            return None, 'An error occurred while redeeming points. Please try again later.'
+
     def __call__(self):
+        success = None
         errors = None
         if request.method == 'POST':
             action = request.form.get('action')
             if action == 'add':
-                errors = self.add(request.form['card_no'], request.form['name'], request.form['phone'])
+                success, errors = self.add(request.form['card_no'], request.form['name'], request.form['phone'])
             elif action == 'edit':
-                errors = self.update(request.form['id'], request.form['name'], request.form['phone'])
+                success, errors = self.update(request.form['id'], request.form['name'], request.form['phone'])
             elif action == 'add_points':
-                errors = self.add_points(request.form['id'], request.form['amount_spent'], request.form['points_gained'])
+                success, errors = self.add_points(request.form['id'], request.form['amount_spent'], request.form['points_gained'])
             elif action == 'redeem_points':
-                errors = self.redeem_points(request.form['id'], request.form['points_redeemed'], request.form['amount_redeemed'])
+                success, errors = self.redeem_points(request.form['id'], request.form['points_redeemed'], request.form['amount_redeemed'])
         
         return render_template(
             'customers/loyalty-points.html',
             helper=Helper(),
             cards=self.fetch(),
             page_title='Loyalty Points',
+            success = success,
             errors = errors
         )
