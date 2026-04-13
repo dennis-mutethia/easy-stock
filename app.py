@@ -262,10 +262,10 @@ def accountProfile():
 def ourPackages():
     return OurPackages(db)()
 
-@app.route('/download', methods=['GET'])
+@app.route('/share-android-app', methods=['GET'])
 @login_required
-def download():
-    return render_template('download.html', page_title='Download > Android App')
+def shareAndroidApp():
+    return render_template('share-android-app.html', page_title='Download > Android App')
 
 @app.route('/download/android', methods=['GET'])
 def download_android():
