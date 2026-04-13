@@ -268,7 +268,7 @@ def download():
     return render_template('download.html', page_title='Download > Android App')
 
 @app.route('/download/android', methods=['GET'])
-def android():
+def download_android():
     return send_from_directory('static/bundles', 'EasyStock.apk', as_attachment=True)
 
 if __name__ == '__main__':
