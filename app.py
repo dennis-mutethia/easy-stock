@@ -269,7 +269,7 @@ def download():
 
 @app.route('/android', methods=['GET'])
 def android():
-    return send_from_directory('static/bundles', 'easy-stock.apk', as_attachment=True)
+    return send_from_directory('static/bundles', 'EasyStock.apk', as_attachment=True)
 
 if __name__ == '__main__':
     debug_mode = os.getenv('IS_DEBUG', False) in ['True', '1', 't']
