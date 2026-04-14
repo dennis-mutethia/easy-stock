@@ -10,10 +10,12 @@
             <input class="text-center" onchange="applyFilter()" style="height: 25px" type="date" id="report_date" name="report_date"
                 required="required" value="{{ report_date }}" max="{{ max_date }}" {{ 'disabled' if current_user.user_level.id not in [0, 1, 2]  }} />
         </div>
+        {% if current_user.user_level.id in [0, 1, 2] %}
         <div class="col-6">
             <a href="#" class="btn btn-xs btn-primary btn-flat" style="width: 100%; font-weight: bold;" data-toggle="modal"
                 data-target="#newModal">Update CashBox</a>
         </div>
+        {% endif %}
     </form><br />
     <table class="table-striped">
         <thead>
