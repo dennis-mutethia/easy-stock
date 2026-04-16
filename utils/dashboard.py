@@ -257,7 +257,7 @@ class Dashboard():
             menu='dashboard',
             report_date=report_date,
             max_date=max_date,
-            total_purchases=total_purchases,
+            total_purchases=total_purchases if total_purchases >=0 else 0,
             total_sales=total_sales,
             total_expenses=total_expenses,
             total_capital=total_capital,
