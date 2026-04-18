@@ -57,11 +57,11 @@ class DemoSTock():
         self.db.ensure_connection()
         for stock in stocks:
             opening = stock.yesterday_opening + stock.yesterday_additions
-            new_opening = random.randint(math.ceil(opening * 0.7), opening)
+            new_opening = random.randint(math.ceil(opening * 0.7), int(opening))
             additions = 0            
             #if (new_opening > 5 and new_opening % 5 == 0) or (new_opening > 3 and new_opening % 3 == 0) or new_opening <= 3:
             sold = 5 #opening - new_opening
-            additions = random.randint(0, sold)
+            additions = random.randint(0, int(sold))
             opening = new_opening  
             
             #if old_opening != new_opening or additions > 0:
