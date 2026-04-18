@@ -2,7 +2,7 @@ name: demo stock data
 
 on:
   schedule:
-    - cron: '0 4 * * *'  # This runs the job every day at 4 am
+    - cron: '0 2 * * *'  # This runs the job every day at 2 am utc
     
   workflow_dispatch:
 
