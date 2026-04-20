@@ -71,7 +71,7 @@
         {% if pkg.amount > 0 %}
         <a class="col-6" href="#"
             onclick="popup('{{ pkg.id }}', {{ pkg.pay }}, '{{ helper.format_number_with_commas(pkg.pay) }}', '{{ pkg.description }}')"
-            data-toggle="modal" data-target="#newModal">
+            data-toggle="modal" data-target="#payModal">
             <div class="alert alert-{{ pkg.color }}" role="alert">
                 <h4 class="alert-heading">{{ pkg.name }}</h4>
                 <p>{{ pkg.description }}</p>
@@ -91,7 +91,7 @@
         {% endfor %}
     </div>
 
-    <div class="modal fade" id="newModal" tabindex="-1" role="dialog" aria-labelledby="newModalLabel"
+    <div class="modal fade" id="payModal_" tabindex="-1" role="dialog" aria-labelledby="payModalLabel"
         aria-hidden="true">
         <div class="modal-dialog" role="document">
             <div class="modal-content">
