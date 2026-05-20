@@ -89,6 +89,7 @@ class Db():
                 updated_at = CURRENT_TIMESTAMP AT TIME ZONE 'Africa/Nairobi', 
                 updated_by = %s 
             WHERE id = %s
+            RETURNING id
             """,
             (package_id, f'+{package.validity} DAYS', f'+{package.validity} DAYS', current_user.id, license_id)
         )
