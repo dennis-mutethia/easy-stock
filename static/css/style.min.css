@@ -64,6 +64,7 @@
 }
 
 body {
+  zoom: 90%;
   margin: 0;
   font-family: var(--bs-font-sans-serif);
   font-size: 0.875rem;
