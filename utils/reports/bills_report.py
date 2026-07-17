@@ -29,7 +29,8 @@ class BillsReport():
                 print(f"An error occurred: {e}")               
         
         customers = Customers(self.db).fetch()
-        bills = CustomerBills(self.db).fetch(from_date, to_date, bill_status, customer_id) 
+        payment_modes = self.db.fetch_payment_modes()
+        bills = CustomerBills(self.db).fetch(from_date, to_date, bill_status, customer_id, customers, payment_modes)
         grand_total = grand_paid = cash_total = mpesa_total =  0
         for bill in bills:
             grand_total = grand_total + bill.total
