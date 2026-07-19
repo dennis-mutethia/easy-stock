@@ -14,7 +14,7 @@
     <!-- Filter Form -->
     <form id="filter-frm" method="GET" class="row mb-2">
         <div class="col-6">
-            <input class="text-center" type="date"
+            <input class="text-center" type="date" {{ 'disabled' if current_user.user_level.id == 3 }}
                    id="stock_date" name="stock_date"
                    value="{{ stock_date }}" max="{{ current_date }}"
                    required onchange="applyFilter()" />
