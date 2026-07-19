@@ -14,53 +14,56 @@ class StockTake():
     def fetch(self, stock_date, search, category_id, in_stock=0):
         self.db.ensure_connection()
         shop_id = current_user.shop.id
-    
-        query = """       
+
+        query = """
         WITH products AS (
             SELECT id, name, category_id
-            FROM products  
+            FROM products
             WHERE shop_id = %s
         ),
         all_stock AS (
-            SELECT 
-                id, 
-                stock_date, 
-                product_id, 
-                CASE WHEN opening   = 'Nan' THEN 0 ELSE opening   END AS opening,
-                CASE WHEN additions = 'Nan' THEN 0 ELSE additions END AS additions, 
-                selling_price, 
+            SELECT
+                id,
+                stock_date,
+                product_id,
+                COALESCE(NULLIF(opening, 'NaN'::float8), 0)   AS opening,
+                COALESCE(NULLIF(additions, 'NaN'::float8), 0) AS additions,
+                selling_price,
                 purchase_price
-            FROM stock 
+            FROM stock
             WHERE shop_id = %s
-        ),  
+        ),
         max_date AS (
             SELECT MAX(stock_date) AS md
-            FROM stock 
+            FROM stock
             WHERE shop_id = %s AND DATE(stock_date) < DATE(%s)
         ),
         yesterday AS (
-            SELECT 
+            -- Fixed: was querying raw `stock` with no shop_id filter, which could
+            -- pull in another shop's data for the matching date. Now sourced from
+            -- the already shop-scoped and null/NaN-cleaned all_stock CTE.
+            SELECT
                 product_id,
-                CASE WHEN opening   = 'Nan' THEN 0 ELSE opening   END AS opening,
-                CASE WHEN additions = 'Nan' THEN 0 ELSE additions END AS additions 
-            FROM stock
-            INNER JOIN max_date ON max_date.md = DATE(stock.stock_date)
+                opening,
+                additions
+            FROM all_stock
+            INNER JOIN max_date ON max_date.md = DATE(all_stock.stock_date)
         ),
         today AS (
-            SELECT 
-                all_stock.id, 
-                product_id, 
-                name, 
-                category_id, 
+            SELECT
+                all_stock.id,
+                product_id,
+                name,
+                category_id,
                 opening,
                 additions,
-                selling_price, 
+                selling_price,
                 purchase_price
             FROM all_stock
             JOIN products ON products.id = all_stock.product_id
             WHERE DATE(stock_date) = DATE(%s)
         )
-        SELECT 
+        SELECT
             today.id, today.product_id, today.name, product_categories.name,
             COALESCE(yesterday.opening, 0)   AS yesterday_opening,
             COALESCE(yesterday.additions, 0) AS yesterday_additions,
@@ -76,15 +79,25 @@ class StockTake():
         if search:
             query += " AND today.name LIKE %s"
             params.append(f"%{search.upper()}%")
-        if int(category_id) > 0:
-            query += " AND today.category_id = %s"
-            params.append(category_id)
-        
+
+        # Fixed: int(category_id) throws on None/'' — guard it instead of assuming
+        # a valid numeric string is always passed in.
+        if category_id not in (None, "", 0, "0"):
+            try:
+                category_id_int = int(category_id)
+                if category_id_int > 0:
+                    query += " AND today.category_id = %s"
+                    params.append(category_id_int)
+            except (TypeError, ValueError):
+                pass
+
         query += " ORDER BY today.category_id, today.name"
-            
-        with self.db.conn.cursor() as cursor:    
+
+        with self.db.conn.cursor() as cursor:
             cursor.execute(query, tuple(params))
             return [Stock(*row) for row in cursor.fetchall()]
+
+
         
     def get_total(self, report_date):
         self.db.ensure_connection()
