@@ -17,7 +17,7 @@
             <input class="text-center" type="date"
                    id="stock_date" name="stock_date"
                    value="{{ stock_date }}" max="{{ current_date }}"
-                   required onchange="applyFilter()" {{ 'disabled' if current_user.user_level.id = 3 else '' }} />
+                   required onchange="applyFilter()" />
         </div>
         <div class="col-6">
             <select class="text-center" name="category_id" id="category_id" onchange="applyFilter()">
