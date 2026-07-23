@@ -13,18 +13,28 @@ class Db():
         self.database_url = os.getenv('DATABASE_URL')
         self.conn = None
         self.ensure_connection()
-    
+        
     def ensure_connection(self):
-        """Reconnect only if connection is closed or broken.
-        Avoids the extra SELECT 1 round trip on healthy connections."""
-        if self.conn is not None and not self.conn.closed:
-            return  # Already healthy — skip entirely
-        try:
+        # Create a new connection if none exists or it has been closed
+        if self.conn is None or self.conn.closed:
             self.conn = psycopg2.connect(self.database_url)
-        except Exception as e:
-            print(f"DB connection error: {e}")
-            raise
+            self.conn.autocommit = True
+            return
 
+        # Verify the existing connection is still alive
+        try:
+            with self.conn.cursor() as cur:
+                cur.execute("SELECT 1")
+        except psycopg2.Error:
+            # Reconnect if the connection is broken
+            try:
+                self.conn.close()
+            except Exception:
+                pass
+
+            self.conn = psycopg2.connect(self.database_url)
+            self.conn.autocommit = True
+        
     def _execute_write(self, query, params):
         """DRY helper for INSERT/UPDATE that commits and returns the first column of the first row."""
         self.ensure_connection()
