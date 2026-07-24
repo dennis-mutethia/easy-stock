@@ -91,7 +91,7 @@ class StockTake():
             except (TypeError, ValueError):
                 pass
 
-        query += " ORDER BY today.category_id, today.name"
+        query += " ORDER BY product_categories.name, today.name"
 
         with self.db.conn.cursor() as cursor:
             cursor.execute(query, tuple(params))
