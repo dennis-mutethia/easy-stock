@@ -1,3 +1,7 @@
+--set timezone
+ALTER DATABASE postgres SET timezone = 'Africa/Nairobi';
+
+
 -- Table structure for table packages
 DROP TABLE IF EXISTS packages;
 CREATE TABLE IF NOT EXISTS packages (
