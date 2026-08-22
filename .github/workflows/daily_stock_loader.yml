@@ -2,7 +2,7 @@ name: daily stock loader
 
 on:
   schedule:
-    - cron: '0 0 * * *'  # This runs the job every day at midnight
+    - cron: '5 21 * * *'  # This runs the job every day at midnight 5th min (Kenyan time)
 
   workflow_dispatch:
 
