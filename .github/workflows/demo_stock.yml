@@ -2,7 +2,7 @@ name: demo stock data
 
 on:
   schedule:
-    - cron: '10 21 * * *'  # This runs the job every day at midnight 20th min (Kenyan time)
+    - cron: '10 19 * * *'  # This runs the job every day at midnight 10th min (Kenyan time)
     
   workflow_dispatch:
 
