@@ -43,7 +43,7 @@
             <tr>
                 <td>{{ expense.date }}</td>
                 <td>{{ expense.name }}</td>
-                <td>{{ expense.user.name }}</td>
+                <td>{{ expense.user.name if expense.user else 'Deleted user' }}</td>
                 <td class="text-right">{{ helper.format_number_with_commas(expense.amount) }}</td>
                 <td class="text-center">
                     <a href="#" onclick="deleteItem({{ expense.id }}, '{{ expense.name }}')" data-toggle="modal"
