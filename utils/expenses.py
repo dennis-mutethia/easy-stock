@@ -16,12 +16,16 @@ class Expenses():
         with self.db.conn.cursor() as cursor:
             cursor.execute(
                 """
+                WITH exp AS(
+                  SELECT * 
+                  FROM expenses
+                  WHERE shop_id = %s
+                )
                 SELECT id, date, name, amount, created_by
-                FROM expenses
+                FROM exp
                 WHERE DATE(date) BETWEEN DATE(%s) AND DATE(%s)
-                  AND shop_id = %s
                 """,
-                (from_date, to_date, current_user.shop.id)
+                (current_user.shop.id, from_date, to_date)
             )
             rows = cursor.fetchall()
 
