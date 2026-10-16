@@ -62,7 +62,11 @@
                         onclick="assignCustomerBill({{ bill.id }}, {{ bill.total }})">Assign Customer</a>
                     {% endif %}
                 </td>
-                <td>{{ bill.date_paid }} </td>
+                <td>
+                    {% for date in bill.date_paid %}
+                    {{ date }}
+                    {% endfor %}
+                </td>
                 <td class="text-right">{{ helper.format_number_with_commas(helper.format_number(bill.total)) }}</td>
                 <td class="text-right text-warning">{{ helper.format_number_with_commas(helper.format_number(bill.cash))
                     }}</td>

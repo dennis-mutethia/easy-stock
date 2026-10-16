@@ -1,11 +1,12 @@
 <!DOCTYPE html>
 <html dir="ltr" lang="en">
-    {% include 'head.html' %}
+{% include 'head.html' %}
 
 <body class="bg-dark">
     {% include 'preloader.html' %}
 
-    <div id="main-wrapper" data-layout="vertical" data-navbarbg="skin5" data-sidebartype="full" data-sidebar-position="absolute" data-header-position="absolute" data-boxed-layout="full" >
+    <div id="main-wrapper" data-layout="vertical" data-navbarbg="skin5" data-sidebartype="full"
+        data-sidebar-position="absolute" data-header-position="absolute" data-boxed-layout="full">
         {% include 'topbar.html' %}
         {% include 'aside.html' %}
         {% include 'header.html' %}
@@ -16,6 +17,59 @@
     </div>
 
     {% include 'footer.html' %}
+
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            document.querySelectorAll('form[method="POST"], form[method="post"]').forEach(function (form) {
+                form.addEventListener("submit", function (event) {
+                    // Prevent duplicate submissions
+                    if (form.dataset.submitting === "true") {
+                        event.preventDefault();
+                        return;
+                    }
+
+                    // Preserve native form validation
+                    if (!form.checkValidity()) {
+                        return;
+                    }
+
+                    // Identify the button that triggered submission
+                    const submitter = event.submitter;
+
+                    // Preserve its name/value before disabling buttons
+                    if (submitter && submitter.name) {
+                        let hidden = form.querySelector('input[data-submit-action="true"]');
+
+                        if (!hidden) {
+                            hidden = document.createElement("input");
+                            hidden.type = "hidden";
+                            hidden.dataset.submitAction = "true";
+                            form.appendChild(hidden);
+                        }
+
+                        hidden.name = submitter.name;
+                        hidden.value = submitter.value;
+                    }
+
+                    // Lock the form against repeated submissions
+                    form.dataset.submitting = "true";
+
+                    form.querySelectorAll('button[type="submit"], input[type="submit"]').forEach(function (button) {
+                        button.disabled = true;
+
+                        if (button.tagName === "BUTTON") {
+                            button.textContent = "Processing...";
+                        } else {
+                            button.value = "Processing...";
+                        }
+                    });
+                });
+            });
+        });
+    </script>
+
+
 </body>
 
 </html>
