@@ -11,9 +11,7 @@ class Payments():
         with self.db.conn.cursor() as cursor:
             cursor.execute(
                 """
-                SELECT id, bill_id, amount, payment_mode_id,
-                       TO_CHAR(created_at + INTERVAL '3 HOURS', 'YYYY-MM-DD HH24:MI') AS created_at,
-                       created_by
+                SELECT id, bill_id, amount, payment_mode_id, DATE(created_at) AS created_at, created_by
                 FROM payments
                 WHERE shop_id = %s
                 """,

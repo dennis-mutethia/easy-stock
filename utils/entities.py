@@ -132,7 +132,9 @@ class Bill():
         self.payments = payments
         self.cash = 0 
         self.mpesa = 0
+        self.date_paid = ''
         for payment in payments:
+            self.date_paid = payment.created_at  # Update date_paid to the last payment's created_at
             if payment.payment_mode.name == 'CASH':
                 self.cash = self.cash + payment.amount
             elif payment.payment_mode.name == 'MPESA':

@@ -54,8 +54,8 @@ class CustomerBills():
             Bill(row[0], row[1], row[2], row[3],
                  customers_map.get(row[4]),
                  users_map.get(row[5]),
-                 payments_map.get(row[0], []))
-            for row in data
+                 payments_map.get(row[0], [])
+            ) for row in data
         ]
             
     def get_bills_to_pay(self, customer_id, paid):

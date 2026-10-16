@@ -39,9 +39,9 @@
             <tr>
                 <th class="text-center" rowspan="2" style="font-size: x-small;">DATE</th>
                 <th class="text-center" rowspan="2" style="font-size: x-small;">CUSTOMER</th>
-                <th class="text-center" rowspan="2" style="font-size: x-small;">SOLD BY</th>
+                <th class="text-center" rowspan="2" style="font-size: x-small;">PAID</th>
                 <th class="text-center" rowspan="2" style="font-size: x-small;">AMOUNT</th>
-                <th class="text-center" colspan="2" style="font-size: x-small;">PAID</th>
+                <th class="text-center" colspan="2" style="font-size: x-small;">AMOUNT PAID</th>
                 <th class="text-center" rowspan="2" style="font-size: x-small;">BAL</th>
                 <th class="text-center" rowspan="2" style="font-size: x-small;">ACTION</th>
             </tr>
@@ -62,7 +62,7 @@
                         onclick="assignCustomerBill({{ bill.id }}, {{ bill.total }})">Assign Customer</a>
                     {% endif %}
                 </td>
-                <td>{{ bill.user.name }} </td>
+                <td>{{ bill.date_paid }} </td>
                 <td class="text-right">{{ helper.format_number_with_commas(helper.format_number(bill.total)) }}</td>
                 <td class="text-right text-warning">{{ helper.format_number_with_commas(helper.format_number(bill.cash))
                     }}</td>
