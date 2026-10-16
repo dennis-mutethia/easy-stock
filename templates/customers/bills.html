@@ -64,7 +64,8 @@
                 </td>
                 <td>
                     {% for date in bill.date_paid %}
-                    {{ date }}
+                    {{ date }} 
+                    {% if not loop.last %} <br /> {% endif %}
                     {% endfor %}
                 </td>
                 <td class="text-right">{{ helper.format_number_with_commas(helper.format_number(bill.total)) }}</td>
