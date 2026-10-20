@@ -14,6 +14,7 @@ class Payments():
                 SELECT id, bill_id, amount, payment_mode_id, DATE(created_at) AS created_at, created_by
                 FROM payments
                 WHERE shop_id = %s
+                ORDER BY created_at ASC
                 """,
                 (current_user.shop.id,)
             )
