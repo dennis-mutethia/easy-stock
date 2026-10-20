@@ -6,12 +6,13 @@
 <!-- ============================================================== -->
 <div class="container-fluid table-responsive row">
     <div class="col-12">
-        <table class="table-striped table-bordered table-condensed"> 
+        <table class="table-striped table-bordered table-condensed">
             <style>
-                th, td {
+                th,
+                td {
                     font-size: x-small;
                 }
-            </style>      
+            </style>
             <thead>
                 <tr>
                     <th>NAME</th>
@@ -31,26 +32,33 @@
                     <td>{{ user.phone }}</td>
                     <td>{{ user.shop.name }}</td>
                     <td>{{ user.user_level.name }}</td>
+
                     <td class="text-center">
-                        <a href="#" onclick="resetPassword('{{ user.phone }}', '{{ user.name }}')" data-toggle="modal"
-                            data-target="#resetModal" {{ 'disabled' if user.user_level.id < current_user.user_level.id }}>
+                        <a href="#" onclick='resetPassword({{ user.phone | tojson }}, {{ user.name | tojson }})'
+                            data-toggle="modal" data-target="#resetModal" {% if user.user_level.id <
+                            current_user.user_level.id %}style="pointer-events: none; opacity: 0.5;" {% endif %}>
                             <i class="mdi mdi-lock-open" style="color: orange"
                                 title="Reset {{ user.name }} Password"></i>
                         </a>
                     </td>
+
                     <td class="text-center">
                         <a href="#"
-                            onclick="editUser({{ user.id }}, '{{ user.name }}', '{{ user.phone }}', '{{ user.shop.name }}', '{{ user.user_level.name }}')"
-                            data-toggle="modal" data-target="#newModal" {{ 'disabled' if user.user_level.id <
-                            current_user.user_level.id }}><i class="mdi mdi-border-color"
-                                title="Edit {{ user.name }}"></i></a>
+                            onclick='editUser({{ user.id | tojson }}, {{ user.name | tojson }}, {{ user.phone | tojson }}, {{ user.shop.name | tojson }}, {{ user.user_level.name | tojson }})'
+                            data-toggle="modal" data-target="#newModal" {% if user.user_level.id <
+                            current_user.user_level.id %}style="pointer-events: none; opacity: 0.5;" {% endif %}>
+                            <i class="mdi mdi-border-color" title="Edit {{ user.name }}"></i>
+                        </a>
                     </td>
+
                     <td class="text-center">
-                        <a href="#" onclick="deleteItem({{ user.id }}, '{{ user.name }}')" data-toggle="modal" data-target="#deleteModal"
-                            {{ 'disabled' if user.user_level.id < current_user.user_level.id }}>
+                        <a href="#" onclick='deleteItem({{ user.id | tojson }}, {{ user.name | tojson }})'
+                            data-toggle="modal" data-target="#deleteModal" {% if user.user_level.id <
+                            current_user.user_level.id %}style="pointer-events: none; opacity: 0.5;" {% endif %}>
                             <i class="mdi mdi-delete" style="color: red" title="Delete {{ user.name }}"></i>
                         </a>
                     </td>
+
                 </tr>
                 {% endfor %}
             </tbody>
@@ -88,8 +96,9 @@
         <div class="modal-content">
             <form method="POST" class="form-horizontal">
                 <input type="hidden" id="edit_id" name="id" />
-                <div class="modal-header">                    
-                    <h5 class="modal-title text-center" id="newModalLabel"><span id="user_header">Add New</span> System User</h5>
+                <div class="modal-header">
+                    <h5 class="modal-title text-center" id="newModalLabel"><span id="user_header">Add New</span> System
+                        User</h5>
                     <button type="button" class="close" data-dismiss="modal">&times;</button>
                 </div>
                 <div class="modal-body">
@@ -109,7 +118,8 @@
                     </div>
                     <div class="form-group row">
                         <div class="col-sm-12">
-                            <input type="text" name="password" id="edit_password" class="form-control input-sm text-center"
+                            <input type="text" name="password" id="edit_password"
+                                class="form-control input-sm text-center"
                                 placeholder="Default Password will be same as Phone No." disabled>
                         </div>
                     </div>
@@ -128,9 +138,9 @@
                         <div class="col-6">
                             <select name="user_level_id" id="edit_user_level" class="form-control input-sm">
                                 {% for user_level in user_levels %}
-                                    {% if user_level.id >= current_user.user_level.id%}
-                                    <option value="{{ user_level.id }}">{{ user_level.name }}</option>
-                                    {% endif %}
+                                {% if user_level.id >= current_user.user_level.id%}
+                                <option value="{{ user_level.id }}">{{ user_level.name }}</option>
+                                {% endif %}
                                 {% endfor %}
                             </select>
                         </div>
@@ -153,14 +163,16 @@
             <form method="POST">
                 <input type="hidden" id="reset_u_phone" name="phone" />
                 <div class="modal-header">
-                    <h5 class="modal-title text-center" id="resetModalLabel">Are you Sure You want to Reset <code class="text-xs" style="color: black;" id="reset_user_name"></code> Password?
+                    <h5 class="modal-title text-center" id="resetModalLabel">Are you Sure You want to Reset <code
+                            class="text-xs" style="color: black;" id="reset_user_name"></code> Password?
                     </h5>
                     <button class="close" type="button" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">×</span>
                     </button>
                 </div>
                 <div style="color: black" class="modal-body">Select "Confirm Reset Password" below if you want to reset
-                    <code class="text-xs" style="color: black;" id="reset_user_name_2"></code> Password to default - Same as Phone Number.
+                    <code class="text-xs" style="color: black;" id="reset_user_name_2"></code> Password to default -
+                    Same as Phone Number.
                     <p style="color: red">This action is not reversible!!</p>
                 </div>
                 <div class="modal-footer">
@@ -180,7 +192,8 @@
             <form method="POST">
                 <input type="hidden" id="delete_user_id" name="id" />
                 <div class="modal-header">
-                    <h5 class="modal-title text-center" id="deleteModalLabel">Are you Sure You want to Delete User - <code class="text-xs" style="color: black;" id="delete_user_name"></code>?</h5>
+                    <h5 class="modal-title text-center" id="deleteModalLabel">Are you Sure You want to Delete User -
+                        <code class="text-xs" style="color: black;" id="delete_user_name"></code>?</h5>
                     <button class="close" type="button" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">×</span>
                     </button>
@@ -216,6 +229,7 @@
     }
 
     function editUser(id, name, phone, shop_name, user_level_name) {
+        console.log(id, name, phone, shop_name, user_level_name)
         $("#user_header").html('Edit');
         $("#edit_id").val(id);
         $("#edit_name").val(name);
