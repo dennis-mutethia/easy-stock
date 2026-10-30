@@ -24,7 +24,7 @@ class CustomerBills():
             query = """
             SELECT id, total, paid, DATE(created_at) AS created_at, customer_id, created_by
             FROM bills
-            WHERE (DATE(created_at) BETWEEN DATE(%s) AND DATE(%s)) AND shop_id = %s AND total != 'Nan'
+            WHERE created_at >= %s AND created_at < %s AND shop_id = %s AND total != 'Nan'
             """
             params = [from_date, to_date, current_user.shop.id]
             
