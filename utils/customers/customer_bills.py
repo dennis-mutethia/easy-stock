@@ -20,13 +20,17 @@ class CustomerBills():
         payment_modes  = payment_modes or []
 
         self.db.ensure_connection()
+        end_date = (
+        datetime.strptime(to_date, "%Y-%m-%d") + timedelta(days=1)
+    ).strftime("%Y-%m-%d")
+
         with self.db.conn.cursor() as cursor:
             query = """
             SELECT id, total, paid, DATE(created_at) AS created_at, customer_id, created_by
             FROM bills
             WHERE created_at >= %s AND created_at < %s AND shop_id = %s AND total != 'Nan'
             """
-            params = [from_date, to_date, current_user.shop.id]
+            params = [from_date, end_date, current_user.shop.id]
             
             if bill_status == 1:
                 query += " AND paid>=total"
