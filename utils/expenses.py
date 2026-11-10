@@ -23,7 +23,7 @@ class Expenses():
                 )
                 SELECT id, date, name, amount, created_by
                 FROM exp
-                WHERE DATE(date) BETWEEN DATE(%s) AND DATE(%s)
+                WHERE DATE(date) BETWEEN DATE(%s) AND DATE(%s) ORDER BY date DESC
                 """,
                 (current_user.shop.id, from_date, to_date)
             )
