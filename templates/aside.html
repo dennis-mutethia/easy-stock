@@ -73,7 +73,7 @@
                         aria-expanded="false"><i class="mdi mdi-file-multiple"></i><span
                             class="hide-menu">Inventory</span></a>
                     <ul aria-expanded="false" class="{{'active' if menu == 'inventory' else 'collapse' }} first-level">
-                        {% if current_user.user_level.id in [0, 1, 2, 3] %}
+                        {% if current_user.user_level.id in [0, 1, 2] %}
                         <li class="sidebar-item">
                             <a href="{{ url_for('inventoryProductsCategories') }}" class="sidebar-link"><i
                                     class="mdi mdi-cart"></i><span class="hide-menu"> Product Categories </span></a>
@@ -85,10 +85,12 @@
                                     class="mdi mdi-shopping"></i><span class="hide-menu"> Products Price List
                                 </span></a>
                         </li>
+{% if current_user.user_level.id in [0, 1, 2] %}
                         <li class="sidebar-item {{'active' if sub_menu == 'stock_adjustment' }}">
                             <a href="{{ url_for('inventoryStockAdjustment') }}" class="sidebar-link"><i
                                     class="mdi mdi-calendar"></i><span class="hide-menu"> Stock Adjustment </span></a>
                         </li>
+{% endif %}
                     </ul>
                 </li>
                 {% endif %}
