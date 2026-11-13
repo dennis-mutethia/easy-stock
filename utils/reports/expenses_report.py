@@ -15,17 +15,11 @@ class ExpensesReport():
         self.db.ensure_connection()
         with self.db.conn.cursor() as cursor:
             query = """
-            SELECT 
-                e.id, 
-                e.date, 
-                e.name, 
-                e.amount, 
-                e.created_by
-            FROM expenses e
-            WHERE e.shop_id = %s
-                AND e.date >= %s::date
-                AND e.date <= %s::date
-            ORDER BY e.date
+SELECT e.id, e.date, e.name, e.amount, u.id, u.name
+FROM expenses e
+LEFT JOIN users u ON u.id = e.created_by
+WHERE e.shop_id = %s AND e.date >= %s::date AND e.date < %s::date + INTERVAL '1 day'
+ORDER BY e.date
             """
             params = [current_user.shop.id,from_date, to_date]
             
