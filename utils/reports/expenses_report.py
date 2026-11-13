@@ -27,7 +27,6 @@ ORDER BY e.date
             rows = cursor.fetchall()
             if not rows:
                 return []
-
             # Fetch all users once, build lookup — avoids N+1
             users_map = {u.id: u for u in SystemUsers(self.db).fetch()}
 
