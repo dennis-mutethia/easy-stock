@@ -24,13 +24,18 @@ ORDER BY e.date
             params = [current_user.shop.id,from_date, to_date]
             
             cursor.execute(query, tuple(params))
-            data = cursor.fetchall()
-            expenses = []
-            for datum in data:                
-                user = SystemUsers(self.db).get_by_id(datum[4])       
-                expenses.append(Expense(datum[0], datum[1], datum[2], datum[3], user))
+            rows = cursor.fetchall()
+            if not rows:
+                return []
 
-            return expenses 
+            # Fetch all users once, build lookup — avoids N+1
+            users_map = {u.id: u for u in SystemUsers(self.db).fetch()}
+
+            return [
+                Expense(row[0], row[1], row[2], row[3], users_map.get(row[4]))
+                for row in rows
+            ]
+
          
     def __call__(self):
         current_date = datetime.now(pytz.timezone("Africa/Nairobi")).strftime('%Y-%m-%d')
