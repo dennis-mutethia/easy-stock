@@ -22,9 +22,9 @@ class ExpensesReport():
                 amount, 
                 created_by
             FROM expenses
-WHERE shop_id = %s
-  AND date >= %s::date
-  AND date < (%s::date + INTERVAL '1 day')
+            WHERE shop_id = %s
+                AND date >= %s::date
+                AND date <= %s::date
             ORDER BY date
             """
             params = [current_user.shop.id,from_date, to_date]
