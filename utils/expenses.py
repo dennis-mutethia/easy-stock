@@ -44,7 +44,8 @@ ORDER BY e.date DESC
                 """
                 SELECT COALESCE(SUM(amount), 0)
                 FROM expenses
-                WHERE DATE(date) = DATE(%s) AND shop_id = %s
+WHERE shop_id = %s AND date >= %s::date AND date < %s::date + INTERVAL '1 day'
+                --WHERE DATE(date) = DATE(%s) AND shop_id = %s
                 """,
                 (report_date, current_user.shop.id)
             )
