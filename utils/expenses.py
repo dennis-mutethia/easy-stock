@@ -47,7 +47,7 @@ ORDER BY e.date DESC
 WHERE shop_id = %s AND date >= %s::date AND date < %s::date + INTERVAL '1 day'
                 --WHERE DATE(date) = DATE(%s) AND shop_id = %s
                 """,
-                (report_date, current_user.shop.id)
+                (current_user.shop.id, report_date, report_date)
             )
             return cursor.fetchone()[0]
         
