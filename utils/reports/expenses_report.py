@@ -16,16 +16,16 @@ class ExpensesReport():
         with self.db.conn.cursor() as cursor:
             query = """
             SELECT 
-                id, 
-                date, 
-                name, 
-                amount, 
-                created_by
-            FROM expenses
-            WHERE shop_id = %s
-                AND date >= %s::date
-                AND date <= %s::date
-            ORDER BY date
+                e.id, 
+                e.date, 
+                e.name, 
+                e.amount, 
+                e.created_by
+            FROM expenses e
+            WHERE e.shop_id = %s
+                AND e.date >= %s::date
+                AND e.date <= %s::date
+            ORDER BY e.date
             """
             params = [current_user.shop.id,from_date, to_date]
             
