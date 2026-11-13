@@ -22,10 +22,12 @@ class ExpensesReport():
                 amount, 
                 created_by
             FROM expenses
-            WHERE (DATE(date) BETWEEN DATE(%s) AND DATE(%s)) AND shop_id = %s
+WHERE shop_id = %s
+  AND date >= %s::date
+  AND date < (%s::date + INTERVAL '1 day')
             ORDER BY date
             """
-            params = [from_date, to_date, current_user.shop.id]
+            params = [current_user.shop.id,from_date, to_date]
             
             cursor.execute(query, tuple(params))
             data = cursor.fetchall()
