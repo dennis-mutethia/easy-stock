@@ -67,11 +67,11 @@
                 <td class="text-center">
                     <a href="#" onclick="editProduct({{ product.id }}, {{ product.product_id }}, '{{ product.name }}', '{{ product.category_name }}', {{ product.purchase_price }}, {{ product.selling_price }}, {{ product.opening+product.additions }})" data-toggle="modal"
                         data-target="#newModal"><i class="mdi mdi-border-color"
-                            title="Edit {{ product.name }}">edit</i></a>
+                            title="Edit {{ product.name }}"></i></a>
                 </td>
                 <td class="text-center">
                     <a href="#" onclick="deleteItem({{ product.product_id }}, '{{ product.name }}')" data-toggle="modal" data-target="#deleteModal"><i
-                            class="mdi mdi-delete" style="color: red" title="Delete {{ product.name }}">delete</i></a>
+                            class="mdi mdi-delete" style="color: red" title="Delete {{ product.name }}"></i></a>
                 </td>
                 {% endif %}
             </tr>
