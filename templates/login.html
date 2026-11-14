@@ -2,70 +2,46 @@
 <html dir="ltr" lang="en">
 {% include 'head.html' %}
 
-<body class="bg-dark">
+<body class="es-app es-auth">
     {% include 'preloader.html' %}
 
-    <div class="auth-wrapper d-flex no-block justify-content-center align-items-center bg-dark">
-        <div class="auth-box bg-dark">
+    <div class="auth-wrapper d-flex no-block justify-content-center align-items-center">
+        <div class="auth-box">
             <div id="loginform">
-                <div class="text-center pt-3 pb-3 text-white border-bottom border-secondary">
-                    <b class="logo-icon ps-2">
-                        <!--You can put here icon as well // <i class="wi wi-sunset"></i> //-->
-                        <!-- Dark Logo icon -->
-                        <img src="{{ url_for('static', filename='images/logo.png') }}" alt="homepage" class="light-logo"
-                            width="25" />
-                    </b>
-                    <!--End Logo icon -->
-                    <!-- Logo text -->
-                    <span class="logo-text ms-2">Easy <sup>STOCK</sup></span><br />
-                    <small>User Login</small>
-                    <!--End Logo icon -->
+                <div class="auth-brand text-center">
+                    <img src="{{ url_for('static', filename='images/logo.png') }}" alt="EasyStock" class="light-logo" />
+                    <h1 class="auth-title">EasyStock</h1>
+                    <p class="auth-sub">Log in to manage your shop</p>
                 </div>
                 <!-- Form -->
-                <form class="form-horizontal mt-3" id="loginform" name="loginform" method="POST">
-                    <div class="row pb-4">
-                        <div class="col-12">
-                            {% if error %}
-                            <p style="color: red; font-size: smaller">{{ error }}</p>
-                            {% endif %}
-                            <div class="input-group mb-3">
-                                <div class="input-group-prepend">
-                                    <span class="input-group-text bg-success text-white h-100" id="basic-addon1"><i
-                                            class="mdi mdi-account fs-4"></i></span>
-                                </div>
-                                <input name="phone" id="phone" type="number" class="form-control form-control-lg"
-                                    placeholder="PhoneNumber" aria-label="Phone" aria-describedby="basic-addon1"
-                                    required="required" min="100000000" max="799999999" />
-                            </div>
-                            <div class="input-group mb-3">
-                                <div class="input-group-prepend">
-                                    <span class="input-group-text bg-warning text-white h-100" id="basic-addon2"><i
-                                            class="mdi mdi-lock fs-4"></i></span>
-                                </div>
-                                <input name="password" id="password" type="password"
-                                    class="form-control form-control-lg" placeholder="Password" aria-label="Password"
-                                    aria-describedby="basic-addon1" required="required" />
-                            </div>
-
-                            <div class="form-group">
-                                <button class="btn btn-success float-end text-white btn-block" type="submit"
-                                    name="action" id="action" value="login">
-                                    Login to my Shop
-                                </button>
-                            </div>
-                        </div>
+                <form class="form-horizontal" id="loginform" name="loginform" method="POST">
+                    {% if error %}
+                    <div class="auth-error" role="alert">{{ error }}</div>
+                    {% endif %}
+                    <div class="auth-field">
+                        <label class="auth-label" for="phone">Phone number</label>
+                        <input name="phone" id="phone" type="number" class="form-control form-control-lg"
+                            placeholder="Phone number" aria-label="Phone"
+                            required="required" min="100000000" max="799999999" inputmode="numeric" autocomplete="username" />
                     </div>
+                    <div class="auth-field">
+                        <label class="auth-label" for="password">Password</label>
+                        <input name="password" id="password" type="password"
+                            class="form-control form-control-lg" placeholder="Password" aria-label="Password"
+                            required="required" autocomplete="current-password" />
+                    </div>
+                    <button class="btn btn-success auth-submit" type="submit"
+                        name="action" id="action" value="login">
+                        Log in to my shop
+                    </button>
                 </form>
-                <div class="col-12">
-                    <a class="btn btn-default btn-sm btn-block" data-toggle="modal" data-target="#newModal" href="#">
-                        Register New Company
+                <div class="auth-links">
+                    <a class="btn btn-default" data-toggle="modal" data-target="#newModal" href="#">
+                        Register new company
                     </a>
-                </div>
-
-                <div class="col-12 text-center">
                     <br />
-                    <a data-toggle="modal" data-target="#resetModal" href="#">
-                        Forgot Passord
+                    <a class="auth-forgot" data-toggle="modal" data-target="#resetModal" href="#">
+                        Forgot password?
                     </a>
                 </div>
             </div>

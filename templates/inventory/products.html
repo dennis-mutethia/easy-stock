@@ -17,7 +17,14 @@
             </select>
         </div>
     </form><br />
-    <table class="table-bordered table-striped">
+        <table class="table-bordered table-striped es-products-table">
+        <colgroup>
+            <col class="es-col-name"><col class="es-col-cat">
+            {% if current_user.user_level.id in [0, 1, 2] %}<col class="es-col-money">{% endif %}
+            <col class="es-col-money"><col class="es-col-money">
+            {% if current_user.user_level.id in [0, 1, 2] %}<col class="es-col-act"><col class="es-col-act">{% endif %}
+        </colgroup>
+
         <style>
             th, td {
                 font-size: x-small;
