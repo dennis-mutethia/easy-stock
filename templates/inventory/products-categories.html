@@ -31,12 +31,12 @@
                 <td class="text-center">
                     <a href="#" onclick="editCategory({{ product_category.id }}, '{{ product_category.name }}')" data-toggle="modal"
                         data-target="#newModal"><i class="mdi mdi-border-color"
-                            title="Delete {{ product_category.name }}">edit</i></a>
+                            title="Delete {{ product_category.name }}"></i></a>
                 </td>
                 <td class="text-center">
                     <a href="#" onclick="deleteItem({{ product_category.id }}, '{{ product_category.name }}')" data-toggle="modal"
                         data-target="#deleteModal"><i class="mdi mdi-delete" style="color: red"
-                            title="Delete {{ product_category.name }}">delete</i></a>
+                            title="Delete {{ product_category.name }}"></i></a>
                 </td>
             </tr>
             {% endfor %}
