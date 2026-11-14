@@ -58,7 +58,7 @@
             {% set sold = stock.yesterday_opening + stock.yesterday_additions - stock.opening %}
             <tr>
                 <td id="name_{{ stock.id }}">{{ stock.name }}</td>
-                <td>{{ stock.category_name }}</td>
+                <td><sub>{{ stock.category_name }}</sub></td>
 
                 <!-- Yesterday total — store raw value in data attr to avoid comma parsing issues -->
                 <td class="text-center"
