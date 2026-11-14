@@ -706,13 +706,15 @@ body.es-app .page-wrapper .auth-box { background: transparent; padding: 0; borde
 
   /* Row actions pinned to the right edge so Edit, Delete and Pay never scroll out of reach.
      :has() is ignored by very old browsers, which then simply scroll. */
-  body.es-app td:has(> a:not(.btn) > i.mdi),
-  body.es-app th[colspan="2"]:has(> a.btn) {
+
+ body.es-app table.es-products-table td:has(> a:not(.btn) > i.mdi),
+  body.es-app table.es-products-table th[colspan="2"]:has(> a.btn) {
     position: sticky; right: 0; z-index: 2;
     box-shadow: -6px 0 8px -6px rgba(22, 36, 34, .25);
   }
-  body.es-app td:has(> a:not(.btn) > i.mdi-delete) { box-shadow: none; }
-  body.es-app td:has(> a:not(.btn) > i.mdi-border-color) { right: 44px; }
+  body.es-app table.es-products-table td:has(> a:not(.btn) > i.mdi-delete) { box-shadow: none; }
+  body.es-app table.es-products-table td:has(> a:not(.btn) > i.mdi-border-color) { right: 44px; }
+
   body.es-app td:has(> a:not(.btn) > i.mdi-border-color),
   body.es-app td:has(> a:not(.btn) > i.mdi-delete) {
     width: 44px; min-width: 44px; max-width: 44px; padding-left: 2px; padding-right: 2px; text-align: center;
@@ -723,7 +725,9 @@ body.es-app .page-wrapper .auth-box { background: transparent; padding: 0; borde
   }
   body.es-app td > a:not(.btn) > i.mdi-border-color::before,
   body.es-app td > a:not(.btn) > i.mdi-delete::before { font-size: 18px; }
-  body.es-app th[colspan="2"]:has(> a.btn) { min-width: 88px; padding: 6px 4px; }
+
+    body.es-app table.es-products-table th[colspan="2"]:has(> a.btn) { min-width: 88px; padding: 6px 4px; }
+
   body.es-app th > a.btn { min-height: 36px; padding: 4px 6px; font-size: 12px; line-height: 1.15; white-space: normal; }
 
   /* Stock take: every column, including both input boxes, stays on one phone screen.
