@@ -16,25 +16,25 @@
                     datasets: [
                         {
                             data: [{{ stocks | join(',') | safe }}],
-                            borderColor: "blue",
+                            borderColor: "#2a4e80",
                             fill: false,
                             label: 'Stock'
                         },
                         {
                             data: [{{ purchases | join(',') | safe }}],
-                            borderColor: "yellow",
+                            borderColor: #e09400",
                             fill: false,
                             label: 'Purchases'
                         },     
                         {
                             data: [{{ sales | join(',') | safe }}],
-                            borderColor: "green",
+                            borderColor: "#1b7f45",
                             fill: false,
                             label: 'Sales'
                         },                     
                         {
                             data: [{{ expenses | join(',') | safe }}],
-                            borderColor: "red",
+                            borderColor: "#c0392b",
                             fill: false,
                             label: 'Expenses'
                         }
