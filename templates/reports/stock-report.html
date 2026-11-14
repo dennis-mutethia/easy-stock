@@ -50,7 +50,7 @@
             {% set total = stock.selling_price * stock.sold %}
             <tr>
                 <td>{{ stock.name }}</td>
-                <td>{{ stock.category_name }}</td>
+                <td><sub>{{ stock.category_name }}</sub></td>
                 <td class="text-center">{{ helper.format_number(stock.opening) }} {{ '+' ~
                     helper.format_number_with_commas(stock.additions) if stock.additions>0 }}</td>
                 <td class="text-center">{{ helper.format_number(stock.opening +
