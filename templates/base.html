@@ -2,7 +2,7 @@
 <html dir="ltr" lang="en">
 {% include 'head.html' %}
 
-<body class="bg-dark">
+<body class="es-app">
     {% include 'preloader.html' %}
 
     <div id="main-wrapper" data-layout="vertical" data-navbarbg="skin5" data-sidebartype="full"
@@ -18,6 +18,20 @@
 
     {% include 'footer.html' %}
 
+    <script>
+        // Tap outside the menu drawer (the dimmed area) to close it
+        document.addEventListener("DOMContentLoaded", function () {
+            var wrapper = document.getElementById("main-wrapper");
+            if (!wrapper) return;
+            wrapper.addEventListener("click", function (event) {
+                if (event.target === wrapper && wrapper.classList.contains("show-sidebar")) {
+                    wrapper.classList.remove("show-sidebar");
+                    var icon = document.querySelector(".nav-toggler i");
+                    if (icon) icon.classList.add("ti-menu");
+                }
+            });
+        });
+    </script>
 
     <script>
         document.addEventListener("DOMContentLoaded", function () {
