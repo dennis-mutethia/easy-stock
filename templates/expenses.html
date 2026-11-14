@@ -4,7 +4,7 @@
 <!-- ============================================================== -->
 <!-- Container fluid  -->
 <!-- ============================================================== -->
-<div class="container-fluid card table-responsive bg-dark">
+<div class="container-fluid table-responsive">
     <form id="filter-frm" method="GET" class="row">
         <div class="col-5">
             <input onchange="applyFilter()" style="height: 25px" type="date" id="from_date" name="from_date"
@@ -18,12 +18,7 @@
                 required="required" value="{{ to_date }}" max="{{ current_date }}" />
         </div>
     </form><br />
-    <table class="table-bordered table-striped"> 
-        <style>
-            th, td {
-                font-size: x-small;
-            }
-        </style>      
+    <table class="table-bordered table-striped">
         <thead>
             <tr>
                 <th class="text-center">DATE</th>
@@ -31,8 +26,8 @@
                 <th class="text-center">CREATED BY</th>
                 <th class="text-center">AMOUNT</th>
                 <th class="text-center">
-                    <button class="btn btn-primary btn-xs text-white" data-toggle="modal"
-                        data-target="#newModal">Add New Expense</button>
+
+                    <a href="#" class="btn btn-xs btn-primary btn-flat" style="width: 100%" data-toggle="modal" data-target="#newModal">Add New Expense</a>
                 </th>
             </tr>
         </thead>
