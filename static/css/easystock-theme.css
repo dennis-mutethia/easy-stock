@@ -815,3 +815,10 @@ body.es-auth .auth-sub, body.es-auth .auth-label { font-size: 12.5px; }
   body.es-app td:has(> a:not(.btn) > i.mdi-border-color) { right: 44px; }
   body.es-app th[colspan="2"]:has(> a.btn) { min-width: 88px; padding: 6px 4px; }
 }
+
+/* v2.0.3 - nothing is pinned any more: action buttons scroll with the rest of the row */
+body.es-app td, body.es-app th {
+  position: static !important;
+  right: auto !important;
+  box-shadow: none !important;
+}
