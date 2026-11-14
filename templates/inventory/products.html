@@ -41,7 +41,7 @@
                 <th class="text-center">IN STOCK</th>
                 {% if current_user.user_level.id in [0, 1, 2] %}
                 <th class="text-center" colspan="2">
-                    <a href="#" class="btn btn-xs btn-success btn-flat text-white" style="width: 100%; font-weight: bold;" onclick="addNewProduct()"
+                    <a href="#" class="btn btn-xs btn-primary btn-flat" style="width: 100%; font-weight: bold;" onclick="addNewProduct()"
                     data-toggle="modal" data-target="#newModal">ADD NEW
                         <br />PRODUCT</a>
                 </th>
