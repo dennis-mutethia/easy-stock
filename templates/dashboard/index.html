@@ -1,23 +1,17 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<style>
-    .p-10 {
-        background-color: #20242c;
-        color: whitesmoke;
-    }
-</style>
 
 <!-- ============================================================== -->
 <!-- Container fluid  -->
 <!-- ============================================================== -->
-<div class="container-fluid table-responsive bg-dark">
+<div class="container-fluid es-dashboard">
     <form id="filter-frm" method="GET" class="row">
         <div class="col-6 text-right">
-            <label class="text-white">ON THIS DATE (filter)</label>
+            <label class="text-white">Show figures for</label>
         </div>
         <div class="col-6">
-            <input onchange="applyFilter()" style="height: 25px" type="date" id="report_date" name="report_date"
+            <input onchange="applyFilter()" type="date" id="report_date" name="report_date"
                 required="required" value="{{ report_date }}" max="{{ max_date }}" />
         </div>
     </form>
