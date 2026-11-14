@@ -48,7 +48,7 @@
             </style>
             <tr>                 
                 <td id="name_{{ stock.id }}">{{ stock.name }}</td> 
-                <td id="category_{{ stock.id }}">{{ stock.category_name }}</td> 
+                <td id="category_{{ stock.id }}"><sub>{{ stock.category_name }}</sub></td> 
                 <td class="text-center" id="yesterday_{{ stock.id }}">{{ helper.format_number_with_commas(stock.yesterday_opening+stock.yesterday_additions) }}</td> 
                 <td class="text-center">{{ helper.format_number_with_commas(sold) if sold>=0 else '' }}</td>            
                 <td class="text-center" id="opening_{{ stock.id }}">{{ helper.format_number_with_commas(stock.opening) }}</td>        
