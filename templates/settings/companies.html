@@ -27,14 +27,14 @@
                         <i class="mdi mdi-check" style="color: lime;" title="Renew {{ company.name }}">renew</i>
                     </a>
                 </td>
-                <td class="text-center">                    
-                    <a href="#" data-toggle="modal" data-target="#editModal" onclick="editCompany({{ company.id }}, '{{ company.name }}');">
-                        <i class="mdi mdi-border-color" title="Edit {{ company.name }}"></i>
-                    </a>
-                </td>
                 <td class="text-center">
                     <a href="#" data-toggle="modal" data-target="#shopsModal" onclick="fetchShops({{ company.id }});">
                         <i class="mdi mdi-eye" style="color: orange;" title="View Shops">shops</i>
+                    </a>
+                </td>
+<td class="text-center">                    
+                    <a href="#" data-toggle="modal" data-target="#editModal" onclick="editCompany({{ company.id }}, '{{ company.name }}');">
+                        <i class="mdi mdi-border-color" title="Edit {{ company.name }}"></i>
                     </a>
                 </td>
                 <td class="text-center">
