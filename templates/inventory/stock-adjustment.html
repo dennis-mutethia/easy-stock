@@ -4,7 +4,7 @@
 <!-- ============================================================== -->
 <!-- Container fluid  -->
 <!-- ============================================================== -->
-<div class="container-fluid table-responsive bg-dark">
+<div class="container-fluid card">
     <form id="filter-frm" method="GET" class="row">
         <div class="col-6"></div>
         <div class="col-6">
@@ -15,7 +15,10 @@
                 {% endfor %}
             </select>
         </div>
-    </form><br />
+    </form>
+</div>
+
+<div class="container-fluid card table-responsive">
     <table class="table-bordered table-striped">
         <style>
             th, td {
