@@ -50,7 +50,6 @@
             <tr>
                 <th class="text-center" rowspan="2">DATE</th>
                 <th class="text-center" rowspan="2">CUSTOMER</th>
-                <th class="text-center" rowspan="2">SOLD BY</th>
                 <th class="text-center" rowspan="2">TOTAL</th>
                 <th class="text-center" colspan="2">PAID</th>
                 <th class="text-center" rowspan="2">BAL</th>
@@ -70,8 +69,7 @@
                     {% if bill.customer %}
                     {{ bill.customer.name }}
                     {% endif %}
-                </td>
-                <td>{{ bill.user.name }} </td>
+                </td>          
                 <td class="text-right">{{ helper.format_number_with_commas(helper.format_number(bill.total)) }}</td>
                 <td class="text-right text-warning">{{ helper.format_number_with_commas(helper.format_number(bill.cash))
                     }}</td>
