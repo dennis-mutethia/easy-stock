@@ -23,11 +23,11 @@
 <div class="container-fluid card table-responsive">
     <table class="table-striped es-ledger">
         <tbody>
-            <tr style="border-top: 2px solid white;"><td class="text-right">TOTAL SALES</th><th class="text-right" style="width: 20%; border-left: double;">{{ helper.format_number_with_commas(today.total_sales) }}</td><td></td></tr>
+            <tr style="border-top: 2px solid white;"><td class="text-right">TOTAL SALES</td><td class="text-right" style="width: 20%; border-left: double;">{{ helper.format_number_with_commas(today.total_sales) }}</td><td></td></tr>
             <tr><td class="text-right">(Add) PAID DEBTS</td><td class="text-right" style="width: 20%; border-left: double;">+ {{ helper.format_number_with_commas(today.paid_bills) }}</td><td></td></tr>
-            <tr><th class="text-right">(Less) NEW DEBTS</th><th class="text-right" style="width: 20%; border-left: double;">- {{ helper.format_number_with_commas(today.new_bills) }}</th><th></th></tr>
-            <tr><th class="text-right">(Less) EXPENSES</th><th class="text-right" style="width: 20%; border-left: double;">- {{ helper.format_number_with_commas(today.total_expenses) }}</th><th></th></tr>
-            <tr><th class="text-right">(Less) POINTS REDEEMED</th><th class="text-right" style="width: 20%; border-left: double;">- {{ helper.format_number_with_commas(today.total_points_redeemed) }}</th><th></th></tr>
+            <tr><td class="text-right">(Less) NEW DEBTS</td><td class="text-right" style="width: 20%; border-left: double;">- {{ helper.format_number_with_commas(today.new_bills) }}</td><td></td></tr>
+            <tr><td class="text-right">(Less) EXPENSES</td><td class="text-right" style="width: 20%; border-left: double;">- {{ helper.format_number_with_commas(today.total_expenses) }}</td><td></td></tr>
+            <tr><td class="text-right">(Less) POINTS REDEEMED</td><td class="text-right" style="width: 20%; border-left: double;">- {{ helper.format_number_with_commas(today.total_points_redeemed) }}</td><td></td></tr>
             <tr style="border-top: 2px solid white;"><th class="text-right">TOTAL EXPECTED AMOUNT</th><th class="text-right" style="width: 20%; border-left: double;"> {{ helper.format_number_with_commas(total_expected) }}</th><th></th></tr>
             <tr><th class="text-right">CASH RECEIVED</th><th style=" border-left: double;"></th><th class="text-right">{{ helper.format_number_with_commas(today.cash) }}</th></tr>
             <tr><th class="text-right">MPESA RECEIVED</th><th style=" border-left: double;"></th><th class="text-right">{{ helper.format_number_with_commas(today.mpesa) }}</th></tr>
