@@ -97,7 +97,14 @@
         </tbody>
         <tfoot>
             <tr>
-                <th class="text-center" colspan="3"><b><u>TOTAL DEBTS</u></b></th>
+                <th class="text-center" colspan="2"><b><u>TOTAL DEBTS</u></b></th>
+<th class="text-center">
+                    {% if (grand_total - grand_paid) > 0 and customer_id>0 %}                    
+                    <a href="#" onclick="updateBillAmount(0,{{ helper.format_number(grand_total - grand_paid) }});" data-toggle="modal" data-target="#newModal">
+                        <i class="mdi mdi-cash-multiple" title="Pay Multiple Bills">Pay Multiple Bills</i>
+                    </a>
+                    {% endif %}
+                </th>
                 <th class="text-right"><b><u>{{ helper.format_number_with_commas(helper.format_number(grand_total))
                             }}</u></b></th>
                 <th class="text-right text-warning"><b><u>{{
@@ -107,13 +114,7 @@
                 <th class="text-right text-danger"><b><u>{{
                             helper.format_number_with_commas(helper.format_number(grand_total - grand_paid)) }}</u></b>
                 </th>
-                <th class="text-center">
-                    {% if (grand_total - grand_paid) > 0 and customer_id>0 %}                    
-                    <a href="#" onclick="updateBillAmount(0,{{ helper.format_number(grand_total - grand_paid) }});" data-toggle="modal" data-target="#newModal">
-                        <i class="mdi mdi-cash-multiple" title="Pay Multiple Bills">Pay Multiple Bills</i>
-                    </a>
-                    {% endif %}
-                </th>
+                
             </tr>
         </tfoot>
     </table>
