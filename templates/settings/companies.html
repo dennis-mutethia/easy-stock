@@ -24,6 +24,7 @@ CREATED ON<br />
 </td> 
                 <td class="text-center">{{ company.created_at }} <br />
                 <sup class="text-center" style="color: {{ 'red' if company.validity < 7 else 'green' }}">{{ company.validity }} days</sup> 
+</td>
                 <td class="text-center">                  
                     <a href="#" data-toggle="modal" data-target="#renewModal" onclick="renewLicense({{ company.license_id }}, '{{ company.name }}');">
                         <i class="mdi mdi-check" style="color: lime;" title="Renew {{ company.name }}">renew</i>
