@@ -67,10 +67,10 @@
                 <td>
                     {% if bill.customer %}
                     {{ bill.customer.name }}
-                    {% endif %}
-                </td>          
-                <td class="text-right">{{ helper.format_number_with_commas(helper.format_number(bill.total)) }}<br />
+                    {% endif %}<br />
 <sup>[{{ bill.user.name }}]</sup>
+                </td>          
+                <td class="text-right">{{ helper.format_number_with_commas(helper.format_number(bill.total)) }}
 </td>
                 <td class="text-right text-warning">{{ helper.format_number_with_commas(helper.format_number(bill.cash))
                     }}</td>
