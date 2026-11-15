@@ -18,8 +18,7 @@
             {% for company in companies %}
             <tr> 
                 <td>
-{{ company.name }} <br />
-<sup>{{ company.phone }}</sup>
+{{ company.name }}
 </td> 
                 <td class="text-center">{{ company.created_at }}</td> 
                 <td class="text-center" style="color: {{ 'red' if company.validity < 7 else 'green' }}">{{ company.validity }} days</td> 
