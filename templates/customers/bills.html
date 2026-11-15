@@ -48,7 +48,6 @@
                 <th class="text-center" rowspan="2" style="font-size: x-small;">AMOUNT</th>
                 <th class="text-center" colspan="2" style="font-size: x-small;">PAID</th>
                 <th class="text-center" rowspan="2" style="font-size: x-small;">BAL</th>
-                <th class="text-center" rowspan="2" style="font-size: x-small;">ACTION</th>
             </tr>
             <tr>
                 <th class="text-center" style="font-size: x-small;">CASH</th>
@@ -92,13 +91,7 @@
                     helper.format_number_with_commas(helper.format_number(bill.total-bill.paid)) if bill.total >
                     bill.paid else '' }}
 </td>
-                <td class="text-center">
-                    {% if bill.total > bill.paid %}
-                    <a href="#" onclick="updateBillAmount({{ bill.id }},{{ helper.format_number(bill.total-bill.paid) }});" data-toggle="modal" data-target="#newModal">
-                        <i class="mdi mdi-cash-multiple" title="Pay this Bill" style="color: limegreen;">Pay</i>
-                    </a>
-                    {% endif %}
-                </td>
+                
             </tr>
             {% endfor %}
         </tbody>
