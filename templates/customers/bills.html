@@ -64,7 +64,8 @@
                     {% else %}
                     <a href="#" data-toggle="modal" data-target="#newBillModal"
                         onclick="assignCustomerBill({{ bill.id }}, {{ bill.total }})">Assign Customer</a>
-                    {% endif %}
+                    {% endif %}<br />
+<sup>[{{ bill.user.name }}]</sup>
                 </td>
                 <td>
                     {% for date in bill.date_paid %}
@@ -72,8 +73,7 @@
                     {% if not loop.last %} <br /> {% endif %}
                     {% endfor %}
                 </td>
-                <td class="text-right">{{ helper.format_number_with_commas(helper.format_number(bill.total)) }}<br />
-<sup>[{{ bill.user.name }}]</sup>
+                <td class="text-right">{{ helper.format_number_with_commas(helper.format_number(bill.total)) }}
 </td>
                 <td class="text-right text-warning">{{ helper.format_number_with_commas(helper.format_number(bill.cash))
                     }}</td>
