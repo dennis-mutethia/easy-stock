@@ -30,9 +30,9 @@ CREATED ON
                 </td>
                 <td class="text-center">     
                     <a href="#" data-toggle="modal" data-target="#renewModal" onclick="renewLicense({{ company.license_id }}, '{{ company.name }}');">
-                        <i class="mdi mdi-check" style="color: lime;" title="Renew {{ company.name }}">
-<strong style="color: {{ 'red' if company.validity < 7 else 'green' }}">{{ company.validity }} days</strong> <br />             
-renew</i>
+                        <i class="mdi mdi-check" style="color: lime;" title="Renew {{ company.name }}">    renew <br />
+<sub style="color: {{ 'red' if company.validity < 7 else 'green' }}">{{ company.validity }} days remaining</sub>
+</i>
                     </a>
                 </td>
 <td class="text-center">                    
