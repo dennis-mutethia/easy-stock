@@ -10,7 +10,7 @@
         height: 100%;
     }
 </style>
-<div class="container-fluid card table-responsive bg-dark">
+<div class="container-fluid card">
     <form id="filter-frm" method="GET" class="row">
         <div class="col-6">
             <input class="text-center" onchange="applyFilter()" type="date" id="report_date"
@@ -25,7 +25,10 @@
                 {% endfor %}
             </select>
         </div>
-    </form><br />
+    </form>
+</div>
+
+<div class="container-fluid card table-responsive">
     
     <table class="table-bordered table-striped">
         <style>
