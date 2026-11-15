@@ -44,8 +44,8 @@
                 <th rowspan="2" style="font-size: x-small;">CUSTOMER<br />
 <sup>[Sold By]</sup>
 </th>
+<th class="text-center" rowspan="2" style="font-size: x-small;">AMOUNT</th>
                 <th class="text-center" rowspan="2" style="font-size: x-small;">PAID ON</th>
-                <th class="text-center" rowspan="2" style="font-size: x-small;">AMOUNT</th>
                 <th class="text-center" colspan="2" style="font-size: x-small;">PAID</th>
                 <th class="text-center" rowspan="2" style="font-size: x-small;">BAL</th>
             </tr>
@@ -68,6 +68,8 @@
                     {% endif %}<br />
 <sup>[{{ bill.user.name }}]</sup>
                 </td>
+<td class="text-right">{{ helper.format_number_with_commas(helper.format_number(bill.total)) }}
+</td>
                 <td>
 {% if bill.total > bill.paid %}
                     <a href="#" onclick="updateBillAmount({{ bill.id }},{{ helper.format_number(bill.total-bill.paid) }});" data-toggle="modal" data-target="#newModal">
@@ -81,8 +83,7 @@
                     {% endfor %}
 {% endif %}
                 </td>
-                <td class="text-right">{{ helper.format_number_with_commas(helper.format_number(bill.total)) }}
-</td>
+                
                 <td class="text-right text-warning">{{ helper.format_number_with_commas(helper.format_number(bill.cash))
                     }}</td>
                 <td class="text-right text-success">{{
