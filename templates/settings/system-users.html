@@ -15,10 +15,10 @@
             </style>
             <thead>
                 <tr>
-                    <th>NAME</th>
+                    <th>NAME<br />
+<sup>[ROLE]</sup></th>
                     <th>PHONE</th>
-                    <th>ATTACHED SHOP<br />
-<sup>[ROLE]</sup>
+                    <th>ATTACHED SHOP
 </th>
                     <th class="text-center" colspan="3">
                         <a href="#" class="btn btn-xs btn-primary btn-flat" style="width: 100%" data-toggle="modal"
@@ -29,10 +29,10 @@
             <tbody>
                 {% for user in users %}
                 <tr title="{{ user.user_level.description }}">
-                    <td>{{ user.name }}</td>
+                    <td>{{ user.name }}<br />
+                    <sup>[{{ user.user_level.name }}]</sup></td>
                     <td>{{ user.phone }}</td>
-                    <td>{{ user.shop.name }}<br />
-                    <sup>[{{ user.user_level.name }}]</sup>
+                    <td>{{ user.shop.name }}
 </td>
 
                     <td class="text-center">
