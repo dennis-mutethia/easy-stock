@@ -9,8 +9,10 @@
         <thead>
             <tr>
                 <th class="text-center" style="font-size: x-small;">COMPANY NAME</th>
-                <th class="text-center" style="font-size: x-small;">CREATED ON</th>
-                <th class="text-center" style="font-size: x-small;">VALIDITY</th>
+                <th class="text-center" style="font-size: x-small;">
+CREATED ON<br />
+<sup>[VALIDITY]</sup>
+</th>
                 <th class="text-center" colspan="4" style="font-size: x-small;">ACTION</th>
             </tr>
         </thead>
@@ -20,8 +22,8 @@
                 <td>
 {{ company.name }}
 </td> 
-                <td class="text-center">{{ company.created_at }}</td> 
-                <td class="text-center" style="color: {{ 'red' if company.validity < 7 else 'green' }}">{{ company.validity }} days</td> 
+                <td class="text-center">{{ company.created_at }} <br />
+                <sup class="text-center" style="color: {{ 'red' if company.validity < 7 else 'green' }}">{{ company.validity }} days</sup> 
                 <td class="text-center">                  
                     <a href="#" data-toggle="modal" data-target="#renewModal" onclick="renewLicense({{ company.license_id }}, '{{ company.name }}');">
                         <i class="mdi mdi-check" style="color: lime;" title="Renew {{ company.name }}">renew</i>
