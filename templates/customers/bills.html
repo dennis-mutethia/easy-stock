@@ -56,7 +56,9 @@
         <tbody>
             {% for bill in bills %}
             <tr>
-                <td class="text-center">{{ bill.created_at }}</td>
+                <td class="text-center">{{ bill.created_at }}<br />
+<sup>[{{ bill.user.name }}]</sup>
+</td>
                 <td>
                     {% if bill.customer %}
                     {{ bill.customer.name }}
