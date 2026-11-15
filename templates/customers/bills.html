@@ -83,7 +83,13 @@
                     helper.format_number_with_commas(helper.format_number(bill.mpesa)) }}</td>
                 <td class="text-right text-danger">{{
                     helper.format_number_with_commas(helper.format_number(bill.total-bill.paid)) if bill.total >
-                    bill.paid else '' }}</td>
+                    bill.paid else '' }}
+{% if bill.total > bill.paid %}<br />
+                    <a href="#" onclick="updateBillAmount({{ bill.id }},{{ helper.format_number(bill.total-bill.paid) }});" data-toggle="modal" data-target="#newModal">
+                        <i class="mdi mdi-cash-multiple" title="Pay this Bill" style="color: limegreen;">Pay</i>
+                    </a>
+                    {% endif %}
+</td>
                 <td class="text-center">
                     {% if bill.total > bill.paid %}
                     <a href="#" onclick="updateBillAmount({{ bill.id }},{{ helper.format_number(bill.total-bill.paid) }});" data-toggle="modal" data-target="#newModal">
