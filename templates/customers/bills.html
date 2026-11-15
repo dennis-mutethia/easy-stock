@@ -56,8 +56,7 @@
         <tbody>
             {% for bill in bills %}
             <tr>
-                <td class="text-center">{{ bill.created_at }}<br />
-<sup>[{{ bill.user.name }}]</sup>
+                <td class="text-center">{{ bill.created_at }}
 </td>
                 <td>
                     {% if bill.customer %}
@@ -73,7 +72,9 @@
                     {% if not loop.last %} <br /> {% endif %}
                     {% endfor %}
                 </td>
-                <td class="text-right">{{ helper.format_number_with_commas(helper.format_number(bill.total)) }}</td>
+                <td class="text-right">{{ helper.format_number_with_commas(helper.format_number(bill.total)) }}<br />
+<sup>[{{ bill.user.name }}]</sup>
+</td>
                 <td class="text-right text-warning">{{ helper.format_number_with_commas(helper.format_number(bill.cash))
                     }}</td>
                 <td class="text-right text-success">{{
