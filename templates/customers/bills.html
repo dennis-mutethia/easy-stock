@@ -70,10 +70,17 @@
 <sup>[{{ bill.user.name }}]</sup>
                 </td>
                 <td>
+{% if bill.total > bill.paid %}
+                    <a href="#" onclick="updateBillAmount({{ bill.id }},{{ helper.format_number(bill.total-bill.paid) }});" data-toggle="modal" data-target="#newModal">
+                        <i class="mdi mdi-cash-multiple" title="Pay this Bill" style="color: limegreen;">Pay</i>
+                    </a>
+{% else %}
+
                     {% for date in bill.date_paid %}
                     {{ date }} 
                     {% if not loop.last %} <br /> {% endif %}
                     {% endfor %}
+{% endif %}
                 </td>
                 <td class="text-right">{{ helper.format_number_with_commas(helper.format_number(bill.total)) }}
 </td>
@@ -84,11 +91,6 @@
                 <td class="text-right text-danger">{{
                     helper.format_number_with_commas(helper.format_number(bill.total-bill.paid)) if bill.total >
                     bill.paid else '' }}
-{% if bill.total > bill.paid %}<br />
-                    <a href="#" onclick="updateBillAmount({{ bill.id }},{{ helper.format_number(bill.total-bill.paid) }});" data-toggle="modal" data-target="#newModal">
-                        <i class="mdi mdi-cash-multiple" title="Pay this Bill" style="color: limegreen;">Pay</i>
-                    </a>
-                    {% endif %}
 </td>
                 <td class="text-center">
                     {% if bill.total > bill.paid %}
