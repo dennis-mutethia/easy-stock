@@ -23,15 +23,15 @@ CREATED ON
 </td> 
                 <td class="text-center">{{ company.created_at }}
 </td>
-                <td class="text-center">     
-<small style="color: {{ 'red' if company.validity < 7 else 'green' }}">{{ company.validity }} days</small> <br />             
-                    <a href="#" data-toggle="modal" data-target="#renewModal" onclick="renewLicense({{ company.license_id }}, '{{ company.name }}');">
-                        <i class="mdi mdi-check" style="color: lime;" title="Renew {{ company.name }}">renew</i>
-                    </a>
-                </td>
-                <td class="text-center">
+<td class="text-center">
                     <a href="#" data-toggle="modal" data-target="#shopsModal" onclick="fetchShops({{ company.id }});">
                         <i class="mdi mdi-eye" style="color: orange;" title="View Shops">shops</i>
+                    </a>
+                </td>
+                <td class="text-center">     
+<strong style="color: {{ 'red' if company.validity < 7 else 'green' }}">{{ company.validity }} days</strong> <br />             
+                    <a href="#" data-toggle="modal" data-target="#renewModal" onclick="renewLicense({{ company.license_id }}, '{{ company.name }}');">
+                        <i class="mdi mdi-check" style="color: lime;" title="Renew {{ company.name }}">renew</i>
                     </a>
                 </td>
 <td class="text-center">                    
