@@ -20,7 +20,7 @@ CREATED ON
             <tr> 
                 <td>
 {{ company.name }}
-                    <sup class="float-right"><a href="#" data-toggle="modal" data-target="#shopsModal" onclick="fetchShops({{ company.id }});"><br />
+                    <sup><a href="#" data-toggle="modal" data-target="#shopsModal" onclick="fetchShops({{ company.id }});">
                         <i class="mdi mdi-eye" style="color: orange;" title="View Shops">shops</i>
                     </a></sup>
 </td> 
@@ -28,8 +28,9 @@ CREATED ON
 </td>
                 <td class="text-center">     
                     <a href="#" data-toggle="modal" data-target="#renewModal" onclick="renewLicense({{ company.license_id }}, '{{ company.name }}');">
-                        <i class="mdi mdi-check" style="color: lime;" title="Renew {{ company.name }}">    renew</i><br />
-<sub class="float-right" style="color: {{ 'red' if company.validity < 7 else 'green' }}">{{ company.validity }} days</sub>
+                        <i class="mdi mdi-check" style="color: lime;" title="Renew {{ company.name }}">    renew</i>
+<sub class="float-right" style="color: {{ 'red' if company.validity < 7 else 'green' }}"> <br />
+{{ company.validity }} days</sub>
                     </a>
                 </td>
 <td class="text-center">                    
