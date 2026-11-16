@@ -20,7 +20,10 @@ CREATED ON
             {% for company in companies %}
             <tr> 
                 <td>
-{{ company.name }}
+{{ company.name }} <br />
+                    <a href="#" data-toggle="modal" data-target="#shopsModal" onclick="fetchShops({{ company.id }});">
+                        <i class="mdi mdi-eye" style="color: orange;" title="View Shops">shops</i>
+                    </a>
 </td> 
                 <td class="text-center">{{ company.created_at }}
 </td>
