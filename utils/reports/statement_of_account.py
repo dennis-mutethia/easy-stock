@@ -1,6 +1,6 @@
 import pytz
 from datetime import datetime, timedelta
-from flask import render_template, request
+from flask import render_template, request, Response
 from flask_login import current_user
 
 from utils.entities import Statement
@@ -74,22 +74,50 @@ class StatementOfAccount():
 
             return statements 
          
-    def __call__(self):        
+    def _resolve_dates(self):
+        """Same defaults as the page: this month so far, up to yesterday."""
         yesterday = datetime.now(pytz.timezone("Africa/Nairobi")) - timedelta(days=1)
         max_date = yesterday.strftime('%Y-%m-%d')
-        
+
         from_date = datetime.now(pytz.timezone("Africa/Nairobi")).replace(day=1).strftime('%Y-%m-%d')
         to_date = max_date
-        
-        if request.method == 'GET':   
-            try:    
+
+        if request.method == 'GET':
+            try:
                 from_date = request.args.get('from_date', from_date)
                 to_date = request.args.get('to_date', to_date)
             except Exception as e:
-                print(f"An error occurred: {e}")               
-        
-        statements = self.fetch(from_date, to_date) 
-                    
+                print(f"An error occurred: {e}")
+        return from_date, to_date, max_date
+
+    def __call__(self):
+        from_date, to_date, max_date = self._resolve_dates()
+
+        statements = self.fetch(from_date, to_date)
+
         return render_template('reports/statement-of-account.html', page_title='Reports >Statement of Account', helper=Helper(), menu='reports', sub_menu='statement_of_account',
                                statements=statements, from_date=from_date, to_date=to_date, max_date=max_date
                                )
+
+    def download_pdf(self):
+        """Same data as the page, returned as a PDF the client can send to a bank."""
+        from_date, to_date, _ = self._resolve_dates()
+        try:
+            datetime.strptime(from_date, '%Y-%m-%d')
+            datetime.strptime(to_date, '%Y-%m-%d')
+        except ValueError:
+            return "Invalid date range", 400
+        if from_date > to_date:
+            from_date, to_date = to_date, from_date
+
+        statements = self.fetch(from_date, to_date)
+
+        from utils.reports.statement_pdf import build_statement_pdf
+        pdf_bytes = build_statement_pdf(current_user.shop.name, from_date, to_date, statements)
+
+        filename = f"statement-of-account_{from_date}_to_{to_date}.pdf"
+        return Response(
+            pdf_bytes,
+            mimetype='application/pdf',
+            headers={'Content-Disposition': f'attachment; filename="{filename}"'}
+        )
