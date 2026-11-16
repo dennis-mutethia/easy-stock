@@ -84,9 +84,9 @@ def build_statement_pdf(shop_name, from_date, to_date, statements):
         if sales > 0:
             lines.append(('Sales', _money(sales), ''))
         if purchases > 0:
-            lines.append(('Purchases', '', _money(purchases)))
+            lines.append(('Purchases', '', '-'+_money(purchases)))
         if expenses > 0:
-            lines.append(('Expenses', '', _money(expenses)))
+            lines.append(('Expenses', '', '-'+_money(expenses)))
         for n, (label, money_in, money_out) in enumerate(lines):
             if n == 0:
                 date_rows.append(len(rows))
@@ -96,7 +96,7 @@ def build_statement_pdf(shop_name, from_date, to_date, statements):
         rows.append(['', 'No transactions in this period', '', ''])
 
     body_end = len(rows) - 1
-    rows.append(['Totals', '', _money(total_in), _money(total_out)])
+    rows.append(['Totals', '', _money(total_in), '-'+_money(total_out)])
     balance = total_in - total_out
     rows.append(['Balance', '',
                  ('+' + _money(balance)) if balance > 0 else '',
