@@ -222,6 +222,11 @@ def profitReport():
 def statementOfAccount():
     return StatementOfAccount(db)()
 
+@app.route('/statement-of-account/pdf', methods=['GET'])
+@login_required
+def statementOfAccountPdf():
+    return StatementOfAccount(db).download_pdf()
+
 @app.route('/stock-report', methods=['GET'])
 @login_required
 def stockReport():
