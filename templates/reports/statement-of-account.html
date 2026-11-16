@@ -53,18 +53,22 @@
                 <td class="text-right"> {{ helper.format_number_with_commas(statement.sales) if statement.sales>0 }} </td>
                 <td class="text-right" style="border-left: double"></td>
             </tr>
+{% if statement.purchases>0 %}
             <tr>
                 <td></td>
-                <td>{{ 'Purchases' if statement.purchases>0 }}</td>
+                <td>Purchases</td>
                 <td></td>
-                <td class="text-right" style="border-left: double">{{ '-'~helper.format_number_with_commas(statement.purchases) if statement.purchases>0 }}</td>
+                <td class="text-right" style="border-left: double">-{{ helper.format_number_with_commas(statement.purchases) }}</td>
             </tr>
+{% endif %}
+{% if statement.expenses>0 %}
             <tr>
                 <td></td>
-                <td>{{ 'Expenses' if statement.expenses>0 }}</td>
+                <td>Expenses</td>
                 <td></td>
-                <td class="text-right" style="border-left: double">{{ '-'~helper.format_number_with_commas(statement.expenses) if statement.expenses>0 }}</td>
+                <td class="text-right" style="border-left: double">-{{ helper.format_number_with_commas(statement.expenses) }}</td>
             </tr>
+{% endif %}
             {% endfor %}
         </tbody>
         <tfoot>
