@@ -12,7 +12,6 @@
                 <th class="text-center" style="font-size: x-small;">
 CREATED ON
 </th>
-<th></th>
                 <th class="text-center" colspan="3" style="font-size: x-small;">ACTION</th>
             </tr>
         </thead>
@@ -27,11 +26,6 @@ CREATED ON
 </td> 
                 <td class="text-center">{{ company.created_at }}
 </td>
-<td class="text-center">
-                    <a href="#" data-toggle="modal" data-target="#shopsModal" onclick="fetchShops({{ company.id }});">
-                        <i class="mdi mdi-eye" style="color: orange;" title="View Shops">shops</i>
-                    </a>
-                </td>
                 <td class="text-center">     
                     <a href="#" data-toggle="modal" data-target="#renewModal" onclick="renewLicense({{ company.license_id }}, '{{ company.name }}');">
                         <i class="mdi mdi-check" style="color: lime;" title="Renew {{ company.name }}">    renew</i><br />
