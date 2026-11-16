@@ -831,3 +831,6 @@ body.es-app table th:first-child { min-width: 0; }
 body.es-app table { border-right: 0; }
 body.es-app table th,
 body.es-app table td { border-right: 1px solid var(--line); }
+
+/* v2.0.7 - first column minimum width 88px -> 72px */
+body.es-app table td:first-child { min-width: 72px; }
