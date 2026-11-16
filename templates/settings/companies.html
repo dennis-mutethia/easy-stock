@@ -18,7 +18,7 @@ CREATED ON
         <tbody>
             {% for company in companies %}
             <tr> 
-                <td>
+                <td class="text-center">
 {{ company.name }} <br />
                     <a href="#" data-toggle="modal" data-target="#shopsModal" onclick="fetchShops({{ company.id }});">
                         <i class="mdi mdi-eye" style="color: orange;" title="View Shops">shops</i>
