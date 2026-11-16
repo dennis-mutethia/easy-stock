@@ -825,3 +825,9 @@ body.es-app td, body.es-app th {
 
 /* v2.0.4 - header cells are never treated as the "first column" for min-width */
 body.es-app table th:first-child { min-width: 0; }
+
+
+/* v2.0.5 - column borders back on all tables */
+body.es-app table { border-right: 0; }
+body.es-app table th,
+body.es-app table td { border-right: 1px solid var(--line); }
