@@ -8,7 +8,6 @@
     <table class="table-striped table-bordered table-condensed">
         <thead>
             <tr>
-<th></th>
                 <th class="text-center" style="font-size: x-small;">COMPANY NAME</th>
                 <th class="text-center" style="font-size: x-small;">
 CREATED ON
@@ -19,12 +18,11 @@ CREATED ON
         <tbody>
             {% for company in companies %}
             <tr> 
-<td>{{ loop.index }}.</td>
-                <td class="text-center">
+                <td>
 {{ company.name }} <br />
-                    <a href="#" data-toggle="modal" data-target="#shopsModal" onclick="fetchShops({{ company.id }});">
+                    <sup class="pull-right"><a href="#" data-toggle="modal" data-target="#shopsModal" onclick="fetchShops({{ company.id }});">
                         <i class="mdi mdi-eye" style="color: orange;" title="View Shops">shops</i>
-                    </a>
+                    </a></sup>
 </td> 
                 <td class="text-center">{{ company.created_at }}
 </td>
