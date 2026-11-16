@@ -56,13 +56,14 @@ class StatementOfAccount():
                 UNION SELECT * FROM expenses
             )
             SELECT date, MAX(total_sales) AS total_sales, MAX(total_purchases) AS total_purchases, MAX(expenses) AS expenses
-            FROM final 
+            FROM final
+            WHERE date BETWEEN DATE(%s) AND DATE(%s)
             GROUP BY date
             ORDER BY date ASC
             """
             params = [
                 current_user.shop.id, from_date, to_date,
-                current_user.shop.id, from_date, to_date
+                current_user.shop.id, from_date, to_date, from_date, to_date
             ]
             
             cursor.execute(query, tuple(params))
