@@ -17,8 +17,8 @@
             <input class="text-center" onchange="applyFilter()" style="height: 25px" type="date" id="to_date" name="to_date"
                 required="required" value="{{ to_date }}" max="{{ max_date }}" />
         </div>
-<div class="col-3 text-center">
-        <a class="btn-xs btn-success"
+<div class="col-2 text-center">
+        <a class=""
             href="{{ url_for('statementOfAccountPdf', from_date=from_date, to_date=to_date) }}">Download PDF</a>
     </div>
     </form>
