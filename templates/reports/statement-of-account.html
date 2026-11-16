@@ -49,8 +49,8 @@
                 <td>
                     {{ statement.date }}
                 </td>
-                <td>{{ 'Sales' if statement.sales>0 }}</td>
-                <td class="text-right"> {{ helper.format_number_with_commas(statement.sales) if statement.sales>0 }} </td>
+                <td>Sales</td>
+                <td class="text-right"> {{ helper.format_number_with_commas(statement.sales) if statement.sales>0 else 0 }} </td>
                 <td class="text-right" style="border-left: double"></td>
             </tr>
 {% if statement.purchases>0 %}
