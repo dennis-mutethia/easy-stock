@@ -8,7 +8,6 @@
     <table class="table-bordered table-striped">
         <thead>
             <tr>
-                <th class="text-center">CARD NO</th>
                 <th>CUSTOMER NAME</th>
                 <th class="text-center">PHONE</th>
                 <th class="text-center">POINTS</th>
@@ -22,8 +21,9 @@
         <tbody>
             {% for card in cards %}
             <tr>
-                <td class="text-center">{{ card.card_no }}</td>
-                <td>{{ card.name }}</td>
+                <td>{{ card.name }} <br />
+<sub>[{{ card.card_no }}]</sub>
+</td>
                 <td>{{ card.phone }}</td>
                 <td class="text-center">{{ card.points }}</td>
                 <td class="text-center">
