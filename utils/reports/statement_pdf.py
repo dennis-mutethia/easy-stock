@@ -81,8 +81,8 @@ def build_statement_pdf(shop_name, from_date, to_date, statements):
         total_in += sales
         total_out += purchases + expenses
         lines = []
-        if sales > 0:
-            lines.append(('Sales', _money(sales), ''))
+        
+        lines.append(('Sales', _money(sales), ''))
         if purchases > 0:
             lines.append(('Purchases', '', '-'+_money(purchases)))
         if expenses > 0:
