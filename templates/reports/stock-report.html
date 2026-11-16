@@ -54,11 +54,7 @@
             <tr>
                 <td>{{ stock.name }}</td>
                 <td><sub>{{ stock.category_name }}</sub></td>
-                <td class="text-center">{{ helper.format_number(stock.opening) }} 
-{% if stock.additions>0 %}
-{{ '+'  ~ helper.format_number_with_commas(stock.additions) ~ ' =' ~ helper.format_number_with_commas(stock.opening+stock.additions) }}
-
-{% endif %}
+                <td class="text-center">{{ helper.format_number(stock.opening) ('+'  ~ helper.format_number_with_commas(stock.additions) if stock.additions>0) }}
 </td>
                 <td class="text-center">{{ helper.format_number(stock.opening +
                     stock.additions - stock.sold) }}</td>
