@@ -19,8 +19,8 @@ CREATED ON
             {% for company in companies %}
             <tr> 
                 <td>
-{{ company.name }} <br /> <br />
-                    <sup class="float-right"><a href="#" data-toggle="modal" data-target="#shopsModal" onclick="fetchShops({{ company.id }});">
+{{ company.name }}
+                    <sup class="float-right"><a href="#" data-toggle="modal" data-target="#shopsModal" onclick="fetchShops({{ company.id }});"><br />
                         <i class="mdi mdi-eye" style="color: orange;" title="View Shops">shops</i>
                     </a></sup>
 </td> 
