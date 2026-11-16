@@ -17,11 +17,11 @@
             <input class="text-center" onchange="applyFilter()" style="height: 25px" type="date" id="to_date" name="to_date"
                 required="required" value="{{ to_date }}" max="{{ max_date }}" />
         </div>
-    <div class="mt-2">
+    </form>
+<div class="mt-2">
         <a class="btn btn-xs btn-success" style="width: 100%"
             href="{{ url_for('statementOfAccountPdf', from_date=from_date, to_date=to_date) }}">Download PDF for bank</a>
     </div>
-    </form>
 </div>
 
 <div class="container-fluid card table-responsive">
