@@ -4,5 +4,6 @@ flask-jwt-extended
 psycopg2-binary
 python-dotenv
 pytz
+reportlab
 requests
 user-agents
