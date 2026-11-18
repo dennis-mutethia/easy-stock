@@ -40,7 +40,7 @@ class CustomerBills():
                 query += " AND customer_id=%s"
                 params.append(customer_id)
             
-            query += " ORDER BY id DESC"
+            query += " ORDER BY created_at DESC"
             cursor.execute(query, tuple(params))
             data = cursor.fetchall()
 
