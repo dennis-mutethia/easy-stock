@@ -13,6 +13,30 @@
             td {
                 color: inherit;
             }
+
+.copy-value {
+    cursor: pointer;
+    color: #007bff;
+    background: #f0f6ff;
+    padding: 5px 8px;
+    border-radius: 4px;
+    user-select: none;
+    display: inline-block;
+}
+
+.copy-value:hover {
+    background: #dceaff;
+}
+
+.copy-value i {
+    margin-left: 5px;
+    font-size: 12px;
+}
+
+.copy-value.copied {
+    color: #28a745;
+    background: #e5f8eb;
+}
         </style>
         <div class="col-12">
             <div class="alert alert-{{ package.color }}" role="alert">
@@ -201,6 +225,34 @@
             }
         });
     }
+
+function copyPaymentValue(value, element) {
+    navigator.clipboard.writeText(value).then(() => {
+        const original = element.innerHTML;
+
+        element.innerHTML = 'Copied! <i class="fa fa-check"></i>';
+        element.classList.add('copied');
+
+        setTimeout(() => {
+            element.innerHTML = original;
+            element.classList.remove('copied');
+        }, 1500);
+
+    }).catch(() => {
+        // Fallback for older browsers
+        const input = document.createElement('textarea');
+        input.value = value;
+        input.style.position = 'fixed';
+        input.style.opacity = '0';
+        document.body.appendChild(input);
+        input.select();
+        document.execCommand('copy');
+        document.body.removeChild(input);
+
+        element.innerHTML = 'Copied! <i class="fa fa-check"></i>';
+    });
+}
+
 </script>
 
 {% endblock %}
