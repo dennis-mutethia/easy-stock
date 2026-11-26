@@ -14,7 +14,7 @@ class Helper():
         if isinstance(number, float) and number.is_integer():
             return int(number)
         elif isinstance(number, float):
-            return f"{number:,.2f}"
+            return f"{round(number, 2):g}"
         return number
 
     @staticmethod
