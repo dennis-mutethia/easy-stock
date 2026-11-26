@@ -44,7 +44,7 @@
                 <td>{{ purchase.name }}</td>
                 <td><sub>{{ purchase.category_name }}</sub></td>
                 <td class="text-center">{{ helper.format_number(purchase.additions) }}</td>
-                <td class="text-center">{{ helper.format_number_with_commas(helper.format_number(purchase.purchase_price)) }}</td>
+                <td class="text-center">{{ helper.format_number(helper.format_number(purchase.purchase_price)) }}</td>
                 <td class="text-right">{{ helper.format_number_with_commas(helper.format_number(total))}}</td>
             </tr>
             {% endfor %}
