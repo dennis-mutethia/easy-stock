@@ -13,6 +13,8 @@ class Helper():
         """Return int if float is whole, otherwise return as-is."""
         if isinstance(number, float) and number.is_integer():
             return int(number)
+        elif isinstance(number, float):
+            return f"{value:,.2f}"
         return number
 
     @staticmethod
