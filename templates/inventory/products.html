@@ -62,7 +62,7 @@
                 <td>{{ product.name }}</td>
                 <td><sub>{{ product.category_name }}</sub></td>
                 {% if current_user.user_level.id in [0, 1, 2] %}
-                <td class="text-center">{{ helper.format_number_with_commas(product.purchase_price) }}</td>
+                <td class="text-center">{{ helper.format_number(product.purchase_price) }}</td>
                 {% endif %}
                 <td class="text-center">{{ helper.format_number_with_commas(product.selling_price) }}</td>
                 <td class="text-center">{{ helper.format_number(product.opening+product.additions) }}</td>
